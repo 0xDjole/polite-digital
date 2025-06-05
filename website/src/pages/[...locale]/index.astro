@@ -1,0 +1,44 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Hero from "@components/Hero/index.astro";
+import LogoCloud from "@components/LogoCloud/index.astro";
+import Feature5 from "@components/Feature/Feature5.astro";
+import Feature10 from "@components/Feature/Feature10.astro";
+import Testimonials from "@components/Testimonials/index.astro";
+import Pricing from "@components/Pricing/index.astro";
+import Faq from "@components/Faq/index.astro";
+import ContactForm from "@components/Forms/ContactForm.svelte";
+import { cmsApi, getBlockFromArray } from "@lib/index";
+import { defaultLocale, locales } from "@lib/i18n";
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({
+		params: {
+			locale: locale === defaultLocale ? undefined : locale,
+		},
+		props: { locale },
+	}));
+}
+
+const { locale = defaultLocale } = Astro.props;
+
+const { getCollection, getBlockObjectValues } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const siteData = getBlockFromArray(websiteCollection, "info", locale);
+---
+
+<BaseLayout title={siteData.title} description={siteData.description}>
+	<Hero />
+	<LogoCloud />
+	<Feature10 />
+	<Testimonials />
+	<Pricing />
+	<Faq />
+
+	<div class="mt-24 md:mt-36">
+		<div class="site-container flex justify-center">
+			<ContactForm client:load />
+		</div>
+	</div>
+</BaseLayout>

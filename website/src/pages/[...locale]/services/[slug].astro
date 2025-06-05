@@ -1,0 +1,42 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { defaultLocale, getLocale, locales } from "@lib/i18n";
+import { cmsApi, getBlockFromArray } from "@lib/index";
+import Service from "@lib/Reservation/Service/index.svelte";
+
+const API_URL = import.meta.env.PUBLIC_API_URL;
+const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
+
+export async function getStaticPaths() {
+	const API_URL = import.meta.env.PUBLIC_API_URL;
+	const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
+
+	const res = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/services?limit=100`);
+	const { items } = await res.json();
+
+	return items.flatMap((service) =>
+		locales.map((locale) => ({
+			params: {
+				slug: service.slug,
+				locale: locale === defaultLocale ? undefined : locale,
+			},
+			props: { locale },
+		})),
+	);
+}
+
+const { slug } = Astro.params;
+
+const serviceRes = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/services/${slug}`);
+const service = await serviceRes.json();
+
+const { getCollection, getBlockObjectValues } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const currLocale = getLocale(Astro.currentLocale);
+const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
+---
+
+<BaseLayout title={siteData.title} description={siteData.description}>
+	<Service client:load service={service} />
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+/**
+ * * FAQ section in accordions
+ */
+
+// components
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@components/Accordion";
+import { getLocale } from "@lib/i18n";
+
+import { cmsApi } from "@lib/index";
+
+const { getCollection, getBlockObjectValues } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const currLocale = getLocale(Astro.currentLocale);
+const faqData = getBlockObjectValues(websiteCollection, "faq", currLocale);
+---
+
+<section id="faq" class="site-container my-24 md:my-36">
+	<div class="flex justify-center">
+		<p class="colored-title inline">FAQ</p>
+	</div>
+	<h2 class="h2 mt-8 text-center">Answers to all your questions</h2>
+	<div class="mx-auto mt-10 flex max-w-3xl flex-col gap-3">
+		<Accordion class="space-y-3">
+			{
+				faqData.map((faqItem, idx) => (
+					<AccordionItem value={`item-${idx}`}>
+						<AccordionTrigger>{faqItem.question}</AccordionTrigger>
+						<AccordionContent class="markdown-content" details={faqItem.answer} />
+					</AccordionItem>
+				))
+			}
+		</Accordion>
+	</div>
+</section>

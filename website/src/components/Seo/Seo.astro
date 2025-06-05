@@ -1,0 +1,72 @@
+---
+import { SEO } from "astro-seo";
+
+import { cmsApi, getImageUrl } from "@lib/index";
+
+const { getCollection } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const siteData = getBlockFromArray(websiteCollection, "info", "en");
+
+// component import
+import HrefLang from "./HrefLang.astro";
+import { getBlockFromArray } from "@lib/index";
+
+interface BaseProps {
+	title: string;
+	description: string;
+	noindex?: boolean;
+}
+
+interface GenProps extends BaseProps {
+	type: "general";
+	image?: ImageMetadata;
+}
+
+const { type, title, description, image, noindex = false } = Astro.props as GenProps;
+
+let optimizedImage;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+
+const imageUrl = getImageUrl(siteData.logo);
+---
+
+<SEO
+	title={title}
+	description={description}
+	canonical={canonicalUrl.toString()}
+	openGraph={{
+		basic: {
+			title: title,
+			type: "website",
+			image: imageUrl,
+			url: canonicalUrl.toString(),
+		},
+		optional: {
+			description: description,
+			siteName: siteData.title,
+		},
+		image: {
+			type: "image/webp",
+			width: optimizedImage?.attributes.width || "1200",
+			height: optimizedImage?.attributes.height || "800",
+			alt: title,
+		},
+	}}
+	twitter={{
+		site: "@" + siteData.authorTwitter,
+		creator: "@" + siteData.authorTwitter,
+		card: "summary_large_image",
+		title: title,
+		description: description,
+		image: imageUrl,
+	}}
+	noindex={noindex}
+	nofollow={noindex}
+/>
+
+<!-- hreflang attributes -->
+<HrefLang />
+
+<!-- JSON LD -->
+<Fragment></Fragment>

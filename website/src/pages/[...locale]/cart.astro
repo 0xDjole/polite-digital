@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+import { cmsApi, getBlockFromArray } from "@lib/index";
+import Cart from "@lib/Reservation/Cart/index.svelte";
+import { defaultLocale, getLocale, locales } from "@lib/i18n";
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({
+		params: {
+			locale: locale === defaultLocale ? undefined : locale,
+		},
+		props: { locale },
+	}));
+}
+
+const { getCollection, getBlockObjectValues } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const currLocale = getLocale(Astro.currentLocale);
+const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
+---
+
+<BaseLayout title={siteData.title} description={siteData.description}>
+	<Cart client:load />
+</BaseLayout>

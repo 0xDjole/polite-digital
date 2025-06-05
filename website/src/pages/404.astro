@@ -1,0 +1,62 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Button from "@components/Button/Button.astro";
+import { getLocaleFromUrl, getRelativeLocaleUrl, t } from "@lib/i18n";
+
+// Detect the locale from the current URL
+const currentLocale = getLocaleFromUrl(Astro.url);
+---
+
+<BaseLayout
+	title={t("notFound.title", currentLocale)}
+	description={t("notFound.description", currentLocale)}
+	noindex={true}
+>
+	<div class="mt-24 md:mt-36">
+		<div class="site-container flex max-w-2xl">
+			<div class="group bg-gradient-primary relative h-full w-full overflow-hidden rounded-2xl">
+				<!-- Glow effects using theme variables -->
+				<div
+					class="glow-primary absolute top-0 right-0 -z-10 mx-auto aspect-square w-[20%] blur-3xl"
+				>
+				</div>
+				<div
+					class="glow-secondary absolute bottom-0 left-0 -z-10 mx-auto aspect-square w-[20%] blur-3xl"
+				>
+				</div>
+				<!-- Border effect -->
+				<div class="relative z-10 p-1">
+					<div
+						class="bg-card hover-lift flex flex-col gap-4 rounded-xl px-6 py-12 text-center shadow-lg transition-all duration-300"
+					>
+						<div
+							class="bg-gradient-secondary mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full"
+						>
+							<span class="text-4xl">🔍</span>
+						</div>
+						<h1 class="h1 mb-2">{t("notFound.heading", currentLocale)}</h1>
+						<p class="description mx-auto max-w-md text-lg">
+							{t("notFound.message", currentLocale)}
+						</p>
+						<div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+							<Button
+								variant="primary"
+								href={getRelativeLocaleUrl(currentLocale, "/")}
+								class="hover-lift"
+							>
+								{t("notFound.homeButton", currentLocale)}
+							</Button>
+							<Button
+								variant="outline"
+								href={getRelativeLocaleUrl(currentLocale, "/services")}
+								class="hover-lift"
+							>
+								{t("notFound.servicesButton", currentLocale)}
+							</Button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</BaseLayout>

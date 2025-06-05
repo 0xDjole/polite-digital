@@ -1,0 +1,67 @@
+---
+import { type CollectionEntry } from "astro:content";
+
+import BaseHead from "@layouts/BaseHead.astro";
+import Nav from "@components/Nav/Nav.astro";
+import Footer from "@components/Footer/Footer.astro";
+import "@/styles/global.css";
+
+import { getLocale } from "@lib/i18n";
+
+interface Props {
+	type?: "blog" | "general";
+	title: string;
+	description: string;
+	heroImage?: ImageMetadata;
+	authorsData?: CollectionEntry<"authors">[];
+	postFrontmatter?: CollectionEntry<"blog">["data"];
+	noindex?: boolean;
+}
+
+const {
+	type = "general",
+	title,
+	description,
+	heroImage,
+	authorsData,
+	postFrontmatter,
+	noindex = false,
+} = Astro.props as Props;
+
+const currLocale = getLocale(Astro.currentLocale);
+---
+
+<!doctype html>
+<html lang={currLocale} class="use-animations" transition:animate="fade">
+	<head>
+		<BaseHead
+			type={type}
+			title={title}
+			description={description}
+			image={heroImage ? heroImage : undefined}
+			authors={authorsData ? authorsData : undefined}
+			postFrontmatter={postFrontmatter ? postFrontmatter : undefined}
+			noindex={noindex}
+		/>
+	</head>
+	<body id="body" class="">
+		<div class="min-h-[100lvh]">
+			<Nav />
+			<main class="">
+				<slot />
+			</main>
+		</div>
+		<Footer />
+
+		<!-- Scroll animations -->
+		<script>
+			import AOS from "@lib/aos/aos";
+
+			// Run on initial page load
+			AOS.init();
+
+			// Run on view transitions navigation
+			document.addEventListener("astro:after-swap", AOS.refreshHard);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,56 @@
+---
+import { Icon } from "astro-icon/components";
+import { cmsApi, getBlockFromArray, getBlockObjectValues } from "@lib/index";
+import Button from "@components/Button/Button.astro";
+import { getLocale } from "@lib/i18n";
+
+const currLocale = getLocale(Astro.currentLocale);
+
+const { getCollection, getImageUrl } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const info = getBlockFromArray(websiteCollection, "info", currLocale);
+
+const heroTitle = info.heroTitle;
+const heroSubtitle = info.heroSubtitle;
+const heroImage = info.heroImage;
+---
+
+<section id="hero1" class="relative mt-20 h-[65vh] w-full overflow-hidden">
+	<!-- full‑bleed image -->
+	<img
+		src={heroImage ? getImageUrl(heroImage, false) : "/images/default-hero.jpg"}
+		alt={heroTitle}
+		class="absolute inset-0 h-full w-full object-cover"
+		loading="lazy"
+		referrerpolicy="no-referrer"
+	/>
+	<div class="absolute inset-0 bg-gray-900/60"></div>
+
+	<div
+		class="relative z-10 flex h-full w-full flex-col items-center justify-center px-4 text-center text-white"
+	>
+		<div class="mb-4 flex items-center justify-center" data-aos="fade-up" data-aos-trigger="#hero1">
+			<a
+				href="/blog/tsconfig-paths-setup/"
+				class="flex items-center gap-2 rounded-full border border-cyan-400/60 px-4 py-1 text-sm ring-1 ring-cyan-400/30 transition hover:border-cyan-300/80"
+			>
+				<Icon name="mdi:wand" class="inline h-4 w-4 text-cyan-300" aria-hidden="true" />
+				<span>New updates!</span>
+			</a>
+		</div>
+
+		<h1
+			data-aos="fade-up"
+			class="bg-gradient-to-r from-white to-gray-200 bg-clip-text pb-2 text-3xl font-semibold text-transparent sm:text-4xl md:text-5xl lg:text-6xl"
+		>
+			{heroTitle}
+		</h1>
+		<p class="mx-auto mt-2 max-w-md opacity-90 md:max-w-lg">{heroSubtitle}</p>
+
+		<div class="mx-auto mt-8 flex max-w-xs flex-col justify-center gap-4 sm:max-w-sm sm:flex-row">
+			<Button variant="primary" href="#pricing" class="cta">Get Started</Button>
+			<Button variant="outline" href="#features" arrow="right" class="cta">Overview</Button>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,93 @@
+name: Terraform update state
+
+on:
+  #  schedule:
+  #    - cron: '44 2 * * *'
+  #  push:
+  #    branches: [ "master" ]
+  #    tags: [ '*.*.*' ]
+  pull_request:
+    branches: ["master"]
+    types:
+      - closed
+env:
+  TF_VAR_ROOT_DOMAIN: ${{ secrets.ROOT_DOMAIN }}
+  TF_VAR_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  TF_VAR_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  TF_VAR_CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    outputs:
+      first_time: ${{ steps.run.outputs.first_time }}
+    steps:
+
+  build:
+    runs-on: [self-hosted, linux, arm64]
+    needs: prebuild
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      actions: write
+    outputs:
+      first_time: ${{ needs.prebuild.outputs.first_time }}
+      tf_plan: ${{ steps.plan.outputs.tf_plan }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install Wrangler globally
+        run: npm install -g wrangler
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: 1.6.4
+
+      - name: TF init
+        run: terraform -chdir=deploy init -upgrade
+      - name: TF plan
+        continue-on-error: true
+        id: plan
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+        run: |
+          export TF_LOG=DEBUG
+          export HELM_DEBUG=1
+
+          output=$(hcloud server list -o columns=name,ipv4 | grep 'master-node' | awk '{print $2}')
+          if [ -z "$output" ]; then
+            echo "No master node found"
+          else
+            mkdir -p $(dirname $TF_VAR_KUBECONFIG_PATH)
+            ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa_arky root@$(hcloud server list -o columns=name,ipv4 | grep 'master-node' | awk '{print $2}') cat ~/.kube/config > $TF_VAR_KUBECONFIG_PATH
+            sed -i "s/127.0.0.1/$(hcloud server list -o columns=name,ipv4 | grep 'master-node' | awk '{print $2}')/g" $TF_VAR_KUBECONFIG_PATH
+            chmod 700 $TF_VAR_KUBECONFIG_PATH
+            ssh -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa_arky root@$output "cat $HOME/terraform.tfstate" > deploy/terraform.tfstate || echo "No state file found on master"
+          fi
+
+          terraform -chdir=deploy plan -out=tfplan.out
+          terraform -chdir=deploy show -json tfplan.out > tfplan.json
+          curl -i -X POST -H 'Content-Type: application/json' -d '{"text": "I Plan finished. ✅"}' https://mati.yepi.io/hooks/o9p1bcd6ejy1ug681ggnjccbyw
+
+      - name: TF apply
+        continue-on-error: true
+        id: apply
+        env:
+          HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+        run: |
+          terraform -chdir=deploy apply -auto-approve "tfplan.out"
