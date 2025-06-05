@@ -1,6 +1,4 @@
 /.terraform/*
-/*.tfstate
-/*.tfstate.*
 /crash.log
 /crash.*.log
 /*.tfvars
@@ -12,7 +10,6 @@
 /.terraformrc
 /terraform.rc
 /.terraform.lock.hcl
-/terraform.tfstate
 /kubeconfig.yaml
 /kubeconfig.yaml-e
 /lb_ip

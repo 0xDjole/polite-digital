@@ -15,14 +15,28 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.4
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Pull latest changes
+        run: |
+          git pull origin master
 
       - name: Terraform Init
         working-directory: ./deploy
@@ -35,3 +49,9 @@ jobs:
       - name: Terraform Apply
         working-directory: ./deploy
         run: terraform apply -auto-approve tfplan
+
+      - name: Commit state file
+        run: |
+          git add deploy/terraform.tfstate deploy/terraform.tfstate.backup
+          git diff --staged --quiet || git commit -m "Update Terraform state [skip ci]"
+          git push origin master
