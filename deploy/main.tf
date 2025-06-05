@@ -16,11 +16,24 @@ terraform {
   }
 }
 
-# Website (Astro) deployment without Git integration (manual deployment)
+# Website (Astro) deployment with Git integration
 resource "cloudflare_pages_project" "polite_website" {
   account_id        = var.CLOUDFLARE_ACCOUNT_ID
   name              = "polite-digital"
   production_branch = "master"
+
+  # Git integration
+  source {
+    type = "github"
+    config {
+      owner                         = var.GITHUB_OWNER
+      repo_name                     = "polite-digital"
+      production_branch             = "master"
+      pr_comments_enabled           = true
+      deployments_enabled           = true
+      production_deployment_enabled = true
+    }
+  }
 
   # Build configuration
   build_config {
@@ -42,7 +55,7 @@ resource "cloudflare_pages_project" "polite_website" {
   }
 }
 
-# No manual deployment needed - Pages will auto-deploy from GitHub
+# Pages will now auto-deploy from GitHub on every push to master
 
 resource "cloudflare_pages_domain" "polite_website_domain" {
   account_id   = var.CLOUDFLARE_ACCOUNT_ID
