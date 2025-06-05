@@ -19,7 +19,7 @@ terraform {
 # Website (Astro) deployment with Git integration
 resource "cloudflare_pages_project" "polite_website" {
   account_id        = var.CLOUDFLARE_ACCOUNT_ID
-  name              = "polite-digital"
+  name              = var.GITHUB_REPO
   production_branch = "master"
 
   # Git integration
@@ -27,7 +27,7 @@ resource "cloudflare_pages_project" "polite_website" {
     type = "github"
     config {
       owner                         = var.GITHUB_OWNER
-      repo_name                     = "polite-digital"
+      repo_name                     = var.GITHUB_REPO
       production_branch             = "master"
       pr_comments_enabled           = true
       deployments_enabled           = true
@@ -66,7 +66,7 @@ resource "cloudflare_pages_domain" "polite_website_domain" {
 resource "cloudflare_record" "polite_website_domain" {
   zone_id = var.CLOUDFLARE_ZONE_ID
   name    = var.ROOT_DOMAIN
-  content = "${cloudflare_pages_project.polite_website.name}.pages.dev"
+  content = cloudflare_pages_project.polite_website.subdomain
   type    = "CNAME"
   ttl     = 1
   proxied = true
