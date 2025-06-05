@@ -1,0 +1,41 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'deploy/**'
+      - '.github/workflows/terraform_apply.yaml'
+  workflow_dispatch:
+env:
+  TF_VAR_ROOT_DOMAIN: ${{ secrets.ROOT_DOMAIN }}
+  TF_VAR_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  TF_VAR_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  TF_VAR_CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+  TF_VAR_GITHUB_OWNER: ${{ github.repository_owner }}
+  TF_VAR_API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
+  TF_VAR_STORAGE_ENDPOINT: ${{ secrets.STORAGE_ENDPOINT }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.4
+
+      - name: Terraform Init
+        working-directory: ./deploy
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ./deploy
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: ./deploy
+        run: terraform apply -auto-approve tfplan
