@@ -52,6 +52,6 @@ jobs:
 
       - name: Commit state file
         run: |
-          git add deploy/terraform.tfstate deploy/terraform.tfstate.backup
+          git add deploy/terraform.tfstate 
           git diff --staged --quiet || git commit -m "Update Terraform state [skip ci]"
           git push origin master

@@ -16,32 +16,19 @@ terraform {
   }
 }
 
-# Website (Astro) deployment with Git integration
+# Website (Astro) deployment without Git integration (manual deployment)
 resource "cloudflare_pages_project" "polite_website" {
   account_id        = var.CLOUDFLARE_ACCOUNT_ID
   name              = "polite-digital"
   production_branch = "master"
-  
-  # Git integration
-  source {
-    type = "github"
-    config {
-      owner                         = var.GITHUB_OWNER
-      repo_name                     = var.GITHUB_REPO
-      production_branch             = "master"
-      pr_comments_enabled           = true
-      deployments_enabled           = true
-      production_deployment_enabled = true
-    }
-  }
-  
+
   # Build configuration
   build_config {
     build_command   = "npm run build"
     destination_dir = "dist"
     root_dir        = "website"
   }
-  
+
   deployment_configs {
     production {
       environment_variables = {
