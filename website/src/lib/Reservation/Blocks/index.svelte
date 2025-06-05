@@ -20,7 +20,6 @@
 		return getLocalizedContent(valueBlock.value[0]);
 	}
 
-	// Helper function to get badge image
 	function getBadgeImage(block) {
 		if (!block || !block.value) return null;
 		
