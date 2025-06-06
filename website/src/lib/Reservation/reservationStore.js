@@ -11,9 +11,7 @@ export const cartParts = persistentAtom("reservationCart", [], {
 	decode: JSON.parse,
 });
 
-// Main store
 export const store = deepMap({
-	// Step management
 	currentStep: 1,
 	totalSteps: 4,
 	steps: {
