@@ -657,7 +657,7 @@ export const actions = {
 	// Phone validation helper
 	validatePhoneNumber(phone) {
 		if (!phone) return false;
-		const cleaned = phone.replace(/\D/g, '');
+		const cleaned = phone.replace(/\D/g, "");
 		return cleaned.length >= 8 && cleaned.length <= 15;
 	},
 
@@ -669,7 +669,7 @@ export const actions = {
 
 		try {
 			const phoneNumber = store.get().phoneNumber;
-			
+
 			// Validate phone number format
 			if (!this.validatePhoneNumber(phoneNumber)) {
 				store.setKey("phoneError", "Please enter a valid phone number");
@@ -681,14 +681,14 @@ export const actions = {
 				token,
 				phoneNumber,
 			});
-			
+
 			if (res.success) {
 				store.setKey("phoneSuccess", "Verification code sent successfully!");
 				store.setKey("codeSentAt", Date.now());
 			} else {
 				store.setKey("phoneError", res.error || "Failed to send verification code");
 			}
-			
+
 			return res.success;
 		} catch (e) {
 			store.setKey("phoneError", e.message);
@@ -704,13 +704,13 @@ export const actions = {
 
 		try {
 			const { phoneNumber, verificationCode } = store.get();
-			
+
 			// Validate code format
 			if (!verificationCode || verificationCode.length !== 4) {
 				store.setKey("verifyError", "Please enter a 4-digit verification code");
 				return false;
 			}
-			
+
 			const token = await this.getGuestToken();
 			const res = await reservationApi.verifyPhoneCode({
 				token,
@@ -732,7 +732,7 @@ export const actions = {
 				}
 				store.setKey("verifyError", errorMessage);
 			}
-			
+
 			return res.success;
 		} catch (e) {
 			store.setKey("verifyError", "Failed to verify code. Please try again.");
@@ -758,7 +758,7 @@ export const actions = {
 			});
 
 			if (result.success) {
-				showToast("🎉 Reservation created successfully!", "success", 6000);
+				showToast("Reservation created successfully!", "success", 6000);
 				const emptyCart = [];
 				store.setKey("parts", emptyCart);
 				cartParts.set(emptyCart);
@@ -767,7 +767,7 @@ export const actions = {
 			}
 		} catch (e) {
 			console.error(e);
-			showToast("❌ Booking failed: " + e.message, "error", 8000);
+			showToast("Booking failed: " + e.message, "error", 8000);
 		} finally {
 			store.setKey("loading", false);
 		}
