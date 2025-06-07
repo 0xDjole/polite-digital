@@ -15,7 +15,7 @@ const aboutImage = info.aboutImage;
 <section id="about" class="bg-secondary py-16 md:py-24">
 	<div class="site-container">
 		<div class="grid items-center gap-12 lg:grid-cols-2">
-			<figure class="order-2 lg:order-1" data-aos="fade-right">
+			<figure class="order-2 lg:order-1 about-image gsap-slide-left">
 				{
 					aboutImage ? (
 						<div class="relative">
@@ -38,18 +38,78 @@ const aboutImage = info.aboutImage;
 					)
 				}
 			</figure>
-			<div class="order-1 space-y-6 lg:order-2" data-aos="fade-left">
-				<h2 class="main-text-gradient text-4xl font-bold md:text-5xl">
+			<div class="order-1 space-y-6 lg:order-2 about-content gsap-slide-right">
+				<h2 class="main-text-gradient text-4xl font-bold md:text-5xl gsap-fade-up" data-delay="0.2">
 					{aboutTitle}
 				</h2>
-				<div class="prose prose-lg text-secondary max-w-none">
+				<div class="prose prose-lg text-secondary max-w-none gsap-fade-up" data-delay="0.4">
 					{aboutContent}
 				</div>
-				<div class="flex flex-wrap gap-4 pt-4">
-					<Button variant="primary" class="hover-lift px-6 py-3"> Our Process </Button>
-					<Button variant="outline" class="hover-lift px-6 py-3"> Contact Us </Button>
+				<div class="flex flex-wrap gap-4 pt-4 gsap-stagger">
+					<Button variant="primary" class="hover-lift px-6 py-3 gsap-stagger-item"> Our Process </Button>
+					<Button variant="outline" class="hover-lift px-6 py-3 gsap-stagger-item"> Contact Us </Button>
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
+
+<script type="module">
+	import { gsap } from '/src/lib/gsap-init.js';
+	
+	// Enhanced About Section Animations
+	function initAboutAnimations() {
+		console.log('✨ Initializing PowerPoint-style About Animations');
+		
+		// Enhanced image hover effect
+		const aboutImage = document.querySelector('.about-image img');
+		if (aboutImage) {
+			aboutImage.addEventListener('mouseenter', () => {
+				gsap.to(aboutImage, { 
+					scale: 1.08, 
+					rotation: 1,
+					filter: "brightness(1.1) contrast(1.1)",
+					duration: 0.4, 
+					ease: "power2.out" 
+				});
+			});
+			
+			aboutImage.addEventListener('mouseleave', () => {
+				gsap.to(aboutImage, { 
+					scale: 1, 
+					rotation: 0,
+					filter: "brightness(1) contrast(1)",
+					duration: 0.4, 
+					ease: "power2.out" 
+				});
+			});
+		}
+		
+		// Enhanced button animations
+		document.querySelectorAll('.hover-lift').forEach(button => {
+			button.addEventListener('mouseenter', () => {
+				gsap.to(button, { 
+					y: -5, 
+					scale: 1.08,
+					boxShadow: "0 15px 30px rgba(0,0,0,0.15)",
+					duration: 0.3, 
+					ease: "back.out(1.7)" 
+				});
+			});
+			
+			button.addEventListener('mouseleave', () => {
+				gsap.to(button, { 
+					y: 0, 
+					scale: 1,
+					boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+					duration: 0.3, 
+					ease: "power2.out" 
+				});
+			});
+		});
+	}
+	
+	// Initialize animations
+	document.addEventListener('DOMContentLoaded', initAboutAnimations);
+	document.addEventListener('astro:after-swap', initAboutAnimations);
+</script>

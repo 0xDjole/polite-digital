@@ -55,14 +55,14 @@
       
       if (!r.ok) throw new Error(await r.text());
       
-      showToast("✅ Thanks! Your message was submitted.", "success", 5000);
+      showToast("Thanks! Your message was submitted.", "success", 5000);
       
       collection.blocks.forEach((f) => {
         form[f.key] = "";
       });
     } catch (e) {
       console.error(e);
-      showToast("❌ Submission failed, please try again.", "error", 6000);
+      showToast("Submission failed, please try again.", "error", 6000);
     } finally {
       isSubmitting = false;
     }

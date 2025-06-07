@@ -3,7 +3,6 @@
 @plugin "@tailwindcss/forms";
 @plugin "tailwindcss-animate";
 @import "./tailwind-theme.css";
-@import "./aos.css" layer(utilities);
 @import "./buttons.css" layer(components);
 
 @layer theme, base, components, utilities;
@@ -92,6 +91,29 @@
 		--font-fallback: "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 		font-family: "Inter", var(--font-fallback);
 		font-feature-settings: "liga" 1, "calt" 1;
+	}
+	
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+	
+	html {
+		scroll-behavior: smooth;
+		width: 100%;
+		overflow-x: hidden;
+	}
+	
+	/* Prevent layout shift during animations */
+	section {
+		will-change: transform, opacity;
+	}
+	
+	/* Smooth animation defaults */
+	* {
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
 
 	[data-theme="dark"] {
@@ -194,6 +216,11 @@
 	body {
 		background-color: var(--bg-primary);
 		color: var(--text-primary);
+		opacity: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		overflow-x: hidden;
 	}
 	
 	button { @apply cursor-pointer; }
@@ -311,6 +338,11 @@
 	.shadow-sm { box-shadow: var(--shadow-sm); }
 	.shadow-md { box-shadow: var(--shadow-md); }
 	.shadow-lg { box-shadow: var(--shadow-lg); }
+
+	/* 3D Transform Utilities */
+	.transform-3d { transform-style: preserve-3d; }
+	.perspective-1000 { perspective: 1000px; }
+	.backface-hidden { backface-visibility: hidden; }
 
 	/* Hover State Utilities */
 	.hover-lift { @apply transition-transform duration-200; }

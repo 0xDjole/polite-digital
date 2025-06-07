@@ -49,24 +49,14 @@ if (remainder === 0) {
 
 <section id="testimonial1" class="site-container my-16 md:my-36">
 	<div class="flex justify-center">
-		<p class="colored-title inline" data-aos="fade-up" data-aos-trigger="#testimonial1">
+		<p class="colored-title inline gsap-fade-up">
 			Testimonials
 		</p>
 	</div>
-	<h2
-		class="h2 mt-8 text-center"
-		data-aos="fade-up"
-		data-aos-delay=".2"
-		data-aos-trigger="#testimonial1"
-	>
+	<h2 class="h2 mt-8 text-center gsap-fade-up" data-delay="0.2">
 		Hear from our customers
 	</h2>
-	<div
-		class="mx-auto mt-8 grid gap-4 md:mt-16 md:grid-cols-3 lg:gap-6"
-		data-aos="fade-up"
-		data-aos-trigger="#testimonial1"
-		data-aos-delay=".8"
-	>
+	<div class="mx-auto mt-8 grid gap-4 md:mt-16 md:grid-cols-3 lg:gap-6 gsap-fade-up" data-delay="0.8">
 		{
 			testimonialCols.map((testimonialCol, idx) => (
 				<div class={`flex w-full flex-col gap-4 lg:gap-6 ${idx == 1 ? "md:pt-10" : ""}`}>

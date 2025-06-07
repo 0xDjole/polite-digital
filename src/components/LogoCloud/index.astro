@@ -20,7 +20,7 @@ const logosWithSvg = await Promise.all(
 );
 ---
 
-<section id="logocloud" class="border-primary border-y py-6">
+<section id="logocloud" class="relative py-16 md:py-20 gsap-fade-up">
 	<div class="relative mx-auto max-w-[1800px] overflow-hidden px-4">
 		<div class="fade-left"></div>
 		<div class="fade-right"></div>
@@ -28,7 +28,7 @@ const logosWithSvg = await Promise.all(
 			<div class="animate-marquee2 flex min-w-full shrink-0 items-center justify-around gap-32">
 				{
 					logosWithSvg.map((logo) => (
-						<div class="logo" set:html={logo.svgContent} aria-label={`${logo.name} logo`} />
+						<div class="logo gsap-scale-in" set:html={logo.svgContent} aria-label={`${logo.name} logo`} />
 					))
 				}
 			</div>
@@ -38,7 +38,7 @@ const logosWithSvg = await Promise.all(
 			>
 				{
 					logosWithSvg.map((logo) => (
-						<div class="logo" set:html={logo.svgContent} aria-label={`${logo.name} logo`} />
+						<div class="logo gsap-scale-in" set:html={logo.svgContent} aria-label={`${logo.name} logo`} />
 					))
 				}
 			</div>
@@ -105,4 +105,70 @@ const logosWithSvg = await Promise.all(
 			});
 		});
 	});
+</script>
+
+<script type="module">
+	import { gsap } from '/src/lib/gsap-init.js';
+	
+	// Enhanced logo animations
+	function initLogoAnimations() {
+		console.log('🏢 Initializing PowerPoint-style Logo Animations');
+		
+		// Enhanced hover effects for logos
+		document.querySelectorAll('.logo').forEach((logo, index) => {
+			logo.addEventListener('mouseenter', () => {
+				gsap.to(logo, { 
+					scale: 1.15, 
+					rotation: 3,
+					filter: "brightness(1.2) saturate(1.3)",
+					duration: 0.3, 
+					ease: "back.out(1.7)" 
+				});
+			});
+			
+			logo.addEventListener('mouseleave', () => {
+				gsap.to(logo, { 
+					scale: 1, 
+					rotation: 0,
+					filter: "brightness(1) saturate(1)",
+					duration: 0.3, 
+					ease: "power2.out" 
+				});
+			});
+
+			// Add subtle pulse animation to random logos
+			if (Math.random() > 0.7) {
+				gsap.to(logo, {
+					scale: 1.05,
+					duration: 2 + Math.random() * 2,
+					repeat: -1,
+					yoyo: true,
+					ease: "sine.inOut",
+					delay: index * 0.2
+				});
+			}
+		});
+
+		// Enhanced marquee pause on hover with smooth transitions
+		const logoMarquee = document.querySelector('.logo-marquee');
+		if (logoMarquee) {
+			logoMarquee.addEventListener('mouseenter', () => {
+				gsap.to('.animate-marquee2', {
+					animationPlayState: 'paused',
+					duration: 0.3
+				});
+			});
+
+			logoMarquee.addEventListener('mouseleave', () => {
+				gsap.to('.animate-marquee2', {
+					animationPlayState: 'running',
+					duration: 0.3
+				});
+			});
+		}
+	}
+		
+	// Initialize animations  
+	document.addEventListener('DOMContentLoaded', initLogoAnimations);
+	document.addEventListener('astro:after-swap', initLogoAnimations);
 </script>
