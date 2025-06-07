@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { showToast } from '../../lib/toast.js';
   
   const API_URL = import.meta.env.PUBLIC_API_URL;
   const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
@@ -54,14 +55,14 @@
       
       if (!r.ok) throw new Error(await r.text());
       
-      alert("Thanks! Your message was submitted.");
+      showToast("✅ Thanks! Your message was submitted.", "success", 5000);
       
       collection.blocks.forEach((f) => {
         form[f.key] = "";
       });
     } catch (e) {
       console.error(e);
-      alert("Submission failed, please try again.");
+      showToast("❌ Submission failed, please try again.", "error", 6000);
     } finally {
       isSubmitting = false;
     }

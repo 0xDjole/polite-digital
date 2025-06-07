@@ -5,6 +5,7 @@ import { getLocalizedString, getLocale, getLocaleFromUrl } from "../../lib/i18n/
 import { API_URL, BUSINESS_ID, STORAGE_URL } from "../env";
 import { getPrice, reservationApi } from "../index";
 import { tzGroups, findTimeZone } from "./timezone-utils";
+import { showToast } from "../toast.js";
 
 export const cartParts = persistentAtom("reservationCart", [], {
 	encode: JSON.stringify,
@@ -44,11 +45,14 @@ export const store = deepMap({
 	// Phone verification
 	phoneNumber: "",
 	phoneError: null,
+	phoneSuccess: null,
 	verificationCode: "",
 	verifyError: null,
 	isPhoneVerified: false,
 	isSendingCode: false,
 	isVerifying: false,
+	codeSentAt: null,
+	canResendAt: null,
 
 	// Service & config
 	guestToken: null,
@@ -650,18 +654,41 @@ export const actions = {
 		cartParts.set(filteredParts);
 	},
 
+	// Phone validation helper
+	validatePhoneNumber(phone) {
+		if (!phone) return false;
+		const cleaned = phone.replace(/\D/g, '');
+		return cleaned.length >= 8 && cleaned.length <= 15;
+	},
+
 	// Phone verification
 	async updateProfilePhone() {
 		store.setKey("phoneError", null);
+		store.setKey("phoneSuccess", null);
 		store.setKey("isSendingCode", true);
 
 		try {
+			const phoneNumber = store.get().phoneNumber;
+			
+			// Validate phone number format
+			if (!this.validatePhoneNumber(phoneNumber)) {
+				store.setKey("phoneError", "Please enter a valid phone number");
+				return false;
+			}
+
 			const token = await this.getGuestToken();
 			const res = await reservationApi.updateProfilePhone({
 				token,
-				phoneNumber: store.get().phoneNumber,
+				phoneNumber,
 			});
-			if (!res.success) store.setKey("phoneError", res.error);
+			
+			if (res.success) {
+				store.setKey("phoneSuccess", "Verification code sent successfully!");
+				store.setKey("codeSentAt", Date.now());
+			} else {
+				store.setKey("phoneError", res.error || "Failed to send verification code");
+			}
+			
 			return res.success;
 		} catch (e) {
 			store.setKey("phoneError", e.message);
@@ -677,6 +704,13 @@ export const actions = {
 
 		try {
 			const { phoneNumber, verificationCode } = store.get();
+			
+			// Validate code format
+			if (!verificationCode || verificationCode.length !== 4) {
+				store.setKey("verifyError", "Please enter a 4-digit verification code");
+				return false;
+			}
+			
 			const token = await this.getGuestToken();
 			const res = await reservationApi.verifyPhoneCode({
 				token,
@@ -686,11 +720,23 @@ export const actions = {
 
 			if (res.success) {
 				store.setKey("isPhoneVerified", true);
+				store.setKey("phoneSuccess", null); // Clear success message
+				store.setKey("verificationCode", ""); // Clear the code
 			} else {
-				store.setKey("verifyError", res.error);
+				// Provide user-friendly error messages
+				let errorMessage = "Invalid verification code";
+				if (res.error?.includes("expired")) {
+					errorMessage = "Verification code has expired. Please request a new one.";
+				} else if (res.error?.includes("incorrect") || res.error?.includes("invalid")) {
+					errorMessage = "Incorrect verification code. Please try again.";
+				}
+				store.setKey("verifyError", errorMessage);
 			}
+			
+			return res.success;
 		} catch (e) {
-			store.setKey("verifyError", e.message);
+			store.setKey("verifyError", "Failed to verify code. Please try again.");
+			return false;
 		} finally {
 			store.setKey("isVerifying", false);
 		}
@@ -712,7 +758,7 @@ export const actions = {
 			});
 
 			if (result.success) {
-				alert("Reservation created successfully!");
+				showToast("🎉 Reservation created successfully!", "success", 6000);
 				const emptyCart = [];
 				store.setKey("parts", emptyCart);
 				cartParts.set(emptyCart);
@@ -721,7 +767,7 @@ export const actions = {
 			}
 		} catch (e) {
 			console.error(e);
-			alert("Booking failed: " + e.message);
+			showToast("❌ Booking failed: " + e.message, "error", 8000);
 		} finally {
 			store.setKey("loading", false);
 		}

@@ -45,12 +45,13 @@ const navData = getBlockObjectValues(websiteCollection, "navigation_items", curr
 					{
 						navData.map((navItem) => (
 							<li>
-								<div
+								<a
 									href={navItem.link}
 									class="text-primary hover:text-secondary block py-2 text-lg font-medium transition"
+									data-nav-link
 								>
 									{navItem.text}
-								</div>
+								</a>
 							</li>
 						))
 					}
@@ -113,6 +114,15 @@ const navData = getBlockObjectValues(websiteCollection, "navigation_items", curr
 					dialog.close();
 					document.body.style.overflow = "";
 				}
+			});
+
+			// Close when clicking navigation links
+			const navLinks = this.querySelectorAll("[data-nav-link]");
+			navLinks.forEach(link => {
+				link.addEventListener("click", () => {
+					dialog?.close();
+					document.body.style.overflow = "";
+				});
 			});
 		}
 	}

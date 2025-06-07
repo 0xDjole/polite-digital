@@ -52,6 +52,9 @@ const currLocale = getLocale(Astro.currentLocale);
 			</main>
 		</div>
 		<Footer />
+		
+		<!-- Toast notifications -->
+		<div id="toast-container"></div>
 
 		<!-- Scroll animations -->
 		<script>
@@ -62,6 +65,28 @@ const currLocale = getLocale(Astro.currentLocale);
 
 			// Run on view transitions navigation
 			document.addEventListener("astro:after-swap", AOS.refreshHard);
+		</script>
+		
+		<!-- Toast notifications -->
+		<script>
+			import { mount } from "svelte";
+			import Toast from "@components/Toast/Toast.svelte";
+			
+			// Mount toast component
+			let toastComponent;
+			
+			function mountToast() {
+				const container = document.getElementById('toast-container');
+				if (container && !toastComponent) {
+					toastComponent = mount(Toast, { target: container });
+				}
+			}
+			
+			// Mount on initial load
+			mountToast();
+			
+			// Mount after view transitions
+			document.addEventListener("astro:after-swap", mountToast);
 		</script>
 	</body>
 </html>
