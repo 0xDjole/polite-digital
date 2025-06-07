@@ -39,7 +39,6 @@ resource "cloudflare_pages_project" "polite_website" {
   build_config {
     build_command   = "npm run build"
     destination_dir = "dist"
-    root_dir        = "website"
   }
 
   deployment_configs {
