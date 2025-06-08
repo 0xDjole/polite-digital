@@ -76,13 +76,13 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 
 <!-- GSAP Initialization -->
 <script>
-	import { initGlobalGSAP } from '../lib/gsap-init.js';
-	
+	import { initGlobalGSAP } from "../lib/gsap-init.js";
+
 	// Initialize on DOM ready
-	document.addEventListener('DOMContentLoaded', initGlobalGSAP);
-	
+	document.addEventListener("DOMContentLoaded", initGlobalGSAP);
+
 	// Handle Astro view transitions
-	document.addEventListener('astro:after-swap', initGlobalGSAP);
+	document.addEventListener("astro:after-swap", initGlobalGSAP);
 </script>
 
 <Seo

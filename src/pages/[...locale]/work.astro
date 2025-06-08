@@ -1,0 +1,276 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { cmsApi, getBlockFromArray } from "@lib/index";
+import { defaultLocale, locales } from "@lib/i18n";
+
+export function getStaticPaths() {
+	return locales.map((locale) => ({
+		params: {
+			locale: locale === defaultLocale ? undefined : locale,
+		},
+		props: { locale },
+	}));
+}
+
+const { locale = defaultLocale } = Astro.props;
+
+const { getCollection, getBlockObjectValues } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const siteData = getBlockFromArray(websiteCollection, "info", locale);
+
+// Featured projects with high-quality images
+const projects = [
+	{
+		id: 1,
+		title: "E-commerce Platform",
+		category: "Web Development",
+		image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop&crop=center",
+		description: "Modern e-commerce solution with advanced filtering and seamless checkout experience.",
+		tags: ["React", "Node.js", "MongoDB"],
+		url: "#"
+	},
+	{
+		id: 2,
+		title: "Brand Identity Design",
+		category: "Branding",
+		image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop&crop=center",
+		description: "Complete brand identity redesign for a tech startup including logo, guidelines, and marketing materials.",
+		tags: ["Design", "Branding", "Figma"],
+		url: "#"
+	},
+	{
+		id: 3,
+		title: "Mobile Banking App",
+		category: "Mobile Development",
+		image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=600&fit=crop&crop=center",
+		description: "Secure and intuitive mobile banking application with biometric authentication and real-time notifications.",
+		tags: ["React Native", "Firebase", "Fintech"],
+		url: "#"
+	},
+	{
+		id: 4,
+		title: "SaaS Dashboard",
+		category: "Web Development",
+		image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop&crop=center",
+		description: "Comprehensive analytics dashboard for SaaS companies with real-time data visualization.",
+		tags: ["Vue.js", "D3.js", "API"],
+		url: "#"
+	},
+	{
+		id: 5,
+		title: "Restaurant Chain Website",
+		category: "Web Development",
+		image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&crop=center",
+		description: "Multi-location restaurant website with online ordering and reservation system.",
+		tags: ["Astro", "Tailwind", "CMS"],
+		url: "#"
+	},
+	{
+		id: 6,
+		title: "Fitness App UI/UX",
+		category: "UI/UX Design",
+		image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center",
+		description: "Complete UI/UX design for a fitness tracking app with gamification elements.",
+		tags: ["Figma", "Prototyping", "User Research"],
+		url: "#"
+	}
+];
+---
+
+<BaseLayout title="Our Work" description="Explore our portfolio of innovative digital solutions and creative projects.">
+	<main class="min-h-screen bg-primary">
+		<!-- Hero Section -->
+		<section class="relative overflow-hidden pt-32 pb-20">
+			<div class="site-container relative">
+				<div class="max-w-4xl mx-auto text-center">
+					<h1 class="text-6xl md:text-8xl font-bold main-text-gradient mb-8 leading-tight">
+						Our Work
+					</h1>
+					<p class="text-xl md:text-2xl text-secondary leading-relaxed max-w-3xl mx-auto">
+						Crafting exceptional digital experiences that push boundaries and inspire innovation. Each project tells a story of creativity, technology, and meticulous attention to detail.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Filter Navigation -->
+		<section class="py-8">
+			<div class="site-container">
+				<div class="flex flex-wrap justify-center gap-4 mb-16">
+					<button class="filter-btn active px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 bg-brand text-brand" data-filter="all">
+						All Projects
+					</button>
+					<button class="filter-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 bg-secondary text-secondary hover-brand" data-filter="Web Development">
+						Web Development
+					</button>
+					<button class="filter-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 bg-secondary text-secondary hover-brand" data-filter="Branding">
+						Branding
+					</button>
+					<button class="filter-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 bg-secondary text-secondary hover-brand" data-filter="Mobile Development">
+						Mobile Development
+					</button>
+					<button class="filter-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 bg-secondary text-secondary hover-brand" data-filter="UI/UX Design">
+						UI/UX Design
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- Portfolio Grid -->
+		<section class="pb-32">
+			<div class="site-container">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 projects-grid">
+					{projects.map((project, index) => (
+						<article 
+							class="project-item group relative overflow-hidden rounded-2xl bg-card shadow-lg hover:shadow-xl transition-all duration-500 hover-lift"
+							data-category={project.category}
+							style={`animation-delay: ${index * 100}ms`}
+						>
+							<div class="aspect-[4/3] overflow-hidden">
+								<img 
+									src={project.image} 
+									alt={project.title}
+									class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+									loading="lazy"
+								/>
+								<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+								<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+									<a 
+										href={project.url}
+										class="px-6 py-3 bg-primary text-primary rounded-full font-medium transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-secondary"
+									>
+										View Project
+									</a>
+								</div>
+							</div>
+							
+							<div class="p-8">
+								<div class="flex items-center justify-between mb-4">
+									<span class="px-3 py-1 text-xs font-medium bg-secondary text-secondary rounded-full">
+										{project.category}
+									</span>
+								</div>
+								
+								<h3 class="text-xl font-bold text-card mb-3 group-hover:text-price transition-colors duration-300">
+									{project.title}
+								</h3>
+								
+								<p class="text-secondary text-sm leading-relaxed mb-6">
+									{project.description}
+								</p>
+								
+								<div class="flex flex-wrap gap-2">
+									{project.tags.map((tag) => (
+										<span class="px-2 py-1 text-xs bg-tertiary text-muted rounded">
+											{tag}
+										</span>
+									))}
+								</div>
+							</div>
+						</article>
+					))}
+				</div>
+			</div>
+		</section>
+
+	</main>
+
+	<script type="module">
+		import { gsap } from "../../lib/gsap-init.js";
+
+		// Filter functionality with GSAP animations
+		document.addEventListener('DOMContentLoaded', function() {
+			const filterBtns = document.querySelectorAll('.filter-btn');
+			const projectItems = document.querySelectorAll('.project-item');
+			
+			filterBtns.forEach(btn => {
+				btn.addEventListener('click', function() {
+					const filter = this.getAttribute('data-filter');
+					
+					// Update active button
+					filterBtns.forEach(b => {
+						b.classList.remove('active', 'bg-brand', 'text-brand');
+						b.classList.add('bg-secondary', 'text-secondary');
+					});
+					this.classList.add('active', 'bg-brand', 'text-brand');
+					this.classList.remove('bg-secondary', 'text-secondary');
+					
+					// Filter projects with animation
+					projectItems.forEach((item, index) => {
+						const category = item.getAttribute('data-category');
+						if (filter === 'all' || category === filter) {
+							gsap.to(item, {
+								opacity: 1,
+								y: 0,
+								scale: 1,
+								duration: 0.6,
+								delay: index * 0.1,
+								ease: "power2.out"
+							});
+							item.style.display = 'block';
+						} else {
+							gsap.to(item, {
+								opacity: 0,
+								y: 30,
+								scale: 0.95,
+								duration: 0.3,
+								ease: "power2.in",
+								onComplete: () => {
+									item.style.display = 'none';
+								}
+							});
+						}
+					});
+				});
+			});
+			
+			// Intersection Observer for entrance animations
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry, index) => {
+					if (entry.isIntersecting) {
+						gsap.to(entry.target, {
+							opacity: 1,
+							y: 0,
+							duration: 0.8,
+							delay: index * 0.1,
+							ease: "power2.out"
+						});
+					}
+				});
+			}, { threshold: 0.1 });
+			
+			projectItems.forEach(item => {
+				gsap.set(item, { opacity: 0, y: 30 });
+				observer.observe(item);
+			});
+
+			// Enhanced hover animations for project cards
+			projectItems.forEach(item => {
+				item.addEventListener('mouseenter', () => {
+					gsap.to(item, {
+						y: -10,
+						boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+						duration: 0.3,
+						ease: "power2.out"
+					});
+				});
+
+				item.addEventListener('mouseleave', () => {
+					gsap.to(item, {
+						y: 0,
+						boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+						duration: 0.3,
+						ease: "power2.out"
+					});
+				});
+			});
+		});
+	</script>
+
+	<style>
+		.project-item {
+			opacity: 0;
+		}
+	</style>
+</BaseLayout>

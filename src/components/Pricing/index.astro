@@ -15,11 +15,13 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 <section id="pricing-4" class="my-24 md:my-36">
 	<div class="site-container">
 		<div class="flex justify-center">
-			<p class="colored-title inline pricing-title gsap-fade-up">Pricing</p>
+			<p class="colored-title pricing-title gsap-fade-up inline">Pricing</p>
 		</div>
-		<h2 class="h2 mt-8 text-center pricing-heading gsap-fade-up" data-delay="0.2">A plan for every business</h2>
+		<h2 class="h2 pricing-heading gsap-fade-up mt-8 text-center" data-delay="0.2">
+			A plan for every business
+		</h2>
 
-		<div class="mt-6 flex justify-center pricing-toggle gsap-fade-up" data-delay="0.4">
+		<div class="pricing-toggle gsap-fade-up mt-6 flex justify-center" data-delay="0.4">
 			<label
 				for="plan-4__toggle"
 				class="bg-muted border-primary relative inline-flex cursor-pointer items-center rounded-lg border p-2 select-none"
@@ -30,7 +32,10 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 			</label>
 		</div>
 
-		<div class="mx-auto mt-12 grid w-full max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pricing-grid gsap-stagger" style="overflow: visible;">
+		<div
+			class="pricing-grid gsap-stagger mx-auto mt-12 grid w-full max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+			style="overflow: visible;"
+		>
 			{
 				pricingData.map((plan) => (
 					<div
@@ -124,101 +129,3 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 		</div>
 	</div>
 </section>
-
-<script>
-	function setupPricingToggle() {
-		const pricingSection = document.getElementById("pricing-4") as HTMLElement;
-		const toggle = pricingSection.querySelector("#plan-4__toggle") as HTMLInputElement;
-		const monthlyPrices = pricingSection?.querySelectorAll(".pricing-monthly");
-		const yearlyPrices = pricingSection?.querySelectorAll(".pricing-yearly");
-
-		if (!toggle || !monthlyPrices || !yearlyPrices) return;
-
-		const observer = new MutationObserver((mutations) => {
-			mutations.forEach((mutation) => {
-				if (mutation.type === "attributes" && mutation.attributeName === "aria-checked") {
-					const isYearly = toggle.getAttribute("aria-checked") === "true";
-					monthlyPrices.forEach((price) => price.classList.toggle("hidden", isYearly));
-					yearlyPrices.forEach((price) => price.classList.toggle("hidden", !isYearly));
-				}
-			});
-		});
-
-		observer.observe(toggle, {
-			attributes: true,
-			attributeFilter: ["aria-checked"],
-		});
-	}
-
-	setupPricingToggle();
-	document.addEventListener("astro:after-swap", setupPricingToggle);
-</script>
-
-<script type="module">
-	import { gsap } from '../../lib/gsap-init.js';
-	
-	// Enhanced pricing animations
-	function initPricingAnimations() {
-		console.log('💰 Initializing PowerPoint-style Pricing Animations');
-		
-		// Enhanced pricing card hover effects
-		document.querySelectorAll('.pricing-plan').forEach((card, index) => {
-			// Enhanced hover effects with PowerPoint-style animations
-			card.addEventListener('mouseenter', () => {
-				gsap.to(card, { 
-					scale: 1.08, 
-					y: -15,
-					rotation: 1,
-					boxShadow: "0 25px 50px rgba(0,0,0,0.2)",
-					duration: 0.4, 
-					ease: "back.out(1.7)" 
-				});
-			});
-			
-			card.addEventListener('mouseleave', () => {
-				gsap.to(card, { 
-					scale: 1, 
-					y: 0,
-					rotation: 0,
-					boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-					duration: 0.4, 
-					ease: "power2.out" 
-				});
-			});
-
-			// Add subtle floating animation to featured cards
-			if (card.querySelector('.bg-gradient-primary')) {
-				gsap.to(card, {
-					y: -5,
-					duration: 2,
-					repeat: -1,
-					yoyo: true,
-					ease: "sine.inOut"
-				});
-			}
-		});
-
-		// Enhanced button hover effects
-		document.querySelectorAll('.pricing-plan button').forEach(button => {
-			button.addEventListener('mouseenter', () => {
-				gsap.to(button, { 
-					scale: 1.1,
-					duration: 0.3, 
-					ease: "back.out(1.7)" 
-				});
-			});
-			
-			button.addEventListener('mouseleave', () => {
-				gsap.to(button, { 
-					scale: 1,
-					duration: 0.3, 
-					ease: "power2.out" 
-				});
-			});
-		});
-	}
-	
-	// Initialize animations
-	document.addEventListener('DOMContentLoaded', initPricingAnimations);
-	document.addEventListener('astro:after-swap', initPricingAnimations);
-</script>
