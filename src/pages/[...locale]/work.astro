@@ -95,10 +95,10 @@ const projects = [
 		</section>
 
 		<!-- Projects Showcase -->
-		<section class="relative" id="projects-showcase">
+		<section class="projects-showcase">
 			<div class="relative">
 				{projects.map((project, index) => (
-					<div class="h-screen relative overflow-hidden" data-project={index}>
+					<div class="project h-screen relative overflow-hidden" data-project={index}>
 						<!-- Full viewport image -->
 						<div class="absolute inset-0 z-10">
 							<img 
@@ -146,3 +146,13 @@ const projects = [
 
 
 </BaseLayout>
+
+<script>
+	import { ScrollTrigger  } from "../../lib/gsap-init";
+let st = ScrollTrigger.create({
+  trigger: ".project",
+  pin: ".projects-showcase",
+  start: "top 10%",
+  end: "+=500",
+});
+</script>
