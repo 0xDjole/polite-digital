@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { cmsApi, getBlockFromArray } from "@lib/index";
 import { defaultLocale, locales } from "@lib/i18n";
 
 export function getStaticPaths() {
@@ -13,146 +12,173 @@ export function getStaticPaths() {
 }
 
 const { locale = defaultLocale } = Astro.props;
-
-const { getCollection, getBlockObjectValues } = cmsApi();
-const websiteCollection = await getCollection("website");
-
-const siteData = getBlockFromArray(websiteCollection, "info", locale);
-
-// Featured projects with high-quality images
-const projects = [
-	{
-		id: 1,
-		title: "E-commerce Platform",
-		category: "Web Development",
-		image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop&crop=center",
-		description: "Modern e-commerce solution with advanced filtering and seamless checkout experience.",
-		tags: ["React", "Node.js", "MongoDB"],
-		url: "#"
-	},
-	{
-		id: 2,
-		title: "Brand Identity Design",
-		category: "Branding",
-		image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop&crop=center",
-		description: "Complete brand identity redesign for a tech startup including logo, guidelines, and marketing materials.",
-		tags: ["Design", "Branding", "Figma"],
-		url: "#"
-	},
-	{
-		id: 3,
-		title: "Mobile Banking App",
-		category: "Mobile Development",
-		image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=600&fit=crop&crop=center",
-		description: "Secure and intuitive mobile banking application with biometric authentication and real-time notifications.",
-		tags: ["React Native", "Firebase", "Fintech"],
-		url: "#"
-	},
-	{
-		id: 4,
-		title: "SaaS Dashboard",
-		category: "Web Development",
-		image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop&crop=center",
-		description: "Comprehensive analytics dashboard for SaaS companies with real-time data visualization.",
-		tags: ["Vue.js", "D3.js", "API"],
-		url: "#"
-	},
-	{
-		id: 5,
-		title: "Restaurant Chain Website",
-		category: "Web Development",
-		image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&crop=center",
-		description: "Multi-location restaurant website with online ordering and reservation system.",
-		tags: ["Astro", "Tailwind", "CMS"],
-		url: "#"
-	},
-	{
-		id: 6,
-		title: "Fitness App UI/UX",
-		category: "UI/UX Design",
-		image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center",
-		description: "Complete UI/UX design for a fitness tracking app with gamification elements.",
-		tags: ["Figma", "Prototyping", "User Research"],
-		url: "#"
-	}
-];
 ---
 
-<BaseLayout title="Our Work" description="Explore our portfolio of innovative digital solutions and creative projects.">
-	<main class="min-h-screen bg-primary">
-		<!-- Hero Section -->
-		<section class="relative overflow-hidden pt-32 pb-20">
-			<div class="site-container relative">
-				<div class="max-w-4xl mx-auto text-center">
-					<h1 class="text-6xl md:text-8xl font-bold main-text-gradient mb-8 leading-tight">
-						Our Work
-					</h1>
-					<p class="text-xl md:text-2xl text-secondary leading-relaxed max-w-3xl mx-auto">
-						Crafting exceptional digital experiences that push boundaries and inspire innovation. Each project tells a story of creativity, technology, and meticulous attention to detail.
-					</p>
+<BaseLayout
+	title="Lenis - Smooth Scrolling Library"
+	description="Explore smooth scrolling experiences"
+>
+	<section id="vertical">
+		<div class="container">
+			<div class="vertical__content">
+				<div class="col col_left">
+					<h2 class="vertical__heading">
+						<span>About</span><span>Smooth</span><span>Scroll</span>
+					</h2>
+				</div>
+				<div class="col col_right">
+					<div class="vertical__item">
+						<h3>Smooth Scroll Lenis</h3>
+						<p>
+							Lenis is an open-source library built to standardize scroll experiences and sauce up
+							websites with butter-smooth navigation, all while using the platform and keeping it
+							accessible.
+						</p>
+					</div>
+					<div class="vertical__item">
+						<h3>Smooth Scroll Lenis</h3>
+						<p>
+							Lenis is an open-source library built to standardize scroll experiences and sauce up
+							websites with butter-smooth navigation, all while using the platform and keeping it
+							accessible.
+						</p>
+					</div>
+					<div class="vertical__item">
+						<h3>Smooth Scroll Lenis</h3>
+						<p>
+							Lenis is an open-source library built to standardize scroll experiences and sauce up
+							websites with butter-smooth navigation, all while using the platform and keeping it
+							accessible.
+						</p>
+					</div>
+					<div class="vertical__item">
+						<h3>Smooth Scroll Lenis</h3>
+						<p>
+							Lenis is an open-source library built to standardize scroll experiences and sauce up
+							websites with butter-smooth navigation, all while using the platform and keeping it
+							accessible.
+						</p>
+					</div>
 				</div>
 			</div>
-		</section>
+		</div>
+	</section>
 
-		<!-- Projects Showcase -->
-		<section class="projects-showcase">
-			<div class="relative">
-				{projects.map((project, index) => (
-					<div class="project h-screen relative overflow-hidden" data-project={index}>
-						<!-- Full viewport image -->
-						<div class="absolute inset-0 z-10">
-							<img 
-								src={project.image} 
-								alt={project.title}
-								class="w-full h-full object-cover object-center"
-								loading="lazy"
-							/>
-							<div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-20"></div>
-						</div>
-						
-						<!-- Project content -->
-						<div class="absolute inset-0 flex items-center justify-center z-30 p-8">
-							<div class="max-w-2xl text-center text-white">
-								<span class="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-sm font-medium mb-6 uppercase tracking-wide">
-									{project.category}
-								</span>
-								<h2 class="text-4xl md:text-6xl font-bold mb-6 leading-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-									{project.title}
-								</h2>
-								<p class="text-xl md:text-2xl leading-relaxed mb-8 opacity-90">
-									{project.description}
-								</p>
-								<div class="flex flex-wrap gap-3 justify-center mb-10">
-									{project.tags.map((tag) => (
-										<span class="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-sm font-medium">
-											{tag}
-										</span>
-									))}
-								</div>
-								<a href={project.url} class="inline-flex items-center px-8 py-4 bg-white/15 backdrop-blur-xl border border-white/30 rounded-full font-semibold text-white no-underline">
-									View Project
-									<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-									</svg>
-								</a>
-							</div>
-						</div>
-					</div>
-				))}
+	<section id="horizontal">
+		<div class="container">
+			<div class="horizontal__content">
+				<div class="horizontal__item">
+					<div class="horizontal__num">1</div>
+				</div>
+				<div class="horizontal__item">
+					<div class="horizontal__num">2</div>
+				</div>
+				<div class="horizontal__item">
+					<div class="horizontal__num">3</div>
+				</div>
+				<div class="horizontal__item">
+					<div class="horizontal__num">4</div>
+				</div>
+				<div class="horizontal__item">
+					<div class="horizontal__num">5</div>
+				</div>
 			</div>
-		</section>
-
-	</main>
-
-
+		</div>
+	</section>
 </BaseLayout>
 
-<script>
-	import { ScrollTrigger  } from "../../lib/gsap-init";
-let st = ScrollTrigger.create({
-  trigger: ".project",
-  pin: ".projects-showcase",
-  start: "top 10%",
-  end: "+=500",
-});
-</script>
+<style>
+	@import "tailwindcss/theme" theme(reference);
+	@import "@/styles/tailwind-theme.css" theme(reference);
+
+	html {
+		scroll-behavior: initial;
+		overflow: hidden;
+	}
+
+	html,
+	body {
+		@apply min-h-full w-full;
+	}
+
+	body {
+		@apply bg-black text-base font-normal text-white;
+		font-family: Slussen;
+	}
+
+	h2 {
+		@apply m-0 border-l-4 p-6 text-6xl leading-none font-black uppercase;
+		border-color: #ff98a2;
+	}
+
+	h2 span {
+		@apply block;
+	}
+
+	h3 {
+		@apply text-xl leading-none font-normal uppercase;
+		font-stretch: expanded;
+		color: #ff98a2;
+	}
+
+	h2,
+	h3,
+	h4 {
+		@apply uppercase;
+	}
+
+	.container {
+		@apply mx-auto w-[95%];
+	}
+
+	section {
+		@apply py-12;
+	}
+
+	.col {
+		@apply w-1/2;
+	}
+
+	#vertical {
+		@apply w-screen;
+		height: 200vh;
+	}
+
+	.vertical__content {
+		@apply flex items-start justify-center;
+	}
+
+	.vertical__content .col_left {
+		@apply h-full;
+	}
+
+	.vertical__content .col.col_right {
+		@apply w-2/5;
+	}
+
+	.vertical__item:not(:last-child) {
+		@apply mb-60;
+	}
+
+	#horizontal {
+		@apply py-24;
+	}
+
+	.horizontal__content {
+		@apply flex;
+	}
+
+	.horizontal__item {
+		@apply mr-12 border border-gray-100;
+		padding: 200px 150px;
+	}
+	.horizontal__item:not(:last-child) {
+		@apply mr-12;
+	}
+
+	.horizontal__num {
+		@apply text-8xl font-black;
+		font-stretch: condensed;
+		color: #ff98a2;
+	}
+</style>
