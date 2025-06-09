@@ -65,10 +65,10 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 </script>
 
 <script>
-	import { initAnimations } from "../lib/animation-init.js";
+	import { animations } from "../lib/animation.js";
 
-	initAnimations();
-	document.addEventListener("astro:after-swap", initAnimations);
+	animations();
+	document.addEventListener("astro:after-swap", animations);
 </script>
 
 <Seo
