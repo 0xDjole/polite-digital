@@ -74,6 +74,13 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 	document.addEventListener("astro:after-swap", initTheme);
 </script>
 
+<!-- Global Animation Initialization -->
+<script>
+	import { initAnimations } from "../lib/gsap-init.js";
+
+	document.addEventListener("DOMContentLoaded", initAnimations);
+	document.addEventListener("astro:after-swap", initAnimations);
+</script>
 
 <Seo
 	type={type}

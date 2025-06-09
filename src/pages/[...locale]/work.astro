@@ -184,11 +184,9 @@ const { locale = defaultLocale } = Astro.props;
 </style>
 
 <script>
-	import { initAnimations } from "../../lib/gsap-init.js";
+	import { gsap, ScrollTrigger } from "../../lib/gsap-init.js";
 
-	function initWork() {
-		const { gsap, ScrollTrigger } = initAnimations();
-
+	function initWorkAnimations() {
 		// Horizontal scroll
 		let sections = gsap.utils.toArray(".horizontal__item");
 		gsap.to(sections, {
@@ -229,6 +227,6 @@ const { locale = defaultLocale } = Astro.props;
 		});
 	}
 
-	document.addEventListener("DOMContentLoaded", initWork);
-	document.addEventListener("astro:after-swap", initWork);
+	document.addEventListener("DOMContentLoaded", initWorkAnimations);
+	document.addEventListener("astro:after-swap", initWorkAnimations);
 </script>
