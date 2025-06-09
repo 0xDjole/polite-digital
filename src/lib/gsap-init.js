@@ -1,25 +1,39 @@
-// Minimal GSAP setup - industry standard
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function initGlobalGSAP() {
-  // Ensure page is visible first
+export function initAnimations() {
   gsap.set('body', { opacity: 1 });
-  gsap.set('*', { opacity: 1 }); // Emergency fallback
   
-  // Standard fade-in on scroll
+  // Init Lenis
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  });
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  // Connect to GSAP
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000);
+  });
+  gsap.ticker.lagSmoothing(0);
+
+  // Basic fade animations
   gsap.utils.toArray('.gsap-fade-up').forEach((element) => {
-    const delay = parseFloat(element.getAttribute('data-delay')) || 0;
-    
     gsap.fromTo(element, 
       { opacity: 0, y: 30 },
       {
         opacity: 1,
         y: 0,
         duration: 0.8,
-        delay: delay,
         scrollTrigger: {
           trigger: element,
           start: "top 80%",
@@ -29,25 +43,7 @@ export function initGlobalGSAP() {
     );
   });
 
-  // Stagger animations for groups
-  gsap.utils.toArray('.gsap-stagger').forEach(container => {
-    const items = container.querySelectorAll('.gsap-stagger-item');
-    
-    gsap.fromTo(items,
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: container,
-          start: "top 80%",
-          once: true
-        }
-      }
-    );
-  });
+  return { gsap, ScrollTrigger, lenis };
 }
 
 export { gsap, ScrollTrigger };

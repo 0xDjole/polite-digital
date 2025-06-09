@@ -184,20 +184,13 @@ const { locale = defaultLocale } = Astro.props;
 </style>
 
 <script>
-	import { initEnhancedAnimations } from "../../lib/animation-init.js";
+	import { initAnimations } from "../../lib/gsap-init.js";
 
-	async function initWorkPageAnimations() {
-		// Initialize Lenis + GSAP
-		const { lenis, gsap, ScrollTrigger } = await initEnhancedAnimations({
-			duration: 1.2,
-			easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-		});
+	function initWork() {
+		const { gsap, ScrollTrigger } = initAnimations();
 
-		if (!lenis || !gsap) return;
-
-		// Horizontal scroll animation
+		// Horizontal scroll
 		let sections = gsap.utils.toArray(".horizontal__item");
-
 		gsap.to(sections, {
 			xPercent: -100 * (sections.length - 1),
 			ease: "none",
@@ -236,9 +229,6 @@ const { locale = defaultLocale } = Astro.props;
 		});
 	}
 
-	// Initialize on DOM ready
-	document.addEventListener("DOMContentLoaded", initWorkPageAnimations);
-
-	// Handle Astro view transitions
-	document.addEventListener("astro:after-swap", initWorkPageAnimations);
+	document.addEventListener("DOMContentLoaded", initWork);
+	document.addEventListener("astro:after-swap", initWork);
 </script>
