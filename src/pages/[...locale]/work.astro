@@ -182,3 +182,63 @@ const { locale = defaultLocale } = Astro.props;
 		color: #ff98a2;
 	}
 </style>
+
+<script>
+	import { initEnhancedAnimations } from "../../lib/animation-init.js";
+
+	async function initWorkPageAnimations() {
+		// Initialize Lenis + GSAP
+		const { lenis, gsap, ScrollTrigger } = await initEnhancedAnimations({
+			duration: 1.2,
+			easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+		});
+
+		if (!lenis || !gsap) return;
+
+		// Horizontal scroll animation
+		let sections = gsap.utils.toArray(".horizontal__item");
+
+		gsap.to(sections, {
+			xPercent: -100 * (sections.length - 1),
+			ease: "none",
+			scrollTrigger: {
+				trigger: "#horizontal",
+				pin: true,
+				scrub: 1,
+				snap: 1 / (sections.length - 1),
+				end: () => "+=" + document.querySelector("#horizontal").offsetWidth,
+			},
+		});
+
+		// Vertical animations
+		gsap.from(".vertical__heading span", {
+			y: 100,
+			opacity: 0,
+			duration: 1.2,
+			stagger: 0.1,
+			ease: "power3.out",
+			scrollTrigger: {
+				trigger: ".vertical__heading",
+				start: "top 80%",
+			},
+		});
+
+		gsap.from(".vertical__item", {
+			y: 60,
+			opacity: 0,
+			duration: 1,
+			stagger: 0.2,
+			ease: "power3.out",
+			scrollTrigger: {
+				trigger: ".vertical__content",
+				start: "top 60%",
+			},
+		});
+	}
+
+	// Initialize on DOM ready
+	document.addEventListener("DOMContentLoaded", initWorkPageAnimations);
+
+	// Handle Astro view transitions
+	document.addEventListener("astro:after-swap", initWorkPageAnimations);
+</script>
