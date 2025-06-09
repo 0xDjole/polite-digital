@@ -2,13 +2,17 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import Lenis from 'lenis';
 
+// Register plugins
 gsap.registerPlugin(ScrollTrigger);
 
+let lenis;
+let isInitialized = false;
+
 export function initAnimations() {
-  gsap.set('body', { opacity: 1 });
+  if (isInitialized) return { gsap, ScrollTrigger, lenis };
   
   // Init Lenis
-  const lenis = new Lenis({
+  lenis = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
   });
@@ -26,6 +30,9 @@ export function initAnimations() {
   });
   gsap.ticker.lagSmoothing(0);
 
+  // Basic setup
+  gsap.set('body', { opacity: 1 });
+  
   // Basic fade animations
   gsap.utils.toArray('.gsap-fade-up').forEach((element) => {
     gsap.fromTo(element, 
@@ -43,6 +50,7 @@ export function initAnimations() {
     );
   });
 
+  isInitialized = true;
   return { gsap, ScrollTrigger, lenis };
 }
 

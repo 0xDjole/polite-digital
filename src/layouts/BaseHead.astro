@@ -52,17 +52,9 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 		const htmlElement = document.documentElement;
 
 		if (!colorTheme) {
-			// Default to dark mode if no preference is set
 			htmlElement.setAttribute("data-theme", "dark");
 			localStorage.setItem("colorTheme", "dark");
-
-			// Alternative: Use system preference (uncomment below and comment above)
-			// const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-			// const defaultTheme = prefersDark ? "dark" : "light";
-			// htmlElement.setAttribute("data-theme", defaultTheme);
-			// localStorage.setItem("colorTheme", defaultTheme);
 		} else {
-			// Apply the stored theme
 			htmlElement.setAttribute("data-theme", colorTheme);
 		}
 	}
@@ -77,8 +69,8 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 <!-- Global Animation Initialization -->
 <script>
 	import { initAnimations } from "../lib/gsap-init.js";
-
-	document.addEventListener("DOMContentLoaded", initAnimations);
+	
+	initAnimations();
 	document.addEventListener("astro:after-swap", initAnimations);
 </script>
 
