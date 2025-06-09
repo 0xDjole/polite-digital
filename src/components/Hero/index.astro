@@ -31,7 +31,10 @@ const heroImage = info.heroImage;
 		class="relative z-10 flex h-full w-full flex-col items-center justify-center px-4 text-center text-white"
 		id="hero-content"
 	>
-		<div class="hero-badge mb-4 flex items-center justify-center gsap-fade-up opacity-0" data-delay="0.2">
+		<div
+			class="hero-badge gsap-fade-up mb-4 flex items-center justify-center opacity-0"
+			data-delay="0.2"
+		>
 			<a
 				href="/blog/tsconfig-paths-setup/"
 				class="flex items-center gap-2 rounded-full border border-cyan-400/60 px-4 py-1 text-sm ring-1 ring-cyan-400/30 transition hover:border-cyan-300/80"
@@ -42,74 +45,30 @@ const heroImage = info.heroImage;
 		</div>
 
 		<h1
-			class="hero-title bg-gradient-to-r from-white to-gray-200 bg-clip-text pb-2 text-3xl font-semibold text-transparent sm:text-4xl md:text-5xl lg:text-6xl gsap-fade-up opacity-0"
+			class="hero-title gsap-fade-up bg-gradient-to-r from-white to-gray-200 bg-clip-text pb-2 text-3xl font-semibold text-transparent opacity-0 sm:text-4xl md:text-5xl lg:text-6xl"
 			data-delay="0.4"
 		>
 			{heroTitle}
 		</h1>
-		<p class="hero-subtitle mx-auto mt-2 max-w-md opacity-0 md:max-w-lg gsap-fade-up" data-delay="0.6">{heroSubtitle}</p>
+		<p
+			class="hero-subtitle gsap-fade-up mx-auto mt-2 max-w-md opacity-0 md:max-w-lg"
+			data-delay="0.6"
+		>
+			{heroSubtitle}
+		</p>
 
 		<div
-			class="hero-buttons mx-auto mt-8 flex max-w-xs flex-col justify-center gap-4 sm:max-w-sm sm:flex-row gsap-stagger"
+			class="hero-buttons gsap-stagger mx-auto mt-8 flex max-w-xs flex-col justify-center gap-4 sm:max-w-sm sm:flex-row"
 		>
-			<Button variant="primary" href="#pricing" class="cta gsap-stagger-item opacity-0">Get Started</Button>
-			<Button variant="outline" href="#features" arrow="right" class="cta gsap-stagger-item opacity-0">Overview</Button>
+			<Button variant="primary" href="#pricing" class="cta gsap-stagger-item opacity-0"
+				>Get Started</Button
+			>
+			<Button
+				variant="outline"
+				href="#features"
+				arrow="right"
+				class="cta gsap-stagger-item opacity-0">Overview</Button
+			>
 		</div>
 	</div>
 </section>
-
-<script type="module">
-	import { gsap, ScrollTrigger } from "../../lib/gsap-init.js";
-
-	// Enhanced Hero Animations
-	function initHeroAnimations() {
-		console.log("✨ Initializing PowerPoint-style Hero Animations");
-
-		// Background image reveal with scale effect
-		gsap.fromTo("#hero1 img", 
-			{ scale: 1.1, filter: "blur(2px)" },
-			{ 
-				scale: 1, 
-				filter: "blur(0px)",
-				duration: 2,
-				ease: "power2.out"
-			}
-		);
-
-		// Floating animation for badge
-		gsap.to(".hero-badge", {
-			y: -8,
-			duration: 3,
-			repeat: -1,
-			yoyo: true,
-			ease: "sine.inOut",
-		});
-
-		// Enhanced button hover animations
-		document.querySelectorAll(".hero-buttons .cta").forEach((button) => {
-			button.addEventListener("mouseenter", () => {
-				gsap.to(button, { 
-					scale: 1.05, 
-					y: -2,
-					boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-					duration: 0.3, 
-					ease: "power2.out" 
-				});
-			});
-
-			button.addEventListener("mouseleave", () => {
-				gsap.to(button, { 
-					scale: 1, 
-					y: 0,
-					boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-					duration: 0.3, 
-					ease: "power2.out" 
-				});
-			});
-		});
-	}
-
-	// Initialize animations
-	document.addEventListener("DOMContentLoaded", initHeroAnimations);
-	document.addEventListener("astro:after-swap", initHeroAnimations);
-</script>

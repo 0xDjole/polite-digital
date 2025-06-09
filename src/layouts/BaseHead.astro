@@ -59,17 +59,14 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 		}
 	}
 
-	// Run on initial page load
 	initTheme();
 
-	// Run on view transitions navigation
 	document.addEventListener("astro:after-swap", initTheme);
 </script>
 
-<!-- Global Animation Initialization -->
 <script>
-	import { initAnimations } from "../lib/gsap-init.js";
-	
+	import { initAnimations } from "../lib/animation-init.js";
+
 	initAnimations();
 	document.addEventListener("astro:after-swap", initAnimations);
 </script>
