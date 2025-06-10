@@ -187,44 +187,41 @@ const { locale = defaultLocale } = Astro.props;
 	import { animations } from "../../lib/animation.js";
 
 	function initWorkAnimations() {
-		// Horizontal scroll
-		const { gsap } = animations();
+		const { gsap, ScrollTrigger } = animations();
 
-		let sections = gsap.utils.toArray(".horizontal__item");
-		gsap.to(sections, {
-			xPercent: -100 * (sections.length - 1),
-			ease: "none",
+		// Vertical scroll animation
+		const section_1 = document.getElementById("vertical");
+		const col_left = document.querySelector(".col_left");
+		const timeln = gsap.timeline({ paused: true });
+
+		timeln.fromTo(
+			col_left,
+			{ y: 0 },
+			{ y: section_1?.scrollHeight - col_left.offsetHeight, duration: 1, ease: "none" },
+			0,
+		);
+
+		const scroll_1 = ScrollTrigger.create({
+			animation: timeln,
+			trigger: section_1,
+			start: "top top",
+			end: "bottom center",
+			scrub: true,
+		});
+
+		// Horizontal scroll animation
+		const section_2 = document.getElementById("horizontal");
+		let box_items = gsap.utils.toArray(".horizontal__item");
+
+		gsap.to(box_items, {
+			xPercent: -100 * (box_items.length - 1),
+			ease: "sine.out",
 			scrollTrigger: {
-				trigger: "#horizontal",
+				trigger: section_2,
 				pin: true,
-				scrub: 1,
-				snap: 1 / (sections.length - 1),
-				end: () => "+=" + document.querySelector("#horizontal").offsetWidth,
-			},
-		});
-
-		// Vertical animations
-		gsap.from(".vertical__heading span", {
-			y: 100,
-			opacity: 0,
-			duration: 1.2,
-			stagger: 0.1,
-			ease: "power3.out",
-			scrollTrigger: {
-				trigger: ".vertical__heading",
-				start: "top 80%",
-			},
-		});
-
-		gsap.from(".vertical__item", {
-			y: 60,
-			opacity: 0,
-			duration: 1,
-			stagger: 0.2,
-			ease: "power3.out",
-			scrollTrigger: {
-				trigger: ".vertical__content",
-				start: "top 60%",
+				scrub: 3,
+				snap: 1 / (box_items.length - 1),
+				end: "+=" + section_2.offsetWidth,
 			},
 		});
 	}
