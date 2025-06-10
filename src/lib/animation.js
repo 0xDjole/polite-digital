@@ -51,6 +51,26 @@ export function animations() {
 		);
 	});
 
+	gsap.utils.toArray(".gsap-stagger").forEach((container) => {
+		const items = container.querySelectorAll(".gsap-stagger-item");
+
+		gsap.fromTo(
+			items,
+			{ opacity: 0, y: 30 },
+			{
+				opacity: 1,
+				y: 0,
+				duration: 0.6,
+				stagger: 0.15,
+				scrollTrigger: {
+					trigger: container,
+					start: "top 80%",
+					once: true,
+				},
+			},
+		);
+	});
+
 	isInitialized = true;
 	return { gsap, ScrollTrigger, lenis };
 }
