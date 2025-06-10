@@ -1,126 +1,37 @@
 @import "tailwindcss/theme" theme(reference);
 @import "@/styles/tailwind-theme.css" theme(reference);
 
+/* Reset Lenis margins and overflow */
 html {
-	scroll-behavior: initial;
-	overflow: hidden;
-}
-
-html,
-body {
-	@apply min-h-full w-full;
+	overflow: hidden !important;
 }
 
 body {
-	@apply bg-black text-base font-normal text-white;
-	font-family: Slussen;
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: hidden !important;
 }
 
-h2 {
-	@apply m-0 border-l-4 p-6 text-6xl leading-none font-black uppercase;
-	border-color: #ff98a2;
+/* Remove any default margins from lenis wrapper */
+[data-lenis-wrapper] {
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
-h2 span {
-	@apply block;
+/* Full screen image container */
+.h-screen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 0;
 }
 
-h3 {
-	@apply text-xl leading-none font-normal uppercase;
-	font-stretch: expanded;
-	color: #ff98a2;
-}
-
-h2,
-h3,
-h4 {
-	@apply uppercase;
-}
-
-.container {
-	@apply mx-auto w-[95%];
-}
-
-section {
-	@apply py-12;
-}
-
-.col {
-	@apply w-1/2;
-}
-
-#vertical {
-	@apply w-screen;
-	height: 200vh;
-}
-
-.vertical__content {
-	@apply flex items-start justify-center;
-}
-
-.vertical__content .col_left {
-	@apply h-full;
-}
-
-.vertical__content .col.col_right {
-	@apply w-2/5;
-}
-
-.vertical__item:not(:last-child) {
-	@apply mb-60;
-}
-
-#horizontal {
-	@apply py-24;
-}
-
-.horizontal__content {
-	@apply flex;
-}
-
-.horizontal__item {
-	@apply mr-12 border border-gray-100;
-	padding: 200px 150px;
-}
-.horizontal__item:not(:last-child) {
-	@apply mr-12;
-}
-
-.horizontal__num {
-	@apply text-8xl font-black;
-	font-stretch: condensed;
-	color: #ff98a2;
-}
-
-.hidden-section {
-	@apply pointer-events-none absolute inset-0 opacity-0;
-	background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-	background-size: 400% 400%;
-	animation: gradientShift 3s ease infinite;
-}
-
-.colorful-content {
-	@apply flex h-full flex-col items-center justify-center p-8 text-center;
-}
-
-.colorful-content h2 {
-	@apply mb-4 text-4xl font-bold text-white;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.colorful-content p {
-	@apply text-lg text-white;
-	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-@keyframes gradientShift {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+/* Make the Image component fill the screen */
+.h-screen img {
+	width: 100vw;
+	height: 100vh;
+	object-fit: cover;
+	object-position: center;
+	display: block;
 }
