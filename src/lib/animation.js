@@ -54,5 +54,3 @@ export function animations() {
 	isInitialized = true;
 	return { gsap, ScrollTrigger, lenis };
 }
-
-export { gsap, ScrollTrigger };
