@@ -1,9 +1,7 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
+import MinimalLayout from "@layouts/MinimalLayout.astro";
 import { defaultLocale, locales } from "@lib/i18n";
-import background1 from "@/assets/images/background1.jpg";
 import "./guitar.css";
-import { Image } from "astro:assets";
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({
@@ -17,8 +15,8 @@ export function getStaticPaths() {
 const { locale = defaultLocale } = Astro.props;
 ---
 
-<div class="h-screen w-screen">
-	<Image src={background1} alt="background1" />
-</div>
+<MinimalLayout title="Guitar" description="Guitar interactive experience">
+	<div class="cover-image"></div>
+</MinimalLayout>
 
 <script src="./guitar.ts"></script>

@@ -356,4 +356,54 @@
 
 	.hover-border { @apply transition-colors duration-200; }
 	.hover-border:hover { border-color: var(--border-brand); }
+
+	/* Minimal Layout Styles */
+	.minimal-layout {
+		overflow: auto;
+		height: 100%;
+	}
+
+	.minimal-layout html {
+		scroll-behavior: auto;
+	}
+
+	.minimal-body {
+		margin: 0;
+		padding: 0;
+		min-height: 100vh;
+		width: 100%;
+		overflow-x: hidden;
+	}
+
+	.minimal-main {
+		width: 100%;
+		min-height: 100vh;
+		position: relative;
+	}
+
+	.minimal-nav {
+		position: relative;
+		z-index: 50;
+	}
+
+	.minimal-footer {
+		position: relative;
+		z-index: 10;
+	}
+
+	/* Override Lenis for minimal pages */
+	.minimal-layout.no-scroll {
+		overflow: hidden;
+	}
+
+	.minimal-body.no-scroll {
+		overflow: hidden;
+	}
+
+	/* Disable Lenis on minimal pages */
+	.minimal-layout [data-lenis-wrapper],
+	.minimal-layout [data-lenis-content] {
+		transform: none !important;
+		will-change: auto !important;
+	}
 }
