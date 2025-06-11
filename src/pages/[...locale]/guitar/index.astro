@@ -16,7 +16,68 @@ const { locale = defaultLocale } = Astro.props;
 ---
 
 <MinimalLayout title="Guitar" description="Guitar interactive experience">
-	<div class="cover-image"></div>
+	<!--  <div class="cover-image"></div> -->
+
+	<div class="content-wrapper">
+		<header id="site-header">
+			<nav class="site-nav">
+				<ul>
+					<li><a href="#">Shope</a></li>
+					<li><a href="#">Article</a></li>
+					<li><a href="#">Contact</a></li>
+				</ul>
+
+				<div class="site-title" id="title">
+					<h1>Maximize</h1>
+				</div>
+				<div class="copy-right">
+					<p>&copy; 2025 All Rights Reserved</p>
+				</div>
+			</nav>
+		</header>
+
+		<main id="site-main">
+			<section class="discover" id="discover">
+				<div class="container">
+					<div class="slide">
+						<h1 class="slide1">Discover</h1>
+					</div>
+
+					<div class="slide">
+						<h1 class="slide2">Latest Trend</h1>
+					</div>
+
+					<div class="slide">
+						<h1 class="slide3">Minimal</h1>
+					</div>
+
+					<div class="slide">
+						<h1 class="slide4">Effort</h1>
+					</div>
+				</div>
+			</section>
+
+			<section class="discover" id="discover">
+				<div class="container">
+					<div class="slide">
+						<h1 class="slide1">Discover</h1>
+					</div>
+
+					<div class="slide">
+						<h1 class="slide2">Latest Trend</h1>
+					</div>
+
+					<div class="slide">
+						<h1 class="slide3">Minimal</h1>
+					</div>
+
+					<div class="slide">
+						<h1 class="slide4">Effort</h1>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
 </MinimalLayout>
 
 <script src="./guitar.ts"></script>
