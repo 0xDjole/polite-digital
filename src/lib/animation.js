@@ -2,14 +2,13 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Lenis from "lenis";
 
-// Register plugins
-gsap.registerPlugin(ScrollTrigger);
-
 let lenis;
 let isInitialized = false;
 
 export function animations() {
 	if (isInitialized) return { gsap, ScrollTrigger, lenis };
+
+	gsap.registerPlugin(ScrollTrigger);
 
 	// Init Lenis
 	lenis = new Lenis({
