@@ -75,3 +75,19 @@
 	letter-spacing: -5px;
 	line-height: 0.9;
 }
+
+#image-section .container {
+	width: 100vw;
+	display: flex;
+	justify-content: center;
+}
+
+#image-section .container .cover {
+	width: 100%;
+	height: 100vh;
+	background-image: url("../../../assets//images//background2.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: none;
+	background-attachment: fixed;
+}

@@ -22,10 +22,10 @@ function initWorkAnimations() {
 
 	const discover_tl = gsap.timeline({
 		scrollTrigger: {
-			trigger: ".slide1",
+			trigger: ".discover",
 			scrub: 1,
 			start: "top center",
-			markers: true,
+			end: "bottom+=300 center",
 		},
 	});
 
@@ -43,6 +43,20 @@ function initWorkAnimations() {
 
 	discover_tl.to(".slide4", {
 		y: 220,
+	});
+
+	const image_tl = gsap.timeline();
+
+	image_tl.from(".cover", {
+		borderRadius: "50%",
+		width: "300px",
+		height: "300px",
+		scrollTrigger: {
+			trigger: "#image-section",
+			start: "top bottom-=200",
+			end: "top center",
+			scrub: true,
+		},
 	});
 }
 
