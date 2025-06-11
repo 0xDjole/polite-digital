@@ -63,6 +63,10 @@
 	text-align: center;
 }
 
+#discover .slide {
+	overflow: hidden;
+}
+
 #discover .slide h1 {
 	display: block;
 	font-size: 16vw;

@@ -14,11 +14,36 @@ function initWorkAnimations() {
 			scale: 1,
 			scrollTrigger: {
 				trigger: "#title",
-				end: "bottom top",
-				scrub: 1,
+				end: "bottom top-30",
+				scrub: true,
 			},
 		},
 	);
+
+	const discover_tl = gsap.timeline({
+		scrollTrigger: {
+			trigger: ".slide1",
+			scrub: 1,
+			start: "top center",
+			markers: true,
+		},
+	});
+
+	discover_tl.to(".slide1", {
+		y: 220,
+	});
+
+	discover_tl.to(".slide2", {
+		y: 220,
+	});
+
+	discover_tl.to(".slide3", {
+		y: 220,
+	});
+
+	discover_tl.to(".slide4", {
+		y: 220,
+	});
 }
 
 document.addEventListener("DOMContentLoaded", initWorkAnimations);
