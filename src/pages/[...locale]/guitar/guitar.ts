@@ -23,28 +23,44 @@ function initWorkAnimations() {
 	const discover_tl = gsap.timeline({
 		scrollTrigger: {
 			trigger: ".discover",
-			scrub: 1,
+			scrub: 1.5,
 			start: "top center",
-			end: "bottom+=200 center",
+			end: "bottom+=300 center",
 		},
 	});
 
 	discover_tl.to(".slide1", {
-		y: 220,
+		y: 150,
+		rotation: -2,
 	});
 
-	discover_tl.to(".slide2", {
-		y: 220,
-	});
+	discover_tl.to(
+		".slide2",
+		{
+			y: 180,
+			rotation: 1,
+		},
+		"-=0.5",
+	);
 
-	discover_tl.to(".slide3", {
-		y: 220,
-	});
+	discover_tl.to(
+		".slide3",
+		{
+			y: 220,
+			rotation: -1,
+		},
+		"-=0.5",
+	);
 
-	discover_tl.to(".slide4", {
-		y: 250,
-		rotate: 45,
-	});
+	discover_tl.to(
+		".slide4",
+		{
+			y: 280,
+			rotation: 3,
+			scale: 1.1,
+		},
+		"-=0.5",
+	);
 
 	const image_tl = gsap.timeline();
 
@@ -63,7 +79,8 @@ function initWorkAnimations() {
 		".the-best",
 		{
 			opacity: 0,
-			scale: 0.5,
+			scale: 0.8,
+			y: 50,
 			scrollTrigger: {
 				trigger: "#image-section",
 				start: "top top",
