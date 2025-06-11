@@ -48,14 +48,13 @@ function initWorkAnimations() {
 	const image_tl = gsap.timeline();
 
 	image_tl.from(".cover", {
-		borderRadius: "50%",
-		width: "300px",
-		height: "300px",
+		clipPath: "circle(20% at 50% 50%)",
 		scrollTrigger: {
 			trigger: "#image-section",
-			start: "top bottom-=200",
-			end: "top center",
-			scrub: true,
+			start: "top top",
+			end: "bottom top",
+			scrub: 2,
+			pin: true,
 		},
 	});
 }

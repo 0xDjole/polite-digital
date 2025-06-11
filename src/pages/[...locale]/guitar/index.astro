@@ -2,6 +2,8 @@
 import MinimalLayout from "@layouts/MinimalLayout.astro";
 import { defaultLocale, locales } from "@lib/i18n";
 import "./guitar.css";
+import Background2 from "@assets/images/background2.jpg";
+import { Image } from "astro:assets";
 
 export function getStaticPaths() {
 	return locales.map((locale) => ({
@@ -38,7 +40,7 @@ const { locale = defaultLocale } = Astro.props;
 
 		<main id="site-main">
 			<section class="discover" id="discover">
-				<div class="container">
+				<div class="cont">
 					<div class="slide">
 						<h1 class="slide1">Discover</h1>
 					</div>
@@ -57,8 +59,8 @@ const { locale = defaultLocale } = Astro.props;
 				</div>
 			</section>
 			<section class="image-section" id="image-section">
-				<div class="container">
-					<div class="cover"></div>
+				<div class="cont">
+					<img class="cover" src={Background2.src} alt="background2" />
 				</div>
 			</section>
 
