@@ -25,7 +25,7 @@ function initWorkAnimations() {
 			trigger: ".discover",
 			scrub: 1,
 			start: "top center",
-			end: "bottom+=300 center",
+			end: "bottom+=200 center",
 		},
 	});
 
@@ -42,7 +42,8 @@ function initWorkAnimations() {
 	});
 
 	discover_tl.to(".slide4", {
-		y: 220,
+		y: 250,
+		rotate: 45,
 	});
 
 	const image_tl = gsap.timeline();
@@ -57,6 +58,21 @@ function initWorkAnimations() {
 			pin: true,
 		},
 	});
+
+	image_tl.from(
+		".the-best",
+		{
+			opacity: 0,
+			scale: 0.5,
+			scrollTrigger: {
+				trigger: "#image-section",
+				start: "top top",
+				end: "bottom top",
+				scrub: 2,
+			},
+		},
+		0,
+	);
 }
 
 document.addEventListener("DOMContentLoaded", initWorkAnimations);
