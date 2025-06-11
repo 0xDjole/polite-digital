@@ -105,6 +105,8 @@
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
 
 	html {
@@ -115,12 +117,6 @@
 	/* Prevent layout shift during animations */
 	section {
 		will-change: transform, opacity;
-	}
-
-	/* Smooth animation defaults */
-	* {
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
 	}
 
 	[data-theme="dark"] {
@@ -219,16 +215,6 @@
 	*:focus-visible {
 		outline-color: var(--text-primary);
 		@apply !transition-none;
-	}
-
-	html {
-		background-color: var(--bg-primary);
-		color: var(--text-primary);
-		@apply leading-[1.6rem];
-		scroll-behavior: smooth;
-		-moz-text-size-adjust: none;
-		-webkit-text-size-adjust: none;
-		text-size-adjust: none;
 	}
 
 	body {
