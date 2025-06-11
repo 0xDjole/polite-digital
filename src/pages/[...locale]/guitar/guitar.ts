@@ -112,68 +112,89 @@ function initWorkAnimations() {
 	});
 
 	// Step 2: Show first paragraph
-	aboutTl.to(".reveal-text:nth-child(1)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+	aboutTl.to(
+		".reveal-text:nth-child(1)",
+		{
+			opacity: 1,
+			y: 0,
+			duration: 2,
+			ease: "power2.out",
+		},
+		"+=1",
+	);
 
 	// Step 3: Show second paragraph
-	aboutTl.to(".reveal-text:nth-child(2)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+	aboutTl.to(
+		".reveal-text:nth-child(2)",
+		{
+			opacity: 1,
+			y: 0,
+			duration: 2,
+			ease: "power2.out",
+		},
+		"+=1",
+	);
 
 	// Step 4: Show third paragraph
-	aboutTl.to(".reveal-text:nth-child(3)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+	aboutTl.to(
+		".reveal-text:nth-child(3)",
+		{
+			opacity: 1,
+			y: 0,
+			duration: 2,
+			ease: "power2.out",
+		},
+		"+=1",
+	);
 
 	// Step 5: Show stats one by one
-	aboutTl.to(".stat-item:nth-child(1)", {
-		opacity: 1,
-		scale: 1,
-		duration: 1.5,
-		ease: "power2.out",
-	}, "+=1");
+	aboutTl.to(
+		".stat-item:nth-child(1)",
+		{
+			opacity: 1,
+			scale: 1,
+			duration: 1.5,
+			ease: "power2.out",
+		},
+		"+=1",
+	);
 
-	aboutTl.to(".stat-item:nth-child(2)", {
-		opacity: 1,
-		scale: 1,
-		duration: 1.5,
-		ease: "power2.out",
-	}, "+=0.5");
+	aboutTl.to(
+		".stat-item:nth-child(2)",
+		{
+			opacity: 1,
+			scale: 1,
+			duration: 1.5,
+			ease: "power2.out",
+		},
+		"+=0.5",
+	);
 
-	aboutTl.to(".stat-item:nth-child(3)", {
-		opacity: 1,
-		scale: 1,
-		duration: 1.5,
-		ease: "power2.out",
-	}, "+=0.5");
+	aboutTl.to(
+		".stat-item:nth-child(3)",
+		{
+			opacity: 1,
+			scale: 1,
+			duration: 1.5,
+			ease: "power2.out",
+		},
+		"+=0.5",
+	);
 
-	// Counter animation
+	// Slow, cinematic counter animation
 	const counters = document.querySelectorAll(".stat-number");
 	counters.forEach((counter) => {
 		const target = parseInt(counter.getAttribute("data-count"));
 		gsap.to(counter, {
 			textContent: target,
-			duration: 2,
+			duration: 3,
 			ease: "power2.out",
 			snap: { textContent: 1 },
-			scrollTrigger: {
-				trigger: counter,
-				start: "top 80%",
-			},
+			delay: 0.5,
 		});
 	});
 
-	// Services section - PowerPoint style with smooth reveals
+	// Services section - Simple horizontal scroll
 	const servicesTl = gsap.timeline({
 		scrollTrigger: {
 			trigger: ".services-section",
@@ -184,42 +205,33 @@ function initWorkAnimations() {
 		},
 	});
 
-	// Step 1: Show services title
 	servicesTl.to(".services-section .section-title", {
 		opacity: 1,
 		y: 0,
-		duration: 2,
-		ease: "power2.out",
+		duration: 1,
 	});
 
-	// Step 2-5: Show each service card one by one
+	servicesTl.to(".services-grid", {
+		x: "-100vw",
+		duration: 8,
+		ease: "none",
+	}, "+=0.5");
+
 	servicesTl.to(".service-card:nth-child(1)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+		onStart: () => document.querySelector(".service-card:nth-child(1)").classList.add("active"),
+	}, "1");
 
 	servicesTl.to(".service-card:nth-child(2)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+		onStart: () => document.querySelector(".service-card:nth-child(2)").classList.add("active"),
+	}, "3");
 
 	servicesTl.to(".service-card:nth-child(3)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+		onStart: () => document.querySelector(".service-card:nth-child(3)").classList.add("active"),
+	}, "5");
 
 	servicesTl.to(".service-card:nth-child(4)", {
-		opacity: 1,
-		y: 0,
-		duration: 2,
-		ease: "power2.out",
-	}, "+=1");
+		onStart: () => document.querySelector(".service-card:nth-child(4)").classList.add("active"),
+	}, "7");
 
 	// Simple CTA animation
 	gsap.to(".cta-title, .cta-text, .cta-button", {
