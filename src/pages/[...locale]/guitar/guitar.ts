@@ -24,8 +24,10 @@ function initWorkAnimations() {
 		scrollTrigger: {
 			trigger: ".discover",
 			scrub: 1.5,
-			start: "top center",
-			end: "bottom+=300 center",
+			start: "top top",
+			end: "bottom top",
+			pin: true,
+			markers: true,
 		},
 	});
 
