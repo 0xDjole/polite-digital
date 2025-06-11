@@ -62,11 +62,75 @@ const { locale = defaultLocale } = Astro.props;
 				<div class="cont">
 					<img class="cover" src={Background2.src} alt="background2" />
 				</div>
-
-				<h2 class="the-best">Best guitars in the world</h2>
+				<h2 class="the-best">Expert Guitar Restoration</h2>
 			</section>
 
-			<div class="h-[1000px]"></div>
+			<section class="about-section" id="about">
+				<div class="container">
+					<div class="about-content">
+						<div class="about-text">
+							<h2 class="section-title" data-text="Our Story">Our Story</h2>
+							<div class="text-block">
+								<p class="reveal-text">It started in a small garage in 1985. Our founder, a passionate guitarist and craftsman, couldn't find anyone who truly understood the soul of his vintage instruments.</p>
+								<p class="reveal-text">What began as fixing guitars for friends became a lifelong mission to preserve the music that moves us all.</p>
+								<p class="reveal-text">Today, we're trusted by musicians worldwide to breathe new life into their most cherished instruments.</p>
+							</div>
+						</div>
+						<div class="about-stats">
+							<div class="stat-item">
+								<span class="stat-number" data-count="2000">0</span>
+								<span class="stat-label">Guitars Restored</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-number" data-count="38">0</span>
+								<span class="stat-label">Years Experience</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-number" data-count="500">0</span>
+								<span class="stat-label">Happy Musicians</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="services-section" id="services">
+				<div class="container">
+					<h2 class="section-title" data-text="Our Services">Our Services</h2>
+					<div class="services-grid">
+						<div class="service-card">
+							<div class="service-icon">🎸</div>
+							<h3>Complete Restoration</h3>
+							<p>Full restoration of vintage and modern guitars, bringing them back to their original glory.</p>
+						</div>
+						<div class="service-card">
+							<div class="service-icon">🔧</div>
+							<h3>Setup & Repair</h3>
+							<p>Professional setup, fret work, and electronic repairs to optimize your instrument's performance.</p>
+						</div>
+						<div class="service-card">
+							<div class="service-icon">🎨</div>
+							<h3>Custom Finishes</h3>
+							<p>Beautiful custom paint jobs and refinishing work that respects your guitar's character.</p>
+						</div>
+						<div class="service-card">
+							<div class="service-icon">⚡</div>
+							<h3>Electronics</h3>
+							<p>Pickup installation, wiring, and electronic upgrades for modern functionality.</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="cta-section" id="contact">
+				<div class="container">
+					<div class="cta-content">
+						<h2 class="cta-title">Ready to Restore Your Guitar?</h2>
+						<p class="cta-text">Let's bring your instrument back to life with the care and expertise it deserves.</p>
+						<a href="/contact" class="cta-button">Get A Quote</a>
+					</div>
+				</div>
+			</section>
 		</main>
 	</div>
 </MinimalLayout>
