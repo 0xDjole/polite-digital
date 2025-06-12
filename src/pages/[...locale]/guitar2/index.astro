@@ -3,6 +3,9 @@ import MinimalLayout from "@layouts/MinimalLayout.astro";
 import { defaultLocale, locales } from "@lib/i18n";
 import "./guitar2.css";
 import Background2 from "@assets/images/background2.jpg";
+import HeroLayer1 from "@assets/images/hero-img-layer-1.jpg";
+import HeroLayer2 from "@assets/images/hero-img-layer-2.png";
+import Logo from "@assets/images/logo.png";
 import { Image } from "astro:assets";
 
 export function getStaticPaths() {
@@ -18,6 +21,51 @@ const { locale = defaultLocale } = Astro.props;
 ---
 
 <MinimalLayout title="Guitar Services" description="Professional guitar servicing and sales">
+	<section class="hero">
+		<div class="hero-img-container">
+			<img src={HeroLayer1.src} alt="" />
+
+			<div class="hero-img-logo">
+				<img src={Logo.src} alt="" />
+			</div>
+
+			<img src={HeroLayer2.src} alt="" />
+
+			<div class="hero-img-copy">
+				<p>Scroll down to reveal</p>
+			</div>
+		</div>
+
+		<div class="fade-overlay"></div>
+
+		<div class="overlay">
+			<svg width="100%" height="100%">
+				<defs>
+					<mask id="logoRevealMask">
+						<rect width="100%" height="100%" fill="white" />
+						<path id="logoMask"></path>
+					</mask>
+				</defs>
+				<rect
+					width="100%"
+					height="100%"
+					fill="#111117"
+					mask="url(#logoRevealMask)"
+				/>
+			</svg>
+		</div>
+
+		<div class="logo-container"></div>
+
+		<div class="overlay-copy">
+			<h1>
+				Guitar <br />
+				Excellence <br />
+				Premium Care
+			</h1>
+		</div>
+	</section>
+
 	<div class="model"></div>
 	
 	<div class="container">
@@ -61,6 +109,11 @@ const { locale = defaultLocale } = Astro.props;
 			<h1>Your guitar deserves <span>the best</span> care possible</h1>
 		</section>
 	</div>
+
+	<section class="outro">
+		<p>Experience excellence in guitar care.</p>
+	</section>
 </MinimalLayout>
 
+<script type="module" src="./logo.js"></script>
 <script src="./guitar2.ts"></script>
