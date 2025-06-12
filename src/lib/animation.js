@@ -1,14 +1,15 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { SplitText } from "gsap/dist/SplitText";
 import Lenis from "lenis";
 
 let lenis;
 let isInitialized = false;
 
 export function animations() {
-	if (isInitialized) return { gsap, ScrollTrigger, lenis };
+	if (isInitialized) return { gsap, ScrollTrigger, SplitText, lenis };
 
-	gsap.registerPlugin(ScrollTrigger);
+	gsap.registerPlugin(ScrollTrigger, SplitText);
 
 	// Init Lenis
 	lenis = new Lenis({
@@ -71,5 +72,5 @@ export function animations() {
 	});
 
 	isInitialized = true;
-	return { gsap, ScrollTrigger, lenis };
+	return { gsap, ScrollTrigger, SplitText, lenis };
 }

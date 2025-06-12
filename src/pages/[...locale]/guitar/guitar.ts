@@ -1,7 +1,7 @@
 import { animations } from "../../../lib/animation.js";
 
 function initWorkAnimations() {
-	const { gsap, ScrollTrigger } = animations();
+	const { gsap, ScrollTrigger, SplitText } = animations();
 
 	gsap.fromTo(
 		"#title",
@@ -76,21 +76,24 @@ function initWorkAnimations() {
 		},
 	});
 
-	image_tl.from(
-		".the-best",
-		{
-			opacity: 0,
-			scale: 0.8,
-			y: 50,
-			scrollTrigger: {
-				trigger: "#image-section",
-				start: "top top",
-				end: "bottom top",
-				scrub: 2,
-			},
+	// Split text animation for "Expert Guitar Restoration"
+	const splitText = new SplitText(".the-best", { type: "chars" });
+	
+	gsap.set(splitText.chars, { opacity: 0, y: 100 });
+	
+	image_tl.to(splitText.chars, {
+		opacity: 1,
+		y: 0,
+		duration: 0.8,
+		stagger: 0.05,
+		ease: "back.out(1.7)",
+		scrollTrigger: {
+			trigger: "#image-section",
+			start: "top top",
+			end: "bottom top",
+			scrub: 2,
 		},
-		0,
-	);
+	}, 0);
 
 	// About section - PowerPoint style story flow
 	const aboutTl = gsap.timeline({
