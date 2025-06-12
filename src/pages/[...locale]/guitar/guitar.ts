@@ -3,10 +3,8 @@ import { animations } from "../../../lib/animation.js";
 function initWorkAnimations() {
 	const { gsap, ScrollTrigger, SplitText } = animations();
 	
-	// Check for reduced motion preference and mobile
+	// Check for reduced motion preference
 	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-	const isMobile = window.innerWidth < 768;
-	
 	if (prefersReducedMotion) {
 		return; // Skip all animations
 	}
@@ -14,36 +12,42 @@ function initWorkAnimations() {
 	// Set default easing for all animations
 	gsap.defaults({ ease: "cubic-bezier(0.4, 0.0, 0.2, 1)" });
 
-	// Simplified title animation for mobile
-	if (!isMobile) {
+	// Detect screen size for simplified mobile approach
+	const isSmallScreen = window.innerWidth < 768;
+	const isVerySmall = window.innerWidth < 480;
+
+	// Title animation - simplified for small screens
+	if (!isVerySmall) {
 		gsap.fromTo(
 			"#title",
 			{
-				scale: 3,
-				y: -100,
+				scale: isSmallScreen ? 2 : 3,
+				y: isSmallScreen ? -50 : -100,
 			},
 			{
 				y: 0,
 				scale: 1,
+				duration: isSmallScreen ? 0.8 : 1.2,
 				scrollTrigger: {
 					trigger: "#title",
-					end: "bottom top-30",
-					scrub: true,
+					start: "top 90%",
+					end: isSmallScreen ? "bottom 70%" : "bottom top-30",
+					scrub: isSmallScreen ? 0.5 : true,
 				},
 			},
 		);
 	}
 
-	// Simplified discover animation for mobile
-	if (isMobile) {
-		// Simple fade-in animation for mobile
+	// Discover section animations
+	if (isSmallScreen) {
+		// Simple mobile animation
 		gsap.fromTo(".slide h1", 
-			{ opacity: 0, y: 50 },
+			{ opacity: 0, y: 30 },
 			{ 
 				opacity: 1, 
 				y: 0, 
-				duration: 0.8,
-				stagger: 0.2,
+				duration: 0.6,
+				stagger: 0.15,
 				scrollTrigger: {
 					trigger: ".discover",
 					start: "top 80%"
@@ -51,7 +55,7 @@ function initWorkAnimations() {
 			}
 		);
 	} else {
-		// Full desktop animation
+		// Desktop animation with pinning
 		const discover_tl = gsap.timeline({
 			scrollTrigger: {
 				trigger: ".discover",
@@ -97,17 +101,17 @@ function initWorkAnimations() {
 	}
 
 	// Image section animations
-	if (isMobile) {
+	if (isSmallScreen) {
 		// Simple mobile version
 		gsap.fromTo(".the-best", 
-			{ opacity: 0, y: 30 },
+			{ opacity: 0, y: 20 },
 			{ 
 				opacity: 1, 
 				y: 0, 
-				duration: 1,
+				duration: 0.8,
 				scrollTrigger: {
 					trigger: "#image-section",
-					start: "top 60%"
+					start: "top 70%"
 				}
 			}
 		);
@@ -129,7 +133,7 @@ function initWorkAnimations() {
 		// Split text animation for "Expert Guitar Restoration"
 		const splitText = new SplitText(".the-best", { type: "chars" });
 
-		gsap.set(splitText.chars, { opacity: 0, y: 100 });
+		gsap.set(splitText.chars, { opacity: 0, y: 50 });
 
 		image_tl.to(
 			splitText.chars,
@@ -137,7 +141,7 @@ function initWorkAnimations() {
 				opacity: 1,
 				y: 0,
 				duration: 0.6,
-				stagger: 0.05,
+				stagger: 0.03,
 				ease: "power2.out",
 				scrollTrigger: {
 					trigger: "#image-section",
@@ -151,7 +155,7 @@ function initWorkAnimations() {
 	}
 
 	// About section animations
-	if (isMobile) {
+	if (isSmallScreen) {
 		// Simple mobile animations
 		gsap.fromTo(".about-section .section-title", 
 			{ opacity: 0, y: 30 },
@@ -167,8 +171,25 @@ function initWorkAnimations() {
 			{ opacity: 0, scale: 0.8 },
 			{ opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, scrollTrigger: { trigger: ".about-stats", start: "top 80%" } }
 		);
+
+		// Simple counter animation
+		const counters = document.querySelectorAll(".stat-number");
+		counters.forEach((counter, index) => {
+			const target = parseInt(counter.getAttribute("data-count"));
+			gsap.to(counter, {
+				textContent: target,
+				duration: 1,
+				ease: "power2.out",
+				snap: { textContent: 1 },
+				delay: index * 0.2,
+				scrollTrigger: {
+					trigger: counter,
+					start: "top 80%"
+				}
+			});
+		});
 	} else {
-		// Full desktop animation
+		// Full desktop animation with pinning
 		const aboutTl = gsap.timeline({
 			scrollTrigger: {
 				trigger: ".about-section",
@@ -179,39 +200,39 @@ function initWorkAnimations() {
 			},
 		});
 
-	// Step 1: Show title
-	aboutTl.to(".about-section .section-title", {
-		opacity: 1,
-		y: 0,
-		duration: 0.6,
-		ease: "power2.out",
-	});
-
-	// Step 2-4: Show paragraphs with stagger
-	aboutTl.to(
-		".reveal-text",
-		{
+		// Step 1: Show title
+		aboutTl.to(".about-section .section-title", {
 			opacity: 1,
 			y: 0,
-			duration: 0.5,
-			stagger: 0.1,
+			duration: 0.6,
 			ease: "power2.out",
-		},
-		"+=0.3",
-	);
+		});
 
-	// Step 5: Show stats with stagger
-	aboutTl.to(
-		".stat-item",
-		{
-			opacity: 1,
-			scale: 1,
-			duration: 0.4,
-			stagger: 0.1,
-			ease: "power2.out",
-		},
-		"+=0.3",
-	);
+		// Step 2-4: Show paragraphs with stagger
+		aboutTl.to(
+			".reveal-text",
+			{
+				opacity: 1,
+				y: 0,
+				duration: 0.5,
+				stagger: 0.1,
+				ease: "power2.out",
+			},
+			"+=0.3",
+		);
+
+		// Step 5: Show stats with stagger
+		aboutTl.to(
+			".stat-item",
+			{
+				opacity: 1,
+				scale: 1,
+				duration: 0.4,
+				stagger: 0.1,
+				ease: "power2.out",
+			},
+			"+=0.3",
+		);
 
 		// Counter animation
 		const counters = document.querySelectorAll(".stat-number");
@@ -228,7 +249,7 @@ function initWorkAnimations() {
 	}
 
 	// Services section
-	if (isMobile) {
+	if (isSmallScreen) {
 		// Simple mobile services animation
 		gsap.fromTo(".services-section .section-title", 
 			{ opacity: 0, y: 30 },
@@ -236,11 +257,11 @@ function initWorkAnimations() {
 		);
 		
 		gsap.fromTo(".service-card", 
-			{ opacity: 0, x: 50 },
+			{ opacity: 0, x: 30 },
 			{ opacity: 1, x: 0, duration: 0.8, stagger: 0.2, scrollTrigger: { trigger: ".services-grid", start: "top 80%" } }
 		);
 	} else {
-		// Full desktop animation
+		// Full desktop animation with horizontal scroll
 		const servicesTl = gsap.timeline({
 			scrollTrigger: {
 				trigger: ".services-section",
@@ -270,7 +291,7 @@ function initWorkAnimations() {
 		servicesTl.to(
 			".service-card:nth-child(1)",
 			{
-				onStart: () => document.querySelector(".service-card:nth-child(1)").classList.add("active"),
+				onStart: () => document.querySelector(".service-card:nth-child(1)")?.classList.add("active"),
 			},
 			"1",
 		);
@@ -278,7 +299,7 @@ function initWorkAnimations() {
 		servicesTl.to(
 			".service-card:nth-child(2)",
 			{
-				onStart: () => document.querySelector(".service-card:nth-child(2)").classList.add("active"),
+				onStart: () => document.querySelector(".service-card:nth-child(2)")?.classList.add("active"),
 			},
 			"3",
 		);
@@ -286,7 +307,7 @@ function initWorkAnimations() {
 		servicesTl.to(
 			".service-card:nth-child(3)",
 			{
-				onStart: () => document.querySelector(".service-card:nth-child(3)").classList.add("active"),
+				onStart: () => document.querySelector(".service-card:nth-child(3)")?.classList.add("active"),
 			},
 			"5",
 		);
@@ -294,7 +315,7 @@ function initWorkAnimations() {
 		servicesTl.to(
 			".service-card:nth-child(4)",
 			{
-				onStart: () => document.querySelector(".service-card:nth-child(4)").classList.add("active"),
+				onStart: () => document.querySelector(".service-card:nth-child(4)")?.classList.add("active"),
 			},
 			"7",
 		);
@@ -314,10 +335,10 @@ function initWorkAnimations() {
 	});
 
 	// Grid animations
-	if (isMobile) {
+	if (isSmallScreen) {
 		// Simple mobile grid animation
 		gsap.fromTo(".box", 
-			{ opacity: 0, y: 30 },
+			{ opacity: 0, y: 20 },
 			{ 
 				opacity: 1, 
 				y: 0, 
@@ -336,7 +357,7 @@ function initWorkAnimations() {
 			const boxes = wrapper.querySelectorAll(".box");
 
 			boxes.forEach((box, index) => {
-				const y = gridIndex % 2 ? 500 - index * 100 : 500 + index * 100;
+				const y = gridIndex % 2 ? 300 - index * 50 : 300 + index * 50;
 
 				gsap.from(box, {
 					y,
@@ -345,12 +366,21 @@ function initWorkAnimations() {
 						trigger: box,
 						start: "top bottom",
 						end: "top bottom",
-						scrub: 2,
+						scrub: 1.5,
 					},
 				});
 			});
 		});
 	}
+
+	// Handle window resize
+	let resizeTimer;
+	window.addEventListener('resize', () => {
+		clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(() => {
+			ScrollTrigger.refresh();
+		}, 100);
+	});
 }
 
 document.addEventListener("DOMContentLoaded", initWorkAnimations);
