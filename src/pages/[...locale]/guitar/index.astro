@@ -173,65 +173,26 @@ const { locale = defaultLocale } = Astro.props;
 			</section>
 
 			<section class="flying-images" id="flying-images">
-				<div class="flying-text">Images</div>
-
-				<div class="grid-wrapper">
-					<div class="grid-items">
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
+				<div class="flying-text">Gallery</div>
+				
+				<div class="flying-container">
+					<div class="flying-image" data-delay="0">
+						<img src={Background2.src} alt="Guitar restoration work" loading="lazy" />
 					</div>
-				</div>
-
-				<div class="grid-wrapper">
-					<div class="grid-items">
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
+					<div class="flying-image" data-delay="1">
+						<img src={Background2.src} alt="Guitar restoration work" loading="lazy" />
 					</div>
-				</div>
-
-				<div class="grid-wrapper">
-					<div class="grid-items">
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
-						</div>
+					<div class="flying-image" data-delay="2">
+						<img src={Background2.src} alt="Guitar restoration work" loading="lazy" />
+					</div>
+					<div class="flying-image" data-delay="3">
+						<img src={Background2.src} alt="Guitar restoration work" loading="lazy" />
+					</div>
+					<div class="flying-image" data-delay="4">
+						<img src={Background2.src} alt="Guitar restoration work" loading="lazy" />
+					</div>
+					<div class="flying-image" data-delay="5">
+						<img src={Background2.src} alt="Guitar restoration work" loading="lazy" />
 					</div>
 				</div>
 			</section>
