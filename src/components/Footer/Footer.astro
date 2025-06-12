@@ -1,30 +1,18 @@
 ---
-import FooterLink from "@components/Footer/FooterLink.astro";
-import SiteLogo from "@components/SiteLogo/SiteLogo.astro";
-
 import { cmsApi, getBlockFromArray } from "@lib/index";
-import { getLocale, getRelativeLocaleUrl } from "@lib/i18n";
+import { getLocale } from "@lib/i18n";
 
-const { getCollection, getBlockObjectValues } = cmsApi();
+const { getCollection } = cmsApi();
 const websiteCollection = await getCollection("website");
 
 const currLocale = getLocale(Astro.currentLocale);
 const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
-
-const today = new Date();
 ---
 
-<div class="border-secondary mt-20 border-t">
-	<footer class="site-container m-auto w-full pb-6">
-		<div class="text-muted text-sm">
-			&copy; {today.getFullYear()}
-			{" "}{siteData.name}. All rights reserved.
+<footer class="w-full py-8 mt-16 border-t border-gray-200 dark:border-gray-800">
+	<div class="container mx-auto px-4 text-center">
+		<div class="text-sm text-gray-600 dark:text-gray-400">
+			{siteData.footerText}
 		</div>
-		<div class="sr-only">
-			<p>
-				A website template crafted with love by <a href="https://cosmicthemes.com/">Cosmic Themes</a
-				>
-			</p>
-		</div>
-	</footer>
-</div>
+	</div>
+</footer>
