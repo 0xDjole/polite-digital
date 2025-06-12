@@ -91,7 +91,7 @@ section {
 	top: 0;
 	left: 0;
 	width: 100vw;
-	height: 150vh;
+	height: 100vh;
 	z-index: 1;
 	transform-origin: center center;
 }

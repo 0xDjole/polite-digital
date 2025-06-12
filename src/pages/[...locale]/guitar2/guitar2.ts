@@ -1,12 +1,11 @@
 import { animations } from "../../../lib/animation.js";
 // @ts-ignore
-import { logoData } from "./logo.js";
 
 function initGuitar2Animations() {
 	const { gsap, ScrollTrigger } = animations();
 
 	// Initialize smooth scrolling with Lenis (if available)
-	if (typeof window !== 'undefined' && (window as any).Lenis) {
+	if (typeof window !== "undefined" && (window as any).Lenis) {
 		const lenis = new (window as any).Lenis();
 		lenis.on("scroll", ScrollTrigger.update);
 		gsap.ticker.add((time: number) => {
@@ -33,48 +32,6 @@ function initGuitar2Animations() {
 		const overlayCopy = document.querySelector(".overlay-copy h1") as HTMLElement;
 
 		const initialOverlayScale = 500;
-		const logoContainer = document.querySelector(".logo-container");
-		const logoMask = document.getElementById("logoMask");
-
-		if (logoMask) {
-			logoMask.setAttribute("d", logoData);
-		}
-
-		function updateLogoMask() {
-			if (!logoContainer || !logoMask) return;
-			
-			const logoDimensions = logoContainer.getBoundingClientRect();
-			const logoBoundingBox = logoMask.getBBox();
-
-			const horizontalScaleRatio = logoDimensions.width / logoBoundingBox.width;
-			const verticalScaleRatio = logoDimensions.height / logoBoundingBox.height;
-			const logoScaleFactor = Math.min(horizontalScaleRatio, verticalScaleRatio);
-
-			const logoHorizontalPosition =
-				logoDimensions.left +
-				(logoDimensions.width - logoBoundingBox.width * logoScaleFactor) / 2 -
-				logoBoundingBox.x * logoScaleFactor;
-			const logoVerticalPosition =
-				logoDimensions.top +
-				(logoDimensions.height - logoBoundingBox.height * logoScaleFactor) / 2 -
-				logoBoundingBox.y * logoScaleFactor;
-
-			logoMask.setAttribute(
-				"transform",
-				`translate(${logoHorizontalPosition}, ${logoVerticalPosition}) scale(${logoScaleFactor})`
-			);
-		}
-
-		updateLogoMask();
-
-		gsap.set(svgOverlay, {
-			transformOrigin: "50% 50%",
-			xPercent: 0,
-			yPercent: 0,
-			left: 0,
-			top: 0,
-			scale: initialOverlayScale,
-		});
 
 		let scrollTriggerInstance: any;
 
@@ -108,8 +65,7 @@ function initGuitar2Animations() {
 						const normalizedProgress = scrollProgress * (1 / 0.85);
 						const heroImgContainerScale = 1.5 - 0.5 * normalizedProgress;
 						const overlayScale =
-							initialOverlayScale *
-							Math.pow(1 / initialOverlayScale, normalizedProgress);
+							initialOverlayScale * Math.pow(1 / initialOverlayScale, normalizedProgress);
 						let fadeOverlayOpacity = 0;
 
 						gsap.set(heroImgContainer, {
@@ -123,10 +79,7 @@ function initGuitar2Animations() {
 						});
 
 						if (scrollProgress >= 0.25) {
-							fadeOverlayOpacity = Math.min(
-								1,
-								(scrollProgress - 0.25) * (1 / 0.4)
-							);
+							fadeOverlayOpacity = Math.min(1, (scrollProgress - 0.25) * (1 / 0.4));
 						}
 
 						gsap.set(fadeOverlay, {
@@ -163,7 +116,6 @@ function initGuitar2Animations() {
 		setupScrollTrigger();
 
 		window.addEventListener("resize", () => {
-			updateLogoMask();
 			ScrollTrigger.refresh();
 			setupScrollTrigger();
 		});
@@ -198,7 +150,13 @@ function initGuitar2Animations() {
 		let animationFrameId: number | null = null;
 		let canvasXPosition = 0;
 
-		function drawTriangle(ctx: CanvasRenderingContext2D, x: number, y: number, fillScale = 0, flipped = false) {
+		function drawTriangle(
+			ctx: CanvasRenderingContext2D,
+			x: number,
+			y: number,
+			fillScale = 0,
+			flipped = false,
+		) {
 			const halfSize = triangleSize / 2;
 
 			if (fillScale < SCALE_THRESHOLD) {
@@ -252,16 +210,14 @@ function initGuitar2Animations() {
 			outlineCtx.clearRect(0, 0, outlineCanvas.width, outlineCanvas.height);
 			fillCtx.clearRect(0, 0, fillCanvas.width, fillCanvas.height);
 
-			const animationProgress =
-				scrollProgress <= 0.65 ? 0 : (scrollProgress - 0.65) / 0.35;
+			const animationProgress = scrollProgress <= 0.65 ? 0 : (scrollProgress - 0.65) / 0.35;
 
 			let needsUpdate = false;
 			const animationSpeed = 0.15;
 
 			triangleStates.forEach((state: any) => {
 				if (state.scale < 1) {
-					const x =
-						state.col * (triangleSize * 0.5) + triangleSize / 2 + canvasXPosition;
+					const x = state.col * (triangleSize * 0.5) + triangleSize / 2 + canvasXPosition;
 					const y = state.row * triangleSize + triangleSize / 2;
 					const flipped = (state.row + state.col) % 2 !== 0;
 					drawTriangle(outlineCtx, x, y, 0, flipped);
@@ -271,8 +227,7 @@ function initGuitar2Animations() {
 			triangleStates.forEach((state: any) => {
 				const shouldBeVisible = state.order <= animationProgress;
 				const targetScale = shouldBeVisible ? 1 : 0;
-				const newScale =
-					state.scale + (targetScale - state.scale) * animationSpeed;
+				const newScale = state.scale + (targetScale - state.scale) * animationSpeed;
 
 				if (Math.abs(newScale - state.scale) > 0.001) {
 					state.scale = newScale;
@@ -280,8 +235,7 @@ function initGuitar2Animations() {
 				}
 
 				if (state.scale >= SCALE_THRESHOLD) {
-					const x =
-						state.col * (triangleSize * 0.5) + triangleSize / 2 + canvasXPosition;
+					const x = state.col * (triangleSize * 0.5) + triangleSize / 2 + canvasXPosition;
 					const y = state.row * triangleSize + triangleSize / 2;
 					const flipped = (state.row + state.col) % 2 !== 0;
 					drawTriangle(fillCtx, x, y, state.scale, flipped);
@@ -353,33 +307,41 @@ function initGuitar2Animations() {
 	}
 
 	// Add simple intro animations
-	gsap.fromTo(".hero-intro h1", {
-		opacity: 0,
-		y: 50,
-	}, {
-		opacity: 1,
-		y: 0,
-		duration: 1.5,
-		ease: "power3.out",
-		scrollTrigger: {
-			trigger: ".hero-intro",
-			start: "top 80%",
-		}
-	});
+	gsap.fromTo(
+		".hero-intro h1",
+		{
+			opacity: 0,
+			y: 50,
+		},
+		{
+			opacity: 1,
+			y: 0,
+			duration: 1.5,
+			ease: "power3.out",
+			scrollTrigger: {
+				trigger: ".hero-intro",
+				start: "top 80%",
+			},
+		},
+	);
 
-	gsap.fromTo(".outro h1", {
-		opacity: 0,
-		y: 50,
-	}, {
-		opacity: 1,
-		y: 0,
-		duration: 1.5,
-		ease: "power3.out",
-		scrollTrigger: {
-			trigger: ".outro",
-			start: "top 80%",
-		}
-	});
+	gsap.fromTo(
+		".outro h1",
+		{
+			opacity: 0,
+			y: 50,
+		},
+		{
+			opacity: 1,
+			y: 0,
+			duration: 1.5,
+			ease: "power3.out",
+			scrollTrigger: {
+				trigger: ".outro",
+				start: "top 80%",
+			},
+		},
+	);
 }
 
 document.addEventListener("DOMContentLoaded", initGuitar2Animations);
