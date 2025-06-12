@@ -23,17 +23,22 @@ const { locale = defaultLocale } = Astro.props;
 	<div class="content-wrapper">
 		<header id="site-header">
 			<nav class="site-nav" role="navigation" aria-label="Main navigation">
-				<ul>
-					<li><a href="#" aria-label="Shop for guitar services">Shop</a></li>
-					<li><a href="#" aria-label="Read articles about guitar restoration">Articles</a></li>
-					<li><a href="#contact" aria-label="Contact us for guitar restoration">Contact</a></li>
-				</ul>
+				<div class="nav-left">
+					<ul>
+						<li><a href="#" aria-label="Shop for guitar services">Shop</a></li>
+						<li><a href="#" aria-label="Read articles about guitar restoration">Articles</a></li>
+						<li><a href="#contact" aria-label="Contact us for guitar restoration">Contact</a></li>
+					</ul>
+				</div>
 
 				<div class="site-title" id="title">
 					<h1>Maximize</h1>
 				</div>
-				<div class="copy-right">
-					<p>&copy; 2025 All Rights Reserved</p>
+				
+				<div class="nav-right">
+					<div class="copy-right">
+						<p>&copy; 2025 All Rights Reserved</p>
+					</div>
 				</div>
 			</nav>
 		</header>
