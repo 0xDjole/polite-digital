@@ -173,7 +173,6 @@
 	padding: 0 2rem;
 }
 
-
 @media (max-width: 768px) {
 	.about-content {
 		grid-template-columns: 1fr;
@@ -210,7 +209,6 @@
 	opacity: 0;
 	transform: scale(0.8);
 }
-
 
 .stat-number {
 	display: block;
@@ -268,18 +266,20 @@
 }
 
 .service-card::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0;
 	left: -100%;
 	width: 100%;
 	height: 100%;
-	background: linear-gradient(90deg, 
-		transparent, 
-		rgba(255, 69, 0, 0.05), 
-		rgba(255, 140, 0, 0.1), 
-		rgba(255, 69, 0, 0.05), 
-		transparent);
+	background: linear-gradient(
+		90deg,
+		transparent,
+		rgba(255, 69, 0, 0.05),
+		rgba(255, 140, 0, 0.1),
+		rgba(255, 69, 0, 0.05),
+		transparent
+	);
 	transition: left 3s ease;
 	z-index: 1;
 	pointer-events: none;
@@ -295,18 +295,13 @@
 }
 
 .service-card::after {
-	content: '';
+	content: "";
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	width: 100%;
 	height: 2px;
-	background: linear-gradient(90deg, 
-		transparent, 
-		#ff4500, 
-		#ff8c00, 
-		#ff4500, 
-		transparent);
+	background: linear-gradient(90deg, transparent, #ff4500, #ff8c00, #ff4500, transparent);
 	background-size: 200% 100%;
 	animation: ember-glow 4s ease-in-out infinite;
 	opacity: 0;
@@ -316,7 +311,6 @@
 .service-card.revealed::after {
 	opacity: 0.6;
 }
-
 
 .service-card:hover {
 	transform: translateY(-5px) scale(1.02);
@@ -403,7 +397,7 @@
 }
 
 .cta-button::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0;
 	left: -100%;
@@ -429,7 +423,8 @@
 
 /* Electric and Plasma Animations */
 @keyframes electric-flow {
-	0%, 100% {
+	0%,
+	100% {
 		background-position: 0% 50%;
 	}
 	50% {
@@ -450,11 +445,16 @@
 }
 
 @keyframes text-glow {
-	0%, 100% {
-		text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+	0%,
+	100% {
+		text-shadow:
+			0 0 5px rgba(255, 255, 255, 0.5),
+			0 0 10px rgba(255, 255, 255, 0.3);
 	}
 	50% {
-		text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
+		text-shadow:
+			0 0 20px rgba(255, 255, 255, 0.8),
+			0 0 30px rgba(255, 255, 255, 0.6);
 	}
 }
 
@@ -489,7 +489,7 @@
 }
 
 .morphing-border::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: -2px;
 	left: -2px;
@@ -504,7 +504,8 @@
 }
 
 @keyframes ember-glow {
-	0%, 100% {
+	0%,
+	100% {
 		background-position: 0% 50%;
 		opacity: 0.3;
 	}
@@ -515,10 +516,37 @@
 }
 
 @keyframes subtle-flicker {
-	0%, 100% {
+	0%,
+	100% {
 		box-shadow: 0 8px 32px rgba(255, 69, 0, 0.1);
 	}
 	50% {
 		box-shadow: 0 8px 32px rgba(255, 69, 0, 0.2);
 	}
+}
+
+#flying-images {
+	margin: 0 2rem;
+	display: relative;
+}
+
+.flying-text {
+	position: absolute;
+	bottom: 0;
+	font-size: 14vw;
+	font-weight: 700;
+	letter-spacing: -5px;
+	color: var(--text-primary);
+}
+
+.grid-wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+.grid-wrapper .grid-items {
+	display: flex;
+	justify-content: space-between;
+	align-items: end;
+	gap: 8vw;
 }

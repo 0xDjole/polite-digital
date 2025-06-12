@@ -78,22 +78,26 @@ function initWorkAnimations() {
 
 	// Split text animation for "Expert Guitar Restoration"
 	const splitText = new SplitText(".the-best", { type: "chars" });
-	
+
 	gsap.set(splitText.chars, { opacity: 0, y: 100 });
-	
-	image_tl.to(splitText.chars, {
-		opacity: 1,
-		y: 0,
-		duration: 0.8,
-		stagger: 0.05,
-		ease: "back.out(1.7)",
-		scrollTrigger: {
-			trigger: "#image-section",
-			start: "top top",
-			end: "bottom top",
-			scrub: 2,
+
+	image_tl.to(
+		splitText.chars,
+		{
+			opacity: 1,
+			y: 0,
+			duration: 0.8,
+			stagger: 0.05,
+			ease: "back.out(1.7)",
+			scrollTrigger: {
+				trigger: "#image-section",
+				start: "top top",
+				end: "bottom top",
+				scrub: 2,
+			},
 		},
-	}, 0);
+		0,
+	);
 
 	// About section - PowerPoint style story flow
 	const aboutTl = gsap.timeline({
@@ -214,27 +218,47 @@ function initWorkAnimations() {
 		duration: 1,
 	});
 
-	servicesTl.to(".services-grid", {
-		x: "-100vw",
-		duration: 8,
-		ease: "none",
-	}, "+=0.5");
+	servicesTl.to(
+		".services-grid",
+		{
+			x: "-100vw",
+			duration: 8,
+			ease: "none",
+		},
+		"+=0.5",
+	);
 
-	servicesTl.to(".service-card:nth-child(1)", {
-		onStart: () => document.querySelector(".service-card:nth-child(1)").classList.add("active"),
-	}, "1");
+	servicesTl.to(
+		".service-card:nth-child(1)",
+		{
+			onStart: () => document.querySelector(".service-card:nth-child(1)").classList.add("active"),
+		},
+		"1",
+	);
 
-	servicesTl.to(".service-card:nth-child(2)", {
-		onStart: () => document.querySelector(".service-card:nth-child(2)").classList.add("active"),
-	}, "3");
+	servicesTl.to(
+		".service-card:nth-child(2)",
+		{
+			onStart: () => document.querySelector(".service-card:nth-child(2)").classList.add("active"),
+		},
+		"3",
+	);
 
-	servicesTl.to(".service-card:nth-child(3)", {
-		onStart: () => document.querySelector(".service-card:nth-child(3)").classList.add("active"),
-	}, "5");
+	servicesTl.to(
+		".service-card:nth-child(3)",
+		{
+			onStart: () => document.querySelector(".service-card:nth-child(3)").classList.add("active"),
+		},
+		"5",
+	);
 
-	servicesTl.to(".service-card:nth-child(4)", {
-		onStart: () => document.querySelector(".service-card:nth-child(4)").classList.add("active"),
-	}, "7");
+	servicesTl.to(
+		".service-card:nth-child(4)",
+		{
+			onStart: () => document.querySelector(".service-card:nth-child(4)").classList.add("active"),
+		},
+		"7",
+	);
 
 	// Simple CTA animation
 	gsap.to(".cta-title, .cta-text, .cta-button", {
@@ -247,6 +271,26 @@ function initWorkAnimations() {
 			trigger: ".cta-section",
 			start: "top 80%",
 		},
+	});
+
+	const gridWrapper = gsap.utils.toArray(".grid-items");
+	gridWrapper.forEach((wrapper, gridIndex) => {
+		const boxes = wrapper.querySelectorAll(".box");
+
+		boxes.forEach((box, index) => {
+			const y = gridIndex % 2 ? 500 - index * 100 : 500 + index * 100;
+
+			gsap.from(box, {
+				y,
+				duration: 0.5,
+				scrollTrigger: {
+					trigger: box,
+					start: "top bottom",
+					end: "top bottom",
+					scrub: 2,
+				},
+			});
+		});
 	});
 }
 

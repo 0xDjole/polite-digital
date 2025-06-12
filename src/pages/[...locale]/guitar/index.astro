@@ -71,9 +71,19 @@ const { locale = defaultLocale } = Astro.props;
 						<div class="about-text">
 							<h2 class="section-title" data-text="Our Story">Our Story</h2>
 							<div class="text-block">
-								<p class="reveal-text">It started in a small garage in 1985. Our founder, a passionate guitarist and craftsman, couldn't find anyone who truly understood the soul of his vintage instruments.</p>
-								<p class="reveal-text">What began as fixing guitars for friends became a lifelong mission to preserve the music that moves us all.</p>
-								<p class="reveal-text">Today, we're trusted by musicians worldwide to breathe new life into their most cherished instruments.</p>
+								<p class="reveal-text">
+									It started in a small garage in 1985. Our founder, a passionate guitarist and
+									craftsman, couldn't find anyone who truly understood the soul of his vintage
+									instruments.
+								</p>
+								<p class="reveal-text">
+									What began as fixing guitars for friends became a lifelong mission to preserve the
+									music that moves us all.
+								</p>
+								<p class="reveal-text">
+									Today, we're trusted by musicians worldwide to breathe new life into their most
+									cherished instruments.
+								</p>
 							</div>
 						</div>
 						<div class="about-stats">
@@ -102,39 +112,116 @@ const { locale = defaultLocale } = Astro.props;
 							<div class="service-card">
 								<div class="service-icon">🎸</div>
 								<h3>Complete Restoration</h3>
-								<p>Full restoration of vintage and modern guitars, bringing them back to their original glory.</p>
+								<p>
+									Full restoration of vintage and modern guitars, bringing them back to their
+									original glory.
+								</p>
 							</div>
 							<div class="service-card">
 								<div class="service-icon">🔧</div>
 								<h3>Setup & Repair</h3>
-								<p>Professional setup, fret work, and electronic repairs to optimize your instrument's performance.</p>
+								<p>
+									Professional setup, fret work, and electronic repairs to optimize your
+									instrument's performance.
+								</p>
 							</div>
 							<div class="service-card">
 								<div class="service-icon">🎨</div>
 								<h3>Custom Finishes</h3>
-								<p>Beautiful custom paint jobs and refinishing work that respects your guitar's character.</p>
+								<p>
+									Beautiful custom paint jobs and refinishing work that respects your guitar's
+									character.
+								</p>
 							</div>
 							<div class="service-card">
 								<div class="service-icon">⚡</div>
 								<h3>Electronics</h3>
-								<p>Pickup installation, wiring, and electronic upgrades for modern functionality.</p>
+								<p>
+									Pickup installation, wiring, and electronic upgrades for modern functionality.
+								</p>
 							</div>
 						</div>
 					</div>
 				</div>
 			</section>
 
-			<section class="cta-section" id="contact">
-				<div class="container">
-					<div class="cta-content">
-						<h2 class="cta-title">Ready to Restore Your Guitar?</h2>
-						<p class="cta-text">Let's bring your instrument back to life with the care and expertise it deserves.</p>
-						<a href="/contact" class="cta-button">Get A Quote</a>
+			<section class="flying-images" id="flying-images">
+				<div class="flying-text">Images</div>
+
+				<div class="grid-wrapper">
+					<div class="grid-items">
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+					</div>
+				</div>
+
+				<div class="grid-wrapper">
+					<div class="grid-items">
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+					</div>
+				</div>
+
+				<div class="grid-wrapper">
+					<div class="grid-items">
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="background2" />
+						</div>
 					</div>
 				</div>
 			</section>
 		</main>
 	</div>
 </MinimalLayout>
+
+<section class="cta-section" id="contact">
+	<div class="cont">
+		<div class="cta-content">
+			<h2 class="cta-title">Ready to Restore Your Guitar?</h2>
+			<p class="cta-text">
+				Let's bring your instrument back to life with the care and expertise it deserves.
+			</p>
+			<a href="/contact" class="cta-button">Get A Quote</a>
+		</div>
+	</div>
+</section>
 
 <script src="./guitar.ts"></script>
