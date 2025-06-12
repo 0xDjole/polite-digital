@@ -22,11 +22,11 @@ const { locale = defaultLocale } = Astro.props;
 
 	<div class="content-wrapper">
 		<header id="site-header">
-			<nav class="site-nav">
+			<nav class="site-nav" role="navigation" aria-label="Main navigation">
 				<ul>
-					<li><a href="#">Shope</a></li>
-					<li><a href="#">Article</a></li>
-					<li><a href="#">Contact</a></li>
+					<li><a href="#" aria-label="Shop for guitar services">Shop</a></li>
+					<li><a href="#" aria-label="Read articles about guitar restoration">Articles</a></li>
+					<li><a href="#contact" aria-label="Contact us for guitar restoration">Contact</a></li>
 				</ul>
 
 				<div class="site-title" id="title">
@@ -60,7 +60,7 @@ const { locale = defaultLocale } = Astro.props;
 			</section>
 			<section class="image-section" id="image-section">
 				<div class="cont">
-					<img class="cover" src={Background2.src} alt="background2" />
+					<img class="cover" src={Background2.src} alt="Expert guitar restoration workspace showing vintage instruments" loading="eager" width="1920" height="1080" />
 				</div>
 				<h2 class="the-best">Expert Guitar Restoration</h2>
 			</section>
@@ -109,32 +109,54 @@ const { locale = defaultLocale } = Astro.props;
 					<h2 class="section-title" data-text="Our Services">Our Services</h2>
 					<div class="services-container">
 						<div class="services-grid">
-							<div class="service-card">
-								<div class="service-icon">🎸</div>
+							<div class="service-card" tabindex="0" role="article" aria-label="Complete guitar restoration service">
+								<div class="service-icon" aria-hidden="true">
+									<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M3 7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+										<path d="M13 8.5h8m-8 3h8m-8 3h8"/>
+										<circle cx="9" cy="9" r="2"/>
+										<circle cx="8" cy="14" r="2"/>
+									</svg>
+								</div>
 								<h3>Complete Restoration</h3>
 								<p>
 									Full restoration of vintage and modern guitars, bringing them back to their
 									original glory.
 								</p>
 							</div>
-							<div class="service-card">
-								<div class="service-icon">🔧</div>
+							<div class="service-card" tabindex="0" role="article" aria-label="Guitar setup and repair service">
+								<div class="service-icon" aria-hidden="true">
+									<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+									</svg>
+								</div>
 								<h3>Setup & Repair</h3>
 								<p>
 									Professional setup, fret work, and electronic repairs to optimize your
 									instrument's performance.
 								</p>
 							</div>
-							<div class="service-card">
-								<div class="service-icon">🎨</div>
+							<div class="service-card" tabindex="0" role="article" aria-label="Custom guitar finishing service">
+								<div class="service-icon" aria-hidden="true">
+									<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M21 3a1 1 0 0 0-1.24-.53L9 6.5V17l2.76-.92a1 1 0 0 1 1.24.53z"/>
+										<path d="m3 9 6-2v10.5c0 .5-.5 1.5-2 1.5s-2-1-2-1.5c0-.5.5-1.5 2-1.5z"/>
+									</svg>
+								</div>
 								<h3>Custom Finishes</h3>
 								<p>
 									Beautiful custom paint jobs and refinishing work that respects your guitar's
 									character.
 								</p>
 							</div>
-							<div class="service-card">
-								<div class="service-icon">⚡</div>
+							<div class="service-card" tabindex="0" role="article" aria-label="Guitar electronics service">
+								<div class="service-icon" aria-hidden="true">
+									<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="13 2 13 9 20 9"/>
+										<path d="M13 3L19.4 8.5a2 2 0 0 1 0 2.8l-5.1 5.1a2 2 0 0 1-2.8 0L3 8"/>
+										<path d="M7 21L21 7"/>
+									</svg>
+								</div>
 								<h3>Electronics</h3>
 								<p>
 									Pickup installation, wiring, and electronic upgrades for modern functionality.
@@ -151,39 +173,19 @@ const { locale = defaultLocale } = Astro.props;
 				<div class="grid-wrapper">
 					<div class="grid-items">
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
-						</div>
-					</div>
-				</div>
-
-				<div class="grid-wrapper">
-					<div class="grid-items">
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
-						</div>
-
-						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 					</div>
 				</div>
@@ -191,19 +193,39 @@ const { locale = defaultLocale } = Astro.props;
 				<div class="grid-wrapper">
 					<div class="grid-items">
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 
 						<div class="box">
-							<img class="cover" src={Background2.src} alt="background2" />
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
+						</div>
+					</div>
+				</div>
+
+				<div class="grid-wrapper">
+					<div class="grid-items">
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
+						</div>
+
+						<div class="box">
+							<img class="cover" src={Background2.src} alt="Guitar restoration gallery image" loading="lazy" width="400" height="300" />
 						</div>
 					</div>
 				</div>
@@ -219,7 +241,7 @@ const { locale = defaultLocale } = Astro.props;
 			<p class="cta-text">
 				Let's bring your instrument back to life with the care and expertise it deserves.
 			</p>
-			<a href="/contact" class="cta-button">Get A Quote</a>
+			<a href="/contact" class="cta-button" role="button" aria-label="Get a quote for guitar restoration">Get A Quote</a>
 		</div>
 	</div>
 </section>

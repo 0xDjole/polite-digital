@@ -2,6 +2,15 @@ import { animations } from "../../../lib/animation.js";
 
 function initWorkAnimations() {
 	const { gsap, ScrollTrigger, SplitText } = animations();
+	
+	// Check for reduced motion preference
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	if (prefersReducedMotion) {
+		return; // Skip all animations
+	}
+	
+	// Set default easing for all animations
+	gsap.defaults({ ease: "cubic-bezier(0.4, 0.0, 0.2, 1)" });
 
 	gsap.fromTo(
 		"#title",
@@ -86,9 +95,9 @@ function initWorkAnimations() {
 		{
 			opacity: 1,
 			y: 0,
-			duration: 0.8,
+			duration: 0.6,
 			stagger: 0.05,
-			ease: "back.out(1.7)",
+			ease: "power2.out",
 			scrollTrigger: {
 				trigger: "#image-section",
 				start: "top top",
@@ -114,90 +123,46 @@ function initWorkAnimations() {
 	aboutTl.to(".about-section .section-title", {
 		opacity: 1,
 		y: 0,
-		duration: 2,
+		duration: 0.6,
 		ease: "power2.out",
 	});
 
-	// Step 2: Show first paragraph
+	// Step 2-4: Show paragraphs with stagger
 	aboutTl.to(
-		".reveal-text:nth-child(1)",
+		".reveal-text",
 		{
 			opacity: 1,
 			y: 0,
-			duration: 2,
+			duration: 0.5,
+			stagger: 0.1,
 			ease: "power2.out",
 		},
-		"+=1",
+		"+=0.3",
 	);
 
-	// Step 3: Show second paragraph
+	// Step 5: Show stats with stagger
 	aboutTl.to(
-		".reveal-text:nth-child(2)",
-		{
-			opacity: 1,
-			y: 0,
-			duration: 2,
-			ease: "power2.out",
-		},
-		"+=1",
-	);
-
-	// Step 4: Show third paragraph
-	aboutTl.to(
-		".reveal-text:nth-child(3)",
-		{
-			opacity: 1,
-			y: 0,
-			duration: 2,
-			ease: "power2.out",
-		},
-		"+=1",
-	);
-
-	// Step 5: Show stats one by one
-	aboutTl.to(
-		".stat-item:nth-child(1)",
+		".stat-item",
 		{
 			opacity: 1,
 			scale: 1,
-			duration: 1.5,
+			duration: 0.4,
+			stagger: 0.1,
 			ease: "power2.out",
 		},
-		"+=1",
+		"+=0.3",
 	);
 
-	aboutTl.to(
-		".stat-item:nth-child(2)",
-		{
-			opacity: 1,
-			scale: 1,
-			duration: 1.5,
-			ease: "power2.out",
-		},
-		"+=0.5",
-	);
-
-	aboutTl.to(
-		".stat-item:nth-child(3)",
-		{
-			opacity: 1,
-			scale: 1,
-			duration: 1.5,
-			ease: "power2.out",
-		},
-		"+=0.5",
-	);
-
-	// Slow, cinematic counter animation
+	// Counter animation
 	const counters = document.querySelectorAll(".stat-number");
-	counters.forEach((counter) => {
+	counters.forEach((counter, index) => {
 		const target = parseInt(counter.getAttribute("data-count"));
 		gsap.to(counter, {
 			textContent: target,
-			duration: 3,
+			duration: 0.6,
 			ease: "power2.out",
 			snap: { textContent: 1 },
-			delay: 0.5,
+			delay: index * 0.1,
 		});
 	});
 
@@ -215,7 +180,7 @@ function initWorkAnimations() {
 	servicesTl.to(".services-section .section-title", {
 		opacity: 1,
 		y: 0,
-		duration: 1,
+		duration: 0.4,
 	});
 
 	servicesTl.to(
@@ -260,12 +225,12 @@ function initWorkAnimations() {
 		"7",
 	);
 
-	// Simple CTA animation
+	// CTA animation
 	gsap.to(".cta-title, .cta-text, .cta-button", {
 		opacity: 1,
 		y: 0,
-		duration: 1,
-		stagger: 0.3,
+		duration: 0.4,
+		stagger: 0.1,
 		ease: "power2.out",
 		scrollTrigger: {
 			trigger: ".cta-section",
@@ -282,7 +247,7 @@ function initWorkAnimations() {
 
 			gsap.from(box, {
 				y,
-				duration: 0.5,
+				duration: 0.4,
 				scrollTrigger: {
 					trigger: box,
 					start: "top bottom",

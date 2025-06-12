@@ -17,7 +17,7 @@
 	position: sticky;
 	top: 0;
 	z-index: 1000;
-	background: rgba(0, 0, 0, 0.95);
+	background: rgba(16, 16, 16, 0.95);
 	backdrop-filter: blur(10px);
 	width: 100%;
 	text-align: center;
@@ -29,7 +29,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 1.5rem 2rem;
+	padding: 24px 32px;
 	color: white;
 }
 
@@ -46,7 +46,7 @@
 
 .site-nav ul {
 	display: flex;
-	gap: 1rem;
+	gap: 16px;
 }
 
 .site-nav ul li a {
@@ -56,10 +56,19 @@
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.8);
 	transition: color 0.3s ease;
+	padding: 8px 16px;
+	border-radius: 8px;
+	outline-offset: 4px;
 }
 
 .site-nav ul li a:hover {
 	color: white;
+}
+
+.site-nav ul li a:focus {
+	outline: 2px solid white;
+	color: white;
+	background: rgba(255, 255, 255, 0.1);
 }
 
 #discover {
@@ -71,7 +80,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin-top: 9rem;
+	margin-top: 144px;
 	text-align: center;
 }
 
@@ -135,7 +144,7 @@
 	font-weight: 800;
 	text-transform: uppercase;
 	letter-spacing: -0.02em;
-	margin-bottom: 3rem;
+	margin-bottom: 48px;
 	text-align: center;
 	position: relative;
 	color: var(--text-primary);
@@ -156,8 +165,8 @@
 
 /* About Section */
 .about-section {
-	padding: 8rem 0;
-	background: #0a0a0a;
+	padding: 128px 0;
+	background: #0F0F0F;
 	color: white;
 	min-height: 100vh;
 }
@@ -165,12 +174,12 @@
 .about-content {
 	display: grid;
 	grid-template-columns: 1fr 300px;
-	gap: 4rem;
+	gap: 64px;
 	align-items: center;
 	height: 100vh;
 	max-width: 1200px;
 	margin: 0 auto;
-	padding: 0 2rem;
+	padding: 0 32px;
 }
 
 @media (max-width: 768px) {
@@ -187,7 +196,7 @@
 .reveal-text {
 	font-size: 1.2rem;
 	line-height: 1.8;
-	margin-bottom: 2rem;
+	margin-bottom: 32px;
 	opacity: 0;
 	transform: translateY(30px);
 	color: rgba(255, 255, 255, 0.8);
@@ -196,14 +205,14 @@
 .about-stats {
 	display: flex;
 	flex-direction: column;
-	gap: 2rem;
+	gap: 32px;
 }
 
 .stat-item {
 	text-align: center;
-	padding: 1.5rem;
+	padding: 24px;
 	background: rgba(255, 255, 255, 0.05);
-	border-radius: 10px;
+	border-radius: 8px;
 	backdrop-filter: blur(10px);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	opacity: 0;
@@ -215,7 +224,7 @@
 	font-size: 2.5rem;
 	font-weight: 900;
 	color: #fff;
-	margin-bottom: 0.5rem;
+	margin-bottom: 8px;
 }
 
 .stat-label {
@@ -227,8 +236,8 @@
 
 /* Services Section */
 .services-section {
-	padding: 8rem 0;
-	background: #0a0a0a;
+	padding: 128px 0;
+	background: #0F0F0F;
 	min-height: 100vh;
 }
 
@@ -243,18 +252,18 @@
 
 .services-grid {
 	display: flex;
-	gap: 50px;
+	gap: 48px;
 	padding-left: 100vw;
 }
 
 .service-card {
-	background: rgba(20, 20, 20, 0.8);
-	padding: 2.5rem 2rem;
-	border-radius: 15px;
+	background: rgba(26, 26, 26, 0.8);
+	padding: 40px 32px;
+	border-radius: 16px;
 	text-align: center;
 	border: 1px solid rgba(255, 100, 0, 0.3);
 	backdrop-filter: blur(10px);
-	width: 350px;
+	width: 352px;
 	height: 400px;
 	flex-shrink: 0;
 	position: relative;
@@ -263,6 +272,8 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	outline-offset: 4px;
+	transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .service-card::before {
@@ -314,18 +325,31 @@
 
 .service-card:hover {
 	transform: translateY(-5px) scale(1.02);
-	background: rgba(30, 20, 10, 0.9);
+	background: rgba(36, 26, 16, 0.9);
 	border-color: rgba(255, 100, 0, 0.5);
 	box-shadow: 0 12px 40px rgba(255, 69, 0, 0.2);
 }
 
+.service-card:focus {
+	outline: 2px solid rgba(255, 100, 0, 0.8);
+	border-color: rgba(255, 100, 0, 0.6);
+	box-shadow: 0 12px 40px rgba(255, 69, 0, 0.3);
+}
+
 .service-icon {
-	font-size: 3rem;
-	margin-bottom: 1.5rem;
+	width: 48px;
+	height: 48px;
+	margin: 0 auto 24px;
 	position: relative;
 	z-index: 2;
 	filter: drop-shadow(0 0 10px rgba(255, 100, 0, 0.3));
 	transition: all 0.3s ease;
+}
+
+.service-icon svg {
+	width: 100%;
+	height: 100%;
+	stroke: rgba(255, 100, 0, 0.8);
 }
 
 .service-card:hover .service-icon {
@@ -336,7 +360,7 @@
 .service-card h3 {
 	font-size: 1.5rem;
 	font-weight: 700;
-	margin-bottom: 1rem;
+	margin-bottom: 16px;
 	color: white;
 	position: relative;
 	z-index: 2;
@@ -352,8 +376,8 @@
 
 /* CTA Section */
 .cta-section {
-	padding: 6rem 0;
-	background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+	padding: 48px 0;
+	background: linear-gradient(135deg, #1A1A1A 0%, #0F0F0F 100%);
 	text-align: center;
 }
 
@@ -365,7 +389,7 @@
 .cta-title {
 	font-size: clamp(2rem, 5vw, 3.5rem);
 	font-weight: 800;
-	margin-bottom: 1.5rem;
+	margin-bottom: 24px;
 	color: white;
 	opacity: 0;
 	transform: translateY(30px);
@@ -374,7 +398,7 @@
 .cta-text {
 	font-size: 1.2rem;
 	color: rgba(255, 255, 255, 0.8);
-	margin-bottom: 2.5rem;
+	margin-bottom: 40px;
 	line-height: 1.6;
 	opacity: 0;
 	transform: translateY(30px);
@@ -382,18 +406,21 @@
 
 .cta-button {
 	display: inline-block;
-	padding: 1rem 2.5rem;
+	padding: 16px 40px;
 	background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
-	color: #000;
+	color: #0F0F0F;
 	text-decoration: none;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 1px;
 	border-radius: 50px;
-	transition: all 0.3s ease;
+	transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
 	opacity: 0;
 	transform: translateY(30px);
+	outline-offset: 4px;
+	position: relative;
+	overflow: hidden;
 }
 
 .cta-button::before {
@@ -414,6 +441,12 @@
 .cta-button:hover {
 	transform: translateY(-3px);
 	box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+}
+
+.cta-button:focus {
+	outline: 2px solid white;
+	transform: translateY(-3px);
+	box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3);
 }
 
 .copy-right {
@@ -526,7 +559,7 @@
 }
 
 #flying-images {
-	margin: 0 2rem;
+	margin: 0 32px;
 	display: relative;
 }
 
@@ -549,4 +582,32 @@
 	justify-content: space-between;
 	align-items: end;
 	gap: 8vw;
+}
+
+/* Accessibility: Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+	
+	.cover-image {
+		background-attachment: scroll;
+	}
+	
+	.service-card,
+	.cta-button {
+		transition: none !important;
+	}
+	
+	.service-card:hover {
+		transform: none;
+	}
+	
+	.cta-button:hover,
+	.cta-button:focus {
+		transform: none;
+	}
 }
