@@ -2,35 +2,21 @@
 @import "@/styles/tailwind-theme.css" theme(reference);
 
 .cover-image {
-	width: 100%;
-	height: 100vh;
+	@apply relative h-screen w-full bg-cover bg-fixed bg-center bg-no-repeat;
 	background-image: url("../../../assets//images/background1.jpg");
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	position: relative;
 	filter: brightness(0.7);
 }
 
 #site-header {
-	position: sticky;
-	top: 0;
-	z-index: 1000;
+	@apply sticky top-0 z-50 w-full text-center text-white;
 	background: rgba(16, 16, 16, 0.95);
 	backdrop-filter: blur(10px);
-	width: 100%;
-	text-align: center;
-	color: white;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .site-nav {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	@apply flex items-center justify-between text-white;
 	padding: 24px 32px;
-	color: white;
 }
 
 .site-title {
@@ -45,61 +31,47 @@
 }
 
 .site-nav ul {
-	display: flex;
-	gap: 16px;
+	@apply flex gap-4;
 }
 
 .site-nav ul li a {
-	text-transform: uppercase;
+	@apply rounded-lg px-4 py-2 font-normal text-white/80 uppercase transition-colors duration-300;
 	font-size: clamp(0.9rem, 1.6vw, 1.2rem);
 	letter-spacing: -0.5px;
-	font-weight: 400;
-	color: rgba(255, 255, 255, 0.8);
-	transition: color 0.3s ease;
-	padding: 8px 16px;
-	border-radius: 8px;
 	outline-offset: 4px;
 }
 
 .site-nav ul li a:hover {
-	color: white;
+	@apply text-white;
 }
 
 .site-nav ul li a:focus {
-	outline: 2px solid white;
-	color: white;
-	background: rgba(255, 255, 255, 0.1);
+	@apply bg-white/10 text-white outline-2 outline-white;
 }
 
 #discover {
-	display: flex;
-	justify-content: center;
+	@apply flex justify-center;
 }
 
 #discover .cont {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	@apply flex flex-col items-center text-center;
 	margin-top: 144px;
-	text-align: center;
 }
 
 #discover .slide {
-	overflow: hidden;
+	@apply overflow-hidden;
 }
 
 #discover .slide h1 {
-	display: block;
+	@apply block leading-none font-extrabold uppercase;
 	font-size: clamp(4rem, 16vw, 12rem);
-	font-weight: 800;
 	color: var(--text-primary);
 	letter-spacing: -0.05em;
 	line-height: 0.85;
-	text-transform: uppercase;
 }
 
 #image-section {
-	position: relative;
+	@apply relative;
 }
 
 .the-best {
@@ -119,24 +91,17 @@
 }
 
 #image-section .cont {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
+	@apply flex min-h-screen items-center justify-center;
 }
 
 .cover {
+	@apply h-screen w-full object-cover;
 	clip-path: circle(100% at 50% 50%);
-	width: 100%;
-	height: 100vh;
-	object-fit: cover;
 }
 
 /* Business Sections */
 .container {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 0 2rem;
+	@apply mx-auto max-w-6xl px-8;
 }
 
 .section-title {
@@ -165,20 +130,15 @@
 
 /* About Section */
 .about-section {
+	@apply min-h-screen text-white;
 	padding: 128px 0;
-	background: #0F0F0F;
-	color: white;
-	min-height: 100vh;
+	background: #0f0f0f;
 }
 
 .about-content {
-	display: grid;
+	@apply mx-auto grid h-screen max-w-6xl items-center;
 	grid-template-columns: 1fr 300px;
 	gap: 64px;
-	align-items: center;
-	height: 100vh;
-	max-width: 1200px;
-	margin: 0 auto;
 	padding: 0 32px;
 }
 
@@ -190,7 +150,7 @@
 }
 
 .text-block {
-	max-width: 600px;
+	@apply max-w-xl;
 }
 
 .reveal-text {
@@ -203,28 +163,19 @@
 }
 
 .about-stats {
-	display: flex;
-	flex-direction: column;
-	gap: 32px;
+	@apply flex flex-col gap-8;
 }
 
 .stat-item {
-	text-align: center;
-	padding: 24px;
+	@apply rounded-lg border p-6 text-center opacity-0;
 	background: rgba(255, 255, 255, 0.05);
-	border-radius: 8px;
 	backdrop-filter: blur(10px);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	opacity: 0;
+	border-color: rgba(255, 255, 255, 0.1);
 	transform: scale(0.8);
 }
 
 .stat-number {
-	display: block;
-	font-size: 2.5rem;
-	font-weight: 900;
-	color: #fff;
-	margin-bottom: 8px;
+	@apply mb-2 block text-4xl font-black text-white;
 }
 
 .stat-label {
@@ -237,7 +188,7 @@
 /* Services Section */
 .services-section {
 	padding: 128px 0;
-	background: #0F0F0F;
+	background: #0f0f0f;
 	min-height: 100vh;
 }
 
@@ -273,7 +224,7 @@
 	flex-direction: column;
 	justify-content: center;
 	outline-offset: 4px;
-	transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .service-card::before {
@@ -377,7 +328,7 @@
 /* CTA Section */
 .cta-section {
 	padding: 48px 0;
-	background: linear-gradient(135deg, #1A1A1A 0%, #0F0F0F 100%);
+	background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
 	text-align: center;
 }
 
@@ -408,13 +359,13 @@
 	display: inline-block;
 	padding: 16px 40px;
 	background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
-	color: #0F0F0F;
+	color: #0f0f0f;
 	text-decoration: none;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 1px;
 	border-radius: 50px;
-	transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
 	opacity: 0;
 	transform: translateY(30px);
@@ -582,32 +533,4 @@
 	justify-content: space-between;
 	align-items: end;
 	gap: 8vw;
-}
-
-/* Accessibility: Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-	* {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
-		scroll-behavior: auto !important;
-	}
-	
-	.cover-image {
-		background-attachment: scroll;
-	}
-	
-	.service-card,
-	.cta-button {
-		transition: none !important;
-	}
-	
-	.service-card:hover {
-		transform: none;
-	}
-	
-	.cta-button:hover,
-	.cta-button:focus {
-		transform: none;
-	}
 }
