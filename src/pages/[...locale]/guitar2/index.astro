@@ -42,16 +42,11 @@ const { locale = defaultLocale } = Astro.props;
 			<svg width="100%" height="100%">
 				<defs>
 					<mask id="logoRevealMask">
-						<rect width="100%" height="100%" fill="white" />
+						<rect width="100%" height="100%" fill="white"></rect>
 						<path id="logoMask"></path>
 					</mask>
 				</defs>
-				<rect
-					width="100%"
-					height="100%"
-					fill="#111117"
-					mask="url(#logoRevealMask)"
-				/>
+				<rect width="100%" height="100%" fill="#111117" mask="url(#logoRevealMask)"></rect>
 			</svg>
 		</div>
 
@@ -67,17 +62,17 @@ const { locale = defaultLocale } = Astro.props;
 	</section>
 
 	<div class="model"></div>
-	
+
 	<div class="container">
 		<section class="hero-intro">
 			<h1><span>Experience Excellence</span> in Guitar Care</h1>
 		</section>
-		
+
 		<section class="sticky">
 			<div class="bg-img"><img src={Background2.src} alt="Guitar workshop" /></div>
-			
+
 			<canvas class="outline-layer"></canvas>
-			
+
 			<div class="cards">
 				<div class="card">
 					<div class="card-img"><img src={Background2.src} alt="Guitar Repair" /></div>
@@ -101,18 +96,14 @@ const { locale = defaultLocale } = Astro.props;
 					</div>
 				</div>
 			</div>
-			
+
 			<canvas class="fill-layer"></canvas>
 		</section>
-		
+
 		<section class="outro">
 			<h1>Your guitar deserves <span>the best</span> care possible</h1>
 		</section>
 	</div>
-
-	<section class="outro">
-		<p>Experience excellence in guitar care.</p>
-	</section>
 </MinimalLayout>
 
 <script type="module" src="./logo.js"></script>
