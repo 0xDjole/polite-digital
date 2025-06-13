@@ -6,6 +6,26 @@ function init() {
 	const track = document.querySelector(".testimonial-track");
 	const heartEmoji = document.querySelector(".heart-emoji");
 	const joinText = document.querySelector(".join-text");
+	const testimonialSplitText = document.querySelector(".testimonial-split-text");
+
+	// Split text animation for heading
+	if (testimonialSplitText) {
+		const headingSplit = new SplitText(testimonialSplitText, { type: "words" });
+		
+		gsap.from(headingSplit.words, {
+			y: 60,
+			opacity: 0,
+			duration: 0.8,
+			stagger: 0.1,
+			ease: "power2.out",
+			scrollTrigger: {
+				trigger: testimonialSplitText,
+				start: "top 85%",
+				end: "bottom 15%",
+				toggleActions: "play none none reverse"
+			}
+		});
+	}
 
 	const tl = gsap.timeline({
 		scrollTrigger: {

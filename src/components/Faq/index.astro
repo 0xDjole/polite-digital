@@ -23,11 +23,16 @@ const faqData = getBlockObjectValues(websiteCollection, "faq", currLocale);
 
 <section id="faq" class="site-container my-24 md:my-36">
 	<div class="flex justify-center">
-		<p class="colored-title inline gsap-fade-up">FAQ</p>
+		<p class="colored-title gsap-fade-up inline text-4xl font-bold md:text-5xl">FAQ</p>
 	</div>
-	<h2 class="h2 mt-8 text-center gsap-fade-up" data-delay="0.2">Answers to all your questions</h2>
+	<h2
+		class="faq-heading gsap-fade-up mt-8 text-center text-5xl font-bold md:text-6xl"
+		data-delay="0.2"
+	>
+		<span class="faq-split-text">Answers to all your questions</span>
+	</h2>
 	<div class="mx-auto mt-10 flex max-w-3xl flex-col gap-3">
-		<Accordion class="space-y-3 gsap-stagger">
+		<Accordion class="gsap-stagger space-y-3">
 			{
 				faqData.map((faqItem, idx) => (
 					<AccordionItem value={`item-${idx}`} class="gsap-stagger-item">
@@ -40,3 +45,4 @@ const faqData = getBlockObjectValues(websiteCollection, "faq", currLocale);
 	</div>
 </section>
 
+<script src="./faq.ts"></script>

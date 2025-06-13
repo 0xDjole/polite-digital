@@ -15,10 +15,10 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 <section id="pricing-4" class="my-24 md:my-36">
 	<div class="site-container">
 		<div class="flex justify-center">
-			<p class="colored-title pricing-title gsap-fade-up inline">Pricing</p>
+			<p class="colored-title pricing-title gsap-fade-up inline text-4xl md:text-5xl font-bold">Pricing</p>
 		</div>
-		<h2 class="h2 pricing-heading gsap-fade-up mt-8 text-center" data-delay="0.2">
-			A plan for every business
+		<h2 class="pricing-heading text-5xl md:text-6xl font-bold gsap-fade-up mt-8 text-center" data-delay="0.2">
+			<span class="pricing-split-text">A plan for every business</span>
 		</h2>
 
 		<div class="pricing-toggle gsap-fade-up mt-6 flex justify-center" data-delay="0.4">
@@ -129,3 +129,5 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 		</div>
 	</div>
 </section>
+
+<script src="./pricing.ts"></script>

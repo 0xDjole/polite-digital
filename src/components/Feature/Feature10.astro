@@ -12,8 +12,9 @@ const aboutContent = info.aboutContent;
 const aboutImage = info.aboutImage;
 ---
 
-<section id="about" class="py-16 md:py-24">
-	<div class="site-container">
+<section id="about" class="feature-pin-section relative overflow-hidden" style="height: 300vh;">
+	<div class="sticky top-0 flex min-h-screen items-center justify-center py-16 md:py-24">
+		<div class="site-container">
 		<div class="grid items-center gap-12 lg:grid-cols-2">
 			<figure class="about-image gsap-slide-left order-2 lg:order-1">
 				{
@@ -39,21 +40,24 @@ const aboutImage = info.aboutImage;
 				}
 			</figure>
 			<div class="about-content gsap-slide-right order-1 space-y-6 lg:order-2">
-				<h2 class="main-text-gradient gsap-fade-up text-4xl font-bold md:text-5xl" data-delay="0.2">
+				<h2 class="main-text-gradient text-4xl font-bold md:text-5xl feature-title" data-delay="0.2">
 					{aboutTitle}
 				</h2>
-				<div class="prose prose-lg text-secondary gsap-fade-up max-w-none" data-delay="0.4">
+				<div class="prose prose-lg text-secondary max-w-none feature-content" data-delay="0.4">
 					{aboutContent}
 				</div>
-				<div class="gsap-stagger flex flex-wrap gap-4 pt-4">
-					<Button variant="primary" class="hover-lift gsap-stagger-item px-6 py-3">
+				<div class="feature-buttons flex flex-wrap gap-4 pt-4">
+					<Button variant="primary" class="feature-btn-1 hover-lift px-6 py-3">
 						Our Process
 					</Button>
-					<Button variant="outline" class="hover-lift gsap-stagger-item px-6 py-3">
+					<Button variant="outline" class="feature-btn-2 hover-lift px-6 py-3">
 						Contact Us
 					</Button>
 				</div>
 			</div>
 		</div>
+		</div>
 	</div>
 </section>
+
+<script src="./feature10.ts"></script>
