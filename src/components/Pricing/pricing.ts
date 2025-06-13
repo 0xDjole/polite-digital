@@ -1,27 +1,32 @@
 import { animations } from "../../lib/animation";
 
 function init() {
-	const { gsap, ScrollTrigger, SplitText } = animations();
+	const { gsap, ScrollTrigger } = animations();
 
-	const pricingSplitText = document.querySelector(".pricing-split-text");
+	const pricingCards = document.querySelectorAll(".pricing-plan");
 	
-	if (pricingSplitText) {
-		const split = new SplitText(pricingSplitText, { type: "words" });
+	// Subtle 3D scrub effects with random angles
+	pricingCards.forEach((card, index) => {
+		// Random angles for each card
+		const randomRotationY = (Math.random() - 0.5) * 30; // -15 to 15
+		const randomRotationX = (Math.random() - 0.5) * 20; // -10 to 10
+		const randomY = -15 - (Math.random() * 20); // -15 to -35
+		const randomZ = Math.random() * 30; // 0 to 30
 		
-		gsap.from(split.words, {
-			y: 50,
-			opacity: 0,
-			duration: 0.8,
-			stagger: 0.08,
-			ease: "power2.out",
+		gsap.to(card, {
+			rotationY: randomRotationY,
+			rotationX: randomRotationX,
+			y: randomY,
+			z: randomZ,
+			ease: "none",
 			scrollTrigger: {
-				trigger: pricingSplitText,
-				start: "top 85%",
-				end: "bottom 15%",
-				toggleActions: "play none none reverse"
+				trigger: card,
+				start: "top 90%",
+				end: "top 30%",
+				scrub: 1,
 			}
 		});
-	}
+	});
 }
 
 document.addEventListener("DOMContentLoaded", init);

@@ -18,7 +18,7 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 			<p class="colored-title pricing-title gsap-fade-up inline text-4xl md:text-5xl font-bold">Pricing</p>
 		</div>
 		<h2 class="pricing-heading text-5xl md:text-6xl font-bold gsap-fade-up mt-8 text-center" data-delay="0.2">
-			<span class="pricing-split-text">A plan for every business</span>
+			A plan for every business
 		</h2>
 
 		<div class="pricing-toggle gsap-fade-up mt-6 flex justify-center" data-delay="0.4">
@@ -34,7 +34,7 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 
 		<div
 			class="pricing-grid gsap-stagger mx-auto mt-12 grid w-full max-w-7xl gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-			style="overflow: visible;"
+			style="overflow: visible; perspective: 800px;"
 		>
 			{
 				pricingData.map((plan) => (
