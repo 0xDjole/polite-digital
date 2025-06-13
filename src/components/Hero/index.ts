@@ -53,15 +53,21 @@ function initWorkAnimations() {
 		},
 	});
 
-	heroTl.fromTo(
-		"#hero-img",
-		{ scale: 2 },
-		{
-			scale: 1,
-			opacity: 1,
+	heroTl
+		.fromTo(
+			"#hero-img",
+			{ scale: 2 },
+			{
+				scale: 1,
+				opacity: 1,
+				ease: "power2.out",
+			},
+		)
+		.to([".hero-title", ".hero-subtitle"], {
+			scale: 0.6,
+			opacity: 0.3,
 			ease: "power2.out",
-		},
-	);
+		}, 0);
 }
 
 document.addEventListener("DOMContentLoaded", initWorkAnimations);
