@@ -2,10 +2,9 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Hero from "@components/Hero/index.astro";
 import LogoCloud from "@components/LogoCloud/index.astro";
-import Feature5 from "@components/Feature/Feature5.astro";
-import Feature10 from "@components/Feature/Feature10.astro";
-import FeatureMoneySaving from "@components/Feature/FeatureMoneySaving.astro";
-import Feature11 from "@components/Feature/Feature11.astro";
+import InteractiveShowcase from "@components/InteractiveShowcase/InteractiveShowcase.astro";
+import FeatureMoneySaving from "@components/FeatureMoneySaving/FeatureMoneySaving.astro";
+import Workflow from "@components/Workflow/Workflow.astro";
 import Testimonials from "@components/Testimonials/index.astro";
 import Pricing from "@components/Pricing/index.astro";
 import Faq from "@components/Faq/index.astro";
@@ -33,9 +32,9 @@ const siteData = getBlockFromArray(websiteCollection, "info", locale);
 <BaseLayout title={siteData.title} description={siteData.description}>
 	<Hero />
 	<LogoCloud />
-	<Feature10 />
+	<InteractiveShowcase />
 	<FeatureMoneySaving />
-	<Feature11 />
+	<Workflow />
 	<Testimonials />
 	<Pricing />
 	<Faq />

@@ -224,7 +224,7 @@ const aboutImage = info.aboutImage;
 <style>
 	.showcase-section {
 		position: relative;
-		background: #0a0a0a;
+		background: var(--bg-primary);
 	}
 
 	.floating-bg {
@@ -240,7 +240,7 @@ const aboutImage = info.aboutImage;
 	.bg-orb {
 		position: absolute;
 		border-radius: 50%;
-		background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+		background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-500) 10%, transparent), color-mix(in srgb, var(--color-primary-400) 10%, transparent));
 		filter: blur(40px);
 		animation: float 6s ease-in-out infinite;
 	}
@@ -302,8 +302,8 @@ const aboutImage = info.aboutImage;
 	.showcase-card {
 		position: relative;
 		padding: 2rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: var(--bg-card);
+		border: 1px solid var(--border-primary);
 		border-radius: 20px;
 		backdrop-filter: blur(10px);
 		cursor: pointer;
@@ -315,13 +315,13 @@ const aboutImage = info.aboutImage;
 
 	.showcase-card:hover {
 		transform: translateY(-5px);
-		border-color: rgba(139, 92, 246, 0.3);
-		background: rgba(255, 255, 255, 0.05);
+		border-color: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+		background: var(--bg-card);
 	}
 
 	.showcase-card.active {
-		border-color: #8b5cf6;
-		background: rgba(139, 92, 246, 0.1);
+		border-color: var(--color-primary-500);
+		background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
 		transform: translateY(-5px);
 	}
 
@@ -331,7 +331,7 @@ const aboutImage = info.aboutImage;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+		background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-500) 10%, transparent), color-mix(in srgb, var(--color-primary-400) 10%, transparent));
 		opacity: 0;
 		transition: opacity 0.4s ease;
 		pointer-events: none;
@@ -346,11 +346,11 @@ const aboutImage = info.aboutImage;
 		width: 60px;
 		height: 60px;
 		margin-bottom: 1rem;
-		color: #8b5cf6;
+		color: var(--text-price);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(139, 92, 246, 0.1);
+		background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
 		border-radius: 12px;
 		font-size: 1.5rem;
 	}
@@ -358,12 +358,12 @@ const aboutImage = info.aboutImage;
 	.card-title {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: white;
+		color: var(--text-primary);
 		margin-bottom: 0.5rem;
 	}
 
 	.card-description {
-		color: rgba(255, 255, 255, 0.7);
+		color: var(--text-secondary);
 		margin-bottom: 1rem;
 		line-height: 1.5;
 	}
@@ -375,16 +375,16 @@ const aboutImage = info.aboutImage;
 
 	.stat {
 		padding: 0.25rem 0.75rem;
-		background: rgba(139, 92, 246, 0.2);
-		border: 1px solid rgba(139, 92, 246, 0.3);
+		background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-primary-500) 30%, transparent);
 		border-radius: 20px;
 		font-size: 0.75rem;
 		font-weight: 600;
-		color: #8b5cf6;
+		color: var(--text-price);
 	}
 
 	.content-container {
-		color: white;
+		color: var(--text-primary);
 	}
 
 	.content-header {
@@ -398,8 +398,8 @@ const aboutImage = info.aboutImage;
 	.badge-text {
 		display: inline-block;
 		padding: 0.5rem 1.5rem;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: var(--bg-card);
+		border: 1px solid var(--border-primary);
 		border-radius: 50px;
 		font-size: 0.875rem;
 		font-weight: 500;
@@ -419,7 +419,7 @@ const aboutImage = info.aboutImage;
 	}
 
 	.highlight-text {
-		background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+		background: var(--gradient-brand);
 		-webkit-background-clip: text;
 		background-clip: text;
 		-webkit-text-fill-color: transparent;
@@ -453,11 +453,11 @@ const aboutImage = info.aboutImage;
 		font-size: 1.5rem;
 		font-weight: 700;
 		margin-bottom: 1rem;
-		color: #8b5cf6;
+		color: var(--text-price);
 	}
 
 	.panel-text {
-		color: rgba(255, 255, 255, 0.8);
+		color: var(--text-secondary);
 		line-height: 1.6;
 		margin-bottom: 2rem;
 	}
@@ -472,12 +472,12 @@ const aboutImage = info.aboutImage;
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		color: rgba(255, 255, 255, 0.9);
+		color: var(--text-primary);
 		font-size: 0.875rem;
 	}
 
 	.feature-item svg {
-		color: #10b981;
+		color: var(--text-success);
 		width: 16px;
 		height: 16px;
 	}
@@ -490,8 +490,8 @@ const aboutImage = info.aboutImage;
 	}
 
 	.code-preview {
-		background: rgba(0, 0, 0, 0.5);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: var(--bg-muted);
+		border: 1px solid var(--border-primary);
 		border-radius: 12px;
 		padding: 1.5rem;
 		font-family: "Courier New", monospace;
@@ -503,16 +503,16 @@ const aboutImage = info.aboutImage;
 	}
 
 	.code-tag {
-		color: #8b5cf6;
+		color: var(--text-price);
 	}
 	.code-attr {
-		color: #3b82f6;
+		color: var(--color-primary-400);
 	}
 	.code-value {
-		color: #10b981;
+		color: var(--text-success);
 	}
 	.code-text {
-		color: #f59e0b;
+		color: var(--text-warning);
 	}
 	.code-indent {
 		opacity: 0.5;
@@ -527,7 +527,7 @@ const aboutImage = info.aboutImage;
 	.design-layer {
 		position: absolute;
 		border-radius: 12px;
-		background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+		background: var(--gradient-brand);
 	}
 
 	.layer-1 {
@@ -571,7 +571,7 @@ const aboutImage = info.aboutImage;
 
 	.chart-bar {
 		width: 40px;
-		background: linear-gradient(to top, #8b5cf6, #3b82f6);
+		background: var(--gradient-brand);
 		border-radius: 4px 4px 0 0;
 		position: relative;
 		display: flex;
@@ -582,7 +582,7 @@ const aboutImage = info.aboutImage;
 	}
 
 	.bar-label {
-		color: white;
+		color: var(--text-primary);
 		font-size: 0.75rem;
 		font-weight: 600;
 	}
@@ -618,24 +618,24 @@ const aboutImage = info.aboutImage;
 	}
 
 	.cta-primary {
-		background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+		background: var(--gradient-brand);
 		color: white;
 	}
 
 	.cta-primary:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+		box-shadow: 0 20px 40px color-mix(in srgb, var(--color-primary-500) 30%, transparent);
 	}
 
 	.cta-secondary {
 		background: rgba(255, 255, 255, 0.1);
-		color: white;
+		color: var(--text-primary);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		backdrop-filter: blur(10px);
 	}
 
 	.cta-secondary:hover {
-		background: rgba(255, 255, 255, 0.2);
+		background: color-mix(in srgb, var(--bg-card) 80%, var(--text-primary) 20%);
 		transform: translateY(-2px);
 	}
 
@@ -684,4 +684,4 @@ const aboutImage = info.aboutImage;
 	}
 </style>
 
-<script src="./feature10.ts"></script>
+<script src="./InteractiveShowcase.ts"></script>
