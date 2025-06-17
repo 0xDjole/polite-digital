@@ -30,6 +30,51 @@ function init() {
       gearAnimation.goToAndStop(frame, true);
     },
   });
+
+  // Highlight each line individually - snap effect
+  const workflowItems = document.querySelectorAll('.workflow-item');
+  
+  workflowItems.forEach((item) => {
+    const title = item.querySelector('.step-title');
+    const description = item.querySelector('.step-description');
+    const features = item.querySelectorAll('.step-features li');
+    
+    // Create array of all elements to highlight
+    const allElements = [];
+    if (title) allElements.push(title);
+    if (description) allElements.push(description);
+    features.forEach(feature => allElements.push(feature));
+    
+    // Create individual triggers for each line
+    allElements.forEach((element, index) => {
+      ScrollTrigger.create({
+        trigger: element,
+        start: 'center 60%',
+        end: 'center 40%',
+        onEnter: () => {
+          // Reset all elements in this item
+          allElements.forEach(el => el.style.color = '');
+          // Highlight only current line
+          element.style.color = '#fbbf24';
+        },
+        onEnterBack: () => {
+          // Reset all elements in this item
+          allElements.forEach(el => el.style.color = '');
+          // Highlight only current line
+          element.style.color = '#fbbf24';
+        }
+      });
+    });
+    
+    // Reset all when leaving the entire item
+    ScrollTrigger.create({
+      trigger: item,
+      start: 'top 80%',
+      end: 'bottom 20%',
+      onLeave: () => allElements.forEach(el => el.style.color = ''),
+      onLeaveBack: () => allElements.forEach(el => el.style.color = '')
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);
