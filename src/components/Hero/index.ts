@@ -183,29 +183,21 @@ function initHeroAnimations() {
 		}
 	});
 
-	// Clip path effect for the end of scroll
+	// Simple clipping effect as we scroll
 	ScrollTrigger.create({
 		trigger: "#hero",
 		start: "top top",
 		end: "bottom top",
 		scrub: 1,
 		onUpdate: (self) => {
-			if (self.progress > 0.7) {
-				const clipProgress = (self.progress - 0.7) / 0.3;
-				const clipPath = `polygon(${20 + clipProgress * 20}% ${10 + clipProgress * 20}%, ${80 - clipProgress * 20}% ${10 + clipProgress * 20}%, ${80 - clipProgress * 20}% ${80 - clipProgress * 20}%, ${20 + clipProgress * 20}% ${80 - clipProgress * 20}%)`;
-				
-				gsap.to("#hero", {
-					clipPath: clipPath,
-					duration: 0.3,
-					ease: "none"
-				});
-			} else {
-				gsap.to("#hero", {
-					clipPath: "none",
-					duration: 0.3,
-					ease: "none"
-				});
-			}
+			const progress = self.progress;
+			
+			// Clip more aggressively, especially the top (falling backwards effect)
+			const clipPath = `polygon(${0 + progress * 8}% ${0 + progress * 15}%, ${100 - progress * 6}% ${0 + progress * 12}%, ${100 - progress * 5}% ${100 - progress * 4}%, ${0 + progress * 7}% ${100 - progress * 6}%)`;
+			
+			gsap.set("#hero", {
+				clipPath: clipPath
+			});
 		}
 	});
 
