@@ -11,7 +11,7 @@ function init() {
 	// Split text animation for heading
 	if (testimonialSplitText) {
 		const headingSplit = new SplitText(testimonialSplitText, { type: "words" });
-		
+
 		gsap.from(headingSplit.words, {
 			y: 60,
 			opacity: 0,
@@ -22,8 +22,8 @@ function init() {
 				trigger: testimonialSplitText,
 				start: "top 85%",
 				end: "bottom 15%",
-				toggleActions: "play none none reverse"
-			}
+				toggleActions: "play none none reverse",
+			},
 		});
 	}
 
@@ -38,16 +38,21 @@ function init() {
 	});
 
 	tl.to(track, {
+		duration: 10,
 		x: () => -track.scrollWidth + track.parentElement.clientWidth / 2 + 150,
 		ease: "none",
 	});
 
 	// Animate heart and split text at the end
-	tl.to(heartEmoji, {
-		scale: 1.5,
-		duration: 0.5,
-		ease: "back.out(1.7)",
-	});
+	tl.to(
+		heartEmoji,
+		{
+			duration: 1,
+			scale: 2,
+			ease: "back.out(1.7)",
+		},
+		"heart",
+	);
 
 	// Split text animation
 	const split = new SplitText(joinText, { type: "chars" });
@@ -56,12 +61,11 @@ function init() {
 		{
 			y: 30,
 			scale: 1.2,
+			duration: 1,
 			opacity: 0,
-			duration: 0.5,
-			stagger: 0.05,
 			ease: "power2.out",
 		},
-		"-=0.3",
+		"heart",
 	);
 }
 
