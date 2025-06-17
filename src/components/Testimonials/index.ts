@@ -31,14 +31,13 @@ function init() {
 		scrollTrigger: {
 			trigger: "#testimonial",
 			start: "top top",
-			end: "+=400%",
+			end: "+=300%",
 			scrub: 1,
 			pin: true,
 		},
 	});
 
 	tl.to(track, {
-		duration: 10,
 		x: () => -track.scrollWidth + track.parentElement.clientWidth / 2 + 150,
 		ease: "none",
 	});
@@ -47,7 +46,6 @@ function init() {
 	tl.to(
 		heartEmoji,
 		{
-			duration: 1,
 			scale: 2,
 			ease: "back.out(1.7)",
 		},
@@ -61,7 +59,6 @@ function init() {
 		{
 			y: 30,
 			scale: 1.2,
-			duration: 1,
 			opacity: 0,
 			ease: "power2.out",
 		},
