@@ -19,12 +19,22 @@ function init() {
     animationData: gearAnimationData,
   });
 
-  // Rotate gear based on scroll progress
+  // Pin and animate like work page
+  const colLeft = document.querySelector('.left-column');
+  const timeline = gsap.timeline({ paused: true });
+
+  timeline.fromTo(
+    colLeft,
+    { y: 0 },
+    { y: section?.scrollHeight - colLeft?.offsetHeight, duration: 1, ease: "none" }
+  );
+
   ScrollTrigger.create({
+    animation: timeline,
     trigger: section,
-    start: 'top bottom',
-    end: 'bottom top',
-    scrub: 1,
+    start: "top center",
+    end: "bottom center",
+    scrub: true,
     onUpdate: (self) => {
       const frame = self.progress * (gearAnimation.totalFrames - 1);
       gearAnimation.goToAndStop(frame, true);
@@ -55,13 +65,13 @@ function init() {
           // Reset all elements in this item
           allElements.forEach(el => el.style.color = '');
           // Highlight only current line
-          element.style.color = '#fbbf24';
+          element.style.color = '#8B5CF6';
         },
         onEnterBack: () => {
           // Reset all elements in this item
           allElements.forEach(el => el.style.color = '');
           // Highlight only current line
-          element.style.color = '#fbbf24';
+          element.style.color = '#8B5CF6';
         }
       });
     });

@@ -2,6 +2,7 @@
 import { getLocale } from "@lib/i18n";
 import { cmsApi, getBlockFromArray, getBlockObjectValues } from "@lib/index";
 import Button from "@components/Button/Button.astro";
+import { Icon } from "astro-icon/components";
 
 const { getCollection, getImageUrl } = cmsApi();
 const websiteCollection = await getCollection("website");
@@ -12,51 +13,675 @@ const aboutContent = info.aboutContent;
 const aboutImage = info.aboutImage;
 ---
 
-<section id="about" class="feature-pin-section relative overflow-hidden">
-	<div class="sticky top-0 flex min-h-screen items-center justify-center py-16 md:py-24">
-		<div class="site-container">
-			<div class="grid items-center gap-12 lg:grid-cols-2">
-				<figure class="about-image gsap-slide-left order-2 lg:order-1">
-					{
-						aboutImage ? (
-							<div class="relative overflow-hidden rounded-3xl">
-								<img
-									referrerpolicy="no-referrer"
-									src={getImageUrl(aboutImage)}
-									alt={aboutTitle}
-									class="particle-image w-full object-cover shadow-lg"
-									style="filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));"
-								/>
-							</div>
-						) : (
-							<div class="bg-muted border-primary flex justify-center rounded-3xl border px-4 py-16 text-5xl shadow-lg">
-								🚀
-							</div>
-						)
-					}
-				</figure>
-				<div class="about-content gsap-slide-right order-1 space-y-6 lg:order-2">
-					<h2
-						class="main-text-gradient feature-title text-4xl font-bold md:text-5xl"
-						data-delay="0.2"
-					>
-						{aboutTitle}
-					</h2>
-					<div class="prose prose-lg text-secondary feature-content max-w-none" data-delay="0.4">
-						{aboutContent}
-					</div>
-					<div class="feature-buttons flex flex-wrap gap-4 pt-4">
-						<Button variant="primary" class="feature-btn-1 hover-lift px-6 py-3">
-							Our Process
-						</Button>
-						<Button variant="outline" class="feature-btn-2 hover-lift px-6 py-3">
-							Contact Us
-						</Button>
+<section id="interactive-showcase" class="showcase-section">
+	<!-- Floating Background Elements -->
+	<div class="floating-bg">
+		<div class="bg-orb orb-1"></div>
+		<div class="bg-orb orb-2"></div>
+		<div class="bg-orb orb-3"></div>
+	</div>
+
+	<!-- Main Content Container -->
+	<div class="showcase-container">
+		<!-- Left Side - Interactive Cards -->
+		<div class="cards-container">
+			<div class="showcase-card card-1" data-card="expertise">
+				<div class="card-icon">
+					<Icon name="mdi:rocket" />
+				</div>
+				<div class="card-content">
+					<h3 class="card-title">Digital Expertise</h3>
+					<p class="card-description">Cutting-edge solutions that push boundaries</p>
+					<div class="card-stats">
+						<span class="stat">150+ Projects</span>
+						<span class="stat">99% Success</span>
 					</div>
 				</div>
+				<div class="card-glow"></div>
+			</div>
+
+			<div class="showcase-card card-2" data-card="innovation">
+				<div class="card-icon">
+					<Icon name="mdi:lightbulb" />
+				</div>
+				<div class="card-content">
+					<h3 class="card-title">Innovation First</h3>
+					<p class="card-description">Award-winning designs that captivate</p>
+					<div class="card-stats">
+						<span class="stat">5+ Awards</span>
+						<span class="stat">24/7 Support</span>
+					</div>
+				</div>
+				<div class="card-glow"></div>
+			</div>
+
+			<div class="showcase-card card-3" data-card="performance">
+				<div class="card-icon">
+					<Icon name="mdi:speedometer" />
+				</div>
+				<div class="card-content">
+					<h3 class="card-title">Peak Performance</h3>
+					<p class="card-description">Lightning-fast websites that convert</p>
+					<div class="card-stats">
+						<span class="stat">&lt;2s Load</span>
+						<span class="stat">95+ Score</span>
+					</div>
+				</div>
+				<div class="card-glow"></div>
+			</div>
+		</div>
+
+		<!-- Right Side - Dynamic Content -->
+		<div class="content-container">
+			<div class="content-header">
+				<div class="header-badge">
+					<span class="badge-text">What We Do</span>
+				</div>
+				<h2 class="main-title">
+					<span class="title-line">Creating Digital</span>
+					<span class="title-line highlight-text">Masterpieces</span>
+				</h2>
+			</div>
+
+			<!-- Dynamic Content Panels -->
+			<div class="content-panels">
+				<div class="content-panel active" data-panel="expertise">
+					<div class="panel-content">
+						<h3 class="panel-title">Digital Expertise</h3>
+						<p class="panel-text">
+							We combine technical mastery with creative vision to deliver digital experiences that
+							not only look stunning but perform flawlessly across all platforms and devices.
+						</p>
+						<div class="panel-features">
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Modern Tech Stack</span>
+							</div>
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Scalable Architecture</span>
+							</div>
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>SEO Optimized</span>
+							</div>
+						</div>
+					</div>
+					<div class="panel-visual">
+						<div class="visual-element">
+							<div class="code-preview">
+								<div class="code-line">
+									<span class="code-tag">&lt;div</span>
+									<span class="code-attr">class=</span>
+									<span class="code-value">"modern-design"</span>
+									<span class="code-tag">&gt;</span>
+								</div>
+								<div class="code-line">
+									<span class="code-indent"> </span>
+									<span class="code-tag">&lt;h1&gt;</span>
+									<span class="code-text">Innovation</span>
+									<span class="code-tag">&lt;/h1&gt;</span>
+								</div>
+								<div class="code-line">
+									<span class="code-tag">&lt;/div&gt;</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="content-panel" data-panel="innovation">
+					<div class="panel-content">
+						<h3 class="panel-title">Innovation First</h3>
+						<p class="panel-text">
+							Our award-winning designs push creative boundaries while maintaining usability. Every
+							project is a unique blend of artistic vision and strategic thinking.
+						</p>
+						<div class="panel-features">
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Award-Winning Design</span>
+							</div>
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>User-Centered Approach</span>
+							</div>
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Brand Integration</span>
+							</div>
+						</div>
+					</div>
+					<div class="panel-visual">
+						<div class="visual-element">
+							<div class="design-preview">
+								<div class="design-layer layer-1"></div>
+								<div class="design-layer layer-2"></div>
+								<div class="design-layer layer-3"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="content-panel" data-panel="performance">
+					<div class="panel-content">
+						<h3 class="panel-title">Peak Performance</h3>
+						<p class="panel-text">
+							Speed matters. Our optimized websites load in under 2 seconds and achieve perfect
+							performance scores, ensuring your users stay engaged and convert.
+						</p>
+						<div class="panel-features">
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Lightning Fast Loading</span>
+							</div>
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Mobile Optimized</span>
+							</div>
+							<div class="feature-item">
+								<Icon name="mdi:check-circle" />
+								<span>Core Web Vitals</span>
+							</div>
+						</div>
+					</div>
+					<div class="panel-visual">
+						<div class="visual-element">
+							<div class="performance-preview">
+								<div class="perf-chart">
+									<div class="chart-bar" style="height: 95%">
+										<span class="bar-label">95</span>
+									</div>
+									<div class="chart-bar" style="height: 98%">
+										<span class="bar-label">98</span>
+									</div>
+									<div class="chart-bar" style="height: 100%">
+										<span class="bar-label">100</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- CTA Section -->
+			<div class="cta-section">
+				<button class="cta-primary">
+					<span class="cta-text">Start Your Project</span>
+					<div class="cta-arrow">
+						<Icon name="mdi:arrow-right" />
+					</div>
+				</button>
+				<button class="cta-secondary">
+					<span class="cta-text">View Portfolio</span>
+				</button>
 			</div>
 		</div>
 	</div>
 </section>
+
+<style>
+	.showcase-section {
+		position: relative;
+		background: #0a0a0a;
+	}
+
+	.floating-bg {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.bg-orb {
+		position: absolute;
+		border-radius: 50%;
+		background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+		filter: blur(40px);
+		animation: float 6s ease-in-out infinite;
+	}
+
+	.orb-1 {
+		width: 300px;
+		height: 300px;
+		top: 10%;
+		left: -10%;
+		animation-delay: 0s;
+	}
+
+	.orb-2 {
+		width: 200px;
+		height: 200px;
+		top: 60%;
+		right: -5%;
+		animation-delay: 2s;
+	}
+
+	.orb-3 {
+		width: 150px;
+		height: 150px;
+		bottom: 20%;
+		left: 30%;
+		animation-delay: 4s;
+	}
+
+	@keyframes float {
+		0%,
+		100% {
+			transform: translateY(0px) rotate(0deg);
+		}
+		33% {
+			transform: translateY(-20px) rotate(5deg);
+		}
+		66% {
+			transform: translateY(10px) rotate(-3deg);
+		}
+	}
+
+	.showcase-container {
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 2rem;
+		display: grid;
+		grid-template-columns: 1fr 1.5fr;
+		gap: 4rem;
+		align-items: center;
+		height: 100vh;
+	}
+
+	.cards-container {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.showcase-card {
+		position: relative;
+		padding: 2rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 20px;
+		backdrop-filter: blur(10px);
+		cursor: pointer;
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		overflow: hidden;
+		transform-style: preserve-3d;
+		will-change: transform;
+	}
+
+	.showcase-card:hover {
+		transform: translateY(-5px);
+		border-color: rgba(139, 92, 246, 0.3);
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.showcase-card.active {
+		border-color: #8b5cf6;
+		background: rgba(139, 92, 246, 0.1);
+		transform: translateY(-5px);
+	}
+
+	.card-glow {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+		opacity: 0;
+		transition: opacity 0.4s ease;
+		pointer-events: none;
+	}
+
+	.showcase-card:hover .card-glow,
+	.showcase-card.active .card-glow {
+		opacity: 1;
+	}
+
+	.card-icon {
+		width: 60px;
+		height: 60px;
+		margin-bottom: 1rem;
+		color: #8b5cf6;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(139, 92, 246, 0.1);
+		border-radius: 12px;
+		font-size: 1.5rem;
+	}
+
+	.card-title {
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: white;
+		margin-bottom: 0.5rem;
+	}
+
+	.card-description {
+		color: rgba(255, 255, 255, 0.7);
+		margin-bottom: 1rem;
+		line-height: 1.5;
+	}
+
+	.card-stats {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.stat {
+		padding: 0.25rem 0.75rem;
+		background: rgba(139, 92, 246, 0.2);
+		border: 1px solid rgba(139, 92, 246, 0.3);
+		border-radius: 20px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: #8b5cf6;
+	}
+
+	.content-container {
+		color: white;
+	}
+
+	.content-header {
+		margin-bottom: 3rem;
+	}
+
+	.header-badge {
+		margin-bottom: 1rem;
+	}
+
+	.badge-text {
+		display: inline-block;
+		padding: 0.5rem 1.5rem;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 50px;
+		font-size: 0.875rem;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		backdrop-filter: blur(10px);
+	}
+
+	.main-title {
+		font-size: clamp(2.5rem, 5vw, 4rem);
+		font-weight: 900;
+		line-height: 1.1;
+	}
+
+	.title-line {
+		display: block;
+	}
+
+	.highlight-text {
+		background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.content-panels {
+		position: relative;
+		min-height: 400px;
+	}
+
+	.content-panel {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		opacity: 0;
+		visibility: hidden;
+		transition: all 0.4s ease;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 2rem;
+		align-items: center;
+	}
+
+	.content-panel.active {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	.panel-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin-bottom: 1rem;
+		color: #8b5cf6;
+	}
+
+	.panel-text {
+		color: rgba(255, 255, 255, 0.8);
+		line-height: 1.6;
+		margin-bottom: 2rem;
+	}
+
+	.panel-features {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.feature-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 0.875rem;
+	}
+
+	.feature-item svg {
+		color: #10b981;
+		width: 16px;
+		height: 16px;
+	}
+
+	.visual-element {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 300px;
+	}
+
+	.code-preview {
+		background: rgba(0, 0, 0, 0.5);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		padding: 1.5rem;
+		font-family: "Courier New", monospace;
+		font-size: 0.875rem;
+	}
+
+	.code-line {
+		margin-bottom: 0.5rem;
+	}
+
+	.code-tag {
+		color: #8b5cf6;
+	}
+	.code-attr {
+		color: #3b82f6;
+	}
+	.code-value {
+		color: #10b981;
+	}
+	.code-text {
+		color: #f59e0b;
+	}
+	.code-indent {
+		opacity: 0.5;
+	}
+
+	.design-preview {
+		position: relative;
+		width: 200px;
+		height: 200px;
+	}
+
+	.design-layer {
+		position: absolute;
+		border-radius: 12px;
+		background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+	}
+
+	.layer-1 {
+		width: 100%;
+		height: 100%;
+		opacity: 0.3;
+		transform: rotate(0deg);
+	}
+
+	.layer-2 {
+		width: 80%;
+		height: 80%;
+		top: 10%;
+		left: 10%;
+		opacity: 0.6;
+		transform: rotate(15deg);
+	}
+
+	.layer-3 {
+		width: 60%;
+		height: 60%;
+		top: 20%;
+		left: 20%;
+		opacity: 1;
+		transform: rotate(30deg);
+	}
+
+	.performance-preview {
+		display: flex;
+		justify-content: center;
+		align-items: end;
+		height: 200px;
+	}
+
+	.perf-chart {
+		display: flex;
+		gap: 1rem;
+		align-items: end;
+		height: 150px;
+	}
+
+	.chart-bar {
+		width: 40px;
+		background: linear-gradient(to top, #8b5cf6, #3b82f6);
+		border-radius: 4px 4px 0 0;
+		position: relative;
+		display: flex;
+		align-items: end;
+		justify-content: center;
+		padding-bottom: 0.5rem;
+		animation: growBar 2s ease-out;
+	}
+
+	.bar-label {
+		color: white;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	@keyframes growBar {
+		from {
+			height: 0;
+		}
+		to {
+			height: var(--height);
+		}
+	}
+
+	.cta-section {
+		margin-top: 3rem;
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.cta-primary,
+	.cta-secondary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 2rem;
+		border-radius: 50px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		text-decoration: none;
+		border: none;
+	}
+
+	.cta-primary {
+		background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+		color: white;
+	}
+
+	.cta-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+	}
+
+	.cta-secondary {
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(10px);
+	}
+
+	.cta-secondary:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+	}
+
+	.cta-arrow {
+		transition: transform 0.3s ease;
+	}
+
+	.cta-primary:hover .cta-arrow {
+		transform: translateX(5px);
+	}
+
+	@media (max-width: 1024px) {
+		.showcase-container {
+			grid-template-columns: 1fr;
+			gap: 3rem;
+		}
+
+		.content-panel {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.visual-element {
+			height: 200px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.showcase-section {
+			padding: 2rem 0;
+		}
+
+		.showcase-container {
+			padding: 0 1rem;
+		}
+
+		.cta-section {
+			flex-direction: column;
+		}
+
+		.cta-primary,
+		.cta-secondary {
+			width: 100%;
+			justify-content: center;
+		}
+	}
+</style>
 
 <script src="./feature10.ts"></script>

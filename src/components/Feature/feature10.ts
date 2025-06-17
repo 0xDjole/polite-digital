@@ -1,123 +1,82 @@
 import { animations } from "../../lib/animation";
 
-function init() {
-	const { gsap, ScrollTrigger, SplitText } = animations();
+function initInteractiveShowcase() {
+	const { gsap, ScrollTrigger } = animations();
 
-	const featureTitle = document.querySelector(".feature-title");
-	const featureContent = document.querySelector(".feature-content");
-	const aboutImage = document.querySelector(".about-image");
-	const zigzagImage = document.querySelector(".zigzag-image");
+	// Get all cards and panels
+	const cards = document.querySelectorAll('.showcase-card');
+	const panels = document.querySelectorAll('.content-panel');
 
-	// Single scrubbed pinned timeline
-	const tl = gsap.timeline({
-		scrollTrigger: {
-			trigger: "#about",
-			start: "top top",
-			end: "+=200%",
-			scrub: 1,
-			pin: true,
-		},
+	// Initialize - set first card as active
+	if (cards.length > 0) {
+		cards[0].classList.add('active');
+	}
+
+	// Card click interactions
+	cards.forEach((card) => {
+		card.addEventListener('click', () => {
+			const cardType = card.getAttribute('data-card');
+			
+			// Remove active from all cards and panels
+			cards.forEach(c => c.classList.remove('active'));
+			panels.forEach(p => p.classList.remove('active'));
+			
+			// Add active to clicked card
+			card.classList.add('active');
+			
+			// Find and activate corresponding panel
+			const targetPanel = document.querySelector(`[data-panel="${cardType}"]`);
+			if (targetPanel) {
+				targetPanel.classList.add('active');
+			}
+		});
 	});
 
-	// Simple title animation without splitting
-	if (featureTitle) {
-		// Initial state
-		gsap.set(featureTitle, {
-			y: 60,
-			opacity: 0,
-			scale: 0.9,
-		});
+	// Clean pinned scroll animation
+	ScrollTrigger.create({
+		trigger: ".showcase-section",
+		start: "top top",
+		end: "+=100vh",
+		pin: true,
+		scrub: 1,
+		onUpdate: (self) => {
+			const progress = self.progress;
 
-		// Animate in and then scale up during scrub
-		tl.to(
-			featureTitle,
-			{
-				y: 0,
-				opacity: 1,
-				scale: 1,
-				ease: "none",
-			},
-			0,
-		).to(
-			featureTitle,
-			{
-				scale: 1.05,
-				y: -10,
-				ease: "none",
-			},
-			0.3,
-		);
-	}
+			// Cards move up
+			gsap.set('.showcase-card', {
+				y: progress * -80,
+			});
 
-	// Simple content animation without splitting
-	if (featureContent) {
-		// Initial state
-		gsap.set(featureContent, {
-			y: 30,
-			opacity: 0,
-		});
+			// Title scales
+			gsap.set('.main-title', {
+				scale: 1 + (progress * 0.2),
+			});
 
-		// Animate in and then move during scrub
-		tl.to(
-			featureContent,
-			{
-				y: 0,
-				opacity: 1,
-				ease: "none",
-			},
-			0.1,
-		).to(
-			featureContent,
-			{
-				y: -10,
-				ease: "none",
-			},
-			0.4,
-		);
-	}
+			// Orbs move
+			gsap.set('.orb-1', {
+				x: progress * -100,
+				y: progress * -50,
+			});
 
-	// Triangle particles reveal effect
-	const particleImage = document.querySelector(".particle-image");
+			gsap.set('.orb-2', {
+				x: progress * 80,
+				y: progress * 40,
+			});
+		}
+	});
 
-	if (aboutImage && particleImage) {
-		// Initial states
-		gsap.set(aboutImage, { x: -100, opacity: 0, scale: 0.8 });
-		gsap.set(particleImage, {
-			filter: "blur(6px) brightness(0.3)",
-			maskImage: "conic-gradient(from 0deg at 50% 50%, black 0deg, black 120deg, transparent 120deg, transparent 240deg, black 240deg, black 360deg)",
-			maskSize: "8px 8px",
-			maskRepeat: "repeat",
-			WebkitMaskImage: "conic-gradient(from 0deg at 50% 50%, black 0deg, black 120deg, transparent 120deg, transparent 240deg, black 240deg, black 360deg)",
-			WebkitMaskSize: "8px 8px",
-			WebkitMaskRepeat: "repeat",
-		});
+	// Handle reduced motion
+	const handleReducedMotion = () => {
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		
+		if (prefersReducedMotion) {
+			ScrollTrigger.getAll().forEach(st => st.disable());
+		}
+	};
 
-		// Slow triangle assembly
-		tl.to(aboutImage, { x: 0, opacity: 1, scale: 1, ease: "none", duration: 1 }, 0)
-		  .to(particleImage, { 
-			  filter: "blur(3px) brightness(0.6)",
-			  maskSize: "12px 12px",
-			  WebkitMaskSize: "12px 12px",
-			  ease: "none",
-			  duration: 1
-		  }, 0.3)
-		  .to(particleImage, { 
-			  filter: "blur(1px) brightness(0.9)",
-			  maskSize: "16px 16px",
-			  WebkitMaskSize: "16px 16px",
-			  ease: "none",
-			  duration: 1
-		  }, 1.0)
-		  .to(particleImage, { 
-			  filter: "blur(0px) brightness(1)",
-			  maskImage: "none",
-			  WebkitMaskImage: "none",
-			  ease: "none",
-			  duration: 0.5
-		  }, 1.8)
-		  .to(aboutImage, { scale: 1.1, rotation: 2, ease: "none" }, 2.0);
-	}
+	handleReducedMotion();
+	window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', handleReducedMotion);
 }
 
-document.addEventListener("DOMContentLoaded", init);
-document.addEventListener("astro:after-swap", init);
+document.addEventListener("DOMContentLoaded", initInteractiveShowcase);
+document.addEventListener("astro:after-swap", initInteractiveShowcase);
