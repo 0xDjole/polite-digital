@@ -1,0 +1,229 @@
+---
+---
+
+<section class="workflow-section">
+	<div class="workflow-container">
+		<div class="workflow-content">
+			<div class="left-column">
+				<div class="workflow-header">
+					<h2 class="workflow-title">
+						<span class="main-text-gradient">Our</span>
+						<span class="main-text-gradient">Workflow</span>
+					</h2>
+					<div class="gear-container">
+						<div id="gear-lottie" class="gear-animation"></div>
+					</div>
+				</div>
+			</div>
+			<div class="right-column">
+				<div class="workflow-item">
+					<div class="step-number">01</div>
+					<h3 class="step-title">Discovery & Strategy</h3>
+					<p class="step-description">
+						We start by understanding your business goals, target audience, and market landscape. 
+						Our strategic approach ensures every decision aligns with your objectives.
+					</p>
+					<ul class="step-features">
+						<li>Market research & analysis</li>
+						<li>Competitor benchmarking</li>
+						<li>User persona development</li>
+						<li>Technical requirements gathering</li>
+					</ul>
+				</div>
+				<div class="workflow-item">
+					<div class="step-number">02</div>
+					<h3 class="step-title">Design & Prototyping</h3>
+					<p class="step-description">
+						Creating stunning, user-centered designs that captivate your audience while maintaining 
+						functionality and accessibility standards.
+					</p>
+					<ul class="step-features">
+						<li>Wireframing & user flow mapping</li>
+						<li>High-fidelity design mockups</li>
+						<li>Interactive prototypes</li>
+						<li>Design system creation</li>
+					</ul>
+				</div>
+				<div class="workflow-item">
+					<div class="step-number">03</div>
+					<h3 class="step-title">Development & Integration</h3>
+					<p class="step-description">
+						Building robust, scalable solutions using cutting-edge technologies and best practices 
+						for optimal performance and security.
+					</p>
+					<ul class="step-features">
+						<li>Frontend & backend development</li>
+						<li>API integration & optimization</li>
+						<li>Database design & implementation</li>
+						<li>Security & performance optimization</li>
+					</ul>
+				</div>
+				<div class="workflow-item">
+					<div class="step-number">04</div>
+					<h3 class="step-title">Testing & Launch</h3>
+					<p class="step-description">
+						Rigorous testing ensures flawless functionality across all devices and browsers 
+						before a smooth, successful launch.
+					</p>
+					<ul class="step-features">
+						<li>Comprehensive quality assurance</li>
+						<li>Cross-browser compatibility testing</li>
+						<li>Performance & load testing</li>
+						<li>Deployment & launch support</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script src="./feature11.ts"></script>
+
+<style>
+	.workflow-section {
+		min-height: 200vh;
+		padding: 4rem 0;
+		background: #0A0A0A;
+	}
+
+	.workflow-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 2rem;
+	}
+
+	.workflow-content {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 4rem;
+		align-items: start;
+	}
+
+	.left-column {
+		position: sticky;
+		top: 50%;
+		transform: translateY(-50%);
+		height: fit-content;
+	}
+
+	.workflow-header {
+		text-align: center;
+	}
+
+	.workflow-title {
+		font-size: clamp(3rem, 8vw, 6rem);
+		font-weight: 900;
+		line-height: 0.9;
+		margin-bottom: 2rem;
+		text-transform: uppercase;
+		letter-spacing: -0.02em;
+	}
+
+	.workflow-title span {
+		display: block;
+	}
+
+	.main-text-gradient {
+		background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.gear-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 2rem;
+	}
+
+	.gear-animation {
+		width: 200px;
+		height: 200px;
+		filter: drop-shadow(0 10px 30px rgba(139, 92, 246, 0.3));
+	}
+
+	.right-column {
+		padding: 2rem 0;
+	}
+
+	.workflow-item {
+		margin-bottom: 4rem;
+		padding: 2rem;
+		border-radius: 24px;
+		background: rgba(255, 255, 255, 0.02);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+	}
+
+	.step-number {
+		font-size: 1rem;
+		font-weight: 700;
+		color: #8B5CF6;
+		margin-bottom: 1rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+
+	.step-title {
+		font-size: 2.5rem;
+		font-weight: 800;
+		color: white;
+		margin-bottom: 1.5rem;
+		line-height: 1.2;
+	}
+
+	.step-description {
+		font-size: 1.125rem;
+		color: rgba(255, 255, 255, 0.8);
+		line-height: 1.6;
+		margin-bottom: 2rem;
+	}
+
+	.step-features {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.step-features li {
+		position: relative;
+		padding-left: 2rem;
+		margin-bottom: 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+
+	.step-features li::before {
+		content: "✓";
+		position: absolute;
+		left: 0;
+		top: 0;
+		color: #8B5CF6;
+		font-weight: bold;
+		font-size: 1.1rem;
+	}
+
+	@media (max-width: 768px) {
+		.workflow-content {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.left-column {
+			position: relative;
+			top: auto;
+		}
+
+		.workflow-title {
+			font-size: 3rem;
+		}
+
+		.gear-animation {
+			width: 150px;
+			height: 150px;
+		}
+	}
+</style>
