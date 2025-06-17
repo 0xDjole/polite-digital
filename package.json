@@ -23,7 +23,6 @@
 		"@iconify-json/mdi": "^1.2.3",
 		"@iconify/json": "^2.2.330",
 		"@iconify/svelte": "^4.2.0",
-		"@lottiefiles/lottie-interactivity": "^1.6.2",
 		"@nanostores/persistent": "^1.0.0",
 		"@tailwindcss/forms": "^0.5.10",
 		"@tailwindcss/vite": "^4.0.17",
