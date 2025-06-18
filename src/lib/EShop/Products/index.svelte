@@ -41,23 +41,6 @@
 		return res?.url || null;
 	}
 
-	function getProductImage(product) {
-		if (!product.gallery || product.gallery.length === 0) {
-			return null;
-		}
-		
-		const thumbnail = product.gallery.find(item => item.settings?.isThumbnail) || product.gallery[0];
-		if (thumbnail?.media?.resolutions?.medium?.url) {
-			return getImageUrl(thumbnail.media.resolutions.medium.url, false);
-		}
-		
-		if (thumbnail?.media?.resolutions?.original?.url) {
-			return getImageUrl(thumbnail.media.resolutions.original.url, false);
-		}
-		
-		return null;
-	}
-
 	function getDefaultVariant(product) {
 		return product.variants?.find(v => v.isDefault) || product.variants?.[0];
 	}
@@ -65,10 +48,6 @@
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
 		return `${priceOption.basePrice} ${priceOption.currency}`;
-	}
-
-	function goToProduct(slug) {
-		window.location.href = `/products/${slug}`;
 	}
 
 	onMount(() => {

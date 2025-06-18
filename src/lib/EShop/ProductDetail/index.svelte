@@ -4,40 +4,17 @@
 	import { showToast } from '@lib/toast.js';
 	import { cartParts } from '@lib/Reservation/reservationStore.js';
 
-	export let slug;
+	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
 
-	let product = null;
-	let loading = true;
+	export let product;
+
+	let loading = false;
 	let error = null;
 	let selectedVariant = null;
 	let quantity = 1;
 	let selectedImageIndex = 0;
 	let addingToCart = false;
 	let userToken = null;
-
-	async function loadProduct() {
-		try {
-			loading = true;
-			error = null;
-			
-			const response = await eshopApi.getProductBySlug({
-				businessId: BUSINESS_ID,
-				slug: slug
-			});
-
-			if (response.success) {
-				product = response.data;
-				selectedVariant = getDefaultVariant(product);
-			} else {
-				error = response.error || 'Product not found';
-			}
-		} catch (err) {
-			error = 'Failed to load product';
-			console.error('Error loading product:', err);
-		} finally {
-			loading = false;
-		}
-	}
 
 	async function getGuestToken() {
 		if (userToken) return userToken;
@@ -88,22 +65,36 @@
 		return `${priceOption.basePrice} ${priceOption.currency}`;
 	}
 
+	function getGalleryThumbnail(gallery) {
+		if (!gallery?.length) return null;
+		const item = gallery.find((g) => g.settings?.isThumbnail) || gallery[0];
+		const res = item.media.resolutions.thumbnail || item.media.resolutions.original;
+		return res?.url || null;
+	}
+
 	function getProductImages(product) {
 		if (!product.gallery || product.gallery.length === 0) {
 			return [];
 		}
 		
 		return product.gallery.map(item => {
-			if (item?.media?.resolutions?.original?.url) {
+			if (item?.media?.resolutions) {
+				const original = item.media.resolutions.original?.url;
+				const thumbnail = item.media.resolutions.thumbnail?.url;
+				
+				if (!original) return null;
+				
 				return {
-					url: getImageUrl(item.media.resolutions.original.url, false),
-					thumbnail: getImageUrl(item.media.resolutions?.thumbnail?.url || item.media.resolutions.original.url, false),
+					url: `${STORAGE_URL}/${original}`,
+					thumbnail: `${STORAGE_URL}/${thumbnail || original}`,
 					alt: product.name
 				};
 			}
 			return null;
 		}).filter(Boolean);
 	}
+
+
 
 	function selectVariant(variant) {
 		selectedVariant = variant;
@@ -114,32 +105,30 @@
 	}
 
 	onMount(() => {
-		loadProduct();
+		if (product) {
+			selectedVariant = getDefaultVariant(product);
+		}
 	});
 
 	$: images = product ? getProductImages(product) : [];
 	$: selectedImage = images[selectedImageIndex];
 	$: isInStock = selectedVariant?.stock > 0;
+
+	$: console.log('iff ',images,product);
 </script>
 
-<div class="min-h-screen bg-gray-50 py-8">
-	<div class="container mx-auto px-4">
+<div class="min-h-screen bg-background py-8">
+	<div class="max-w-7xl mx-auto px-6">
 		{#if loading}
 			<div class="flex justify-center items-center py-20">
-				<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+				<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
 			</div>
 		{:else if error}
-			<div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-md mx-auto">
-				<div class="text-red-800 text-lg mb-2">Error</div>
-				<div class="text-red-600 mb-4">{error}</div>
+			<div class="bg-destructive/10 border border-destructive/20 rounded-lg p-6 text-center max-w-md mx-auto">
+				<div class="text-destructive text-lg mb-2">Error</div>
+				<div class="text-destructive/80 mb-4">{error}</div>
 				<button 
-					class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors mr-2"
-					on:click={loadProduct}
-				>
-					Retry
-				</button>
-				<button 
-					class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+					class="px-4 py-2 bg-muted text-muted-foreground rounded hover:bg-muted/80 transition-colors"
 					on:click={goBack}
 				>
 					Go Back
@@ -149,19 +138,19 @@
 			<!-- Breadcrumb -->
 			<nav class="mb-6">
 				<button 
-					class="text-blue-600 hover:text-blue-800 transition-colors"
+					class="text-primary hover:text-primary/80 transition-colors"
 					on:click={goBack}
 				>
 					← Back to Products
 				</button>
 			</nav>
 
-			<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+			<div class="bg-card rounded-lg shadow-sm border overflow-hidden">
 				<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
 					<!-- Product Images -->
 					<div class="space-y-4">
 						{#if selectedImage}
-							<div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+							<div class="aspect-square bg-muted rounded-lg overflow-hidden">
 								<img 
 									src={selectedImage.url} 
 									alt={selectedImage.alt}
@@ -186,8 +175,8 @@
 								</div>
 							{/if}
 						{:else}
-							<div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-								<svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="aspect-square bg-muted rounded-lg flex items-center justify-center">
+								<svg class="w-24 h-24 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
 								</svg>
 							</div>
@@ -197,18 +186,18 @@
 					<!-- Product Details -->
 					<div class="space-y-6">
 						<div>
-							<h1 class="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+							<h1 class="text-3xl font-bold text-foreground mb-2">{product.name}</h1>
 							<div class="flex items-center gap-2 mb-4">
-								<span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+								<span class="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
 									{product.productType}
 								</span>
-								<span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+								<span class="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
 									SKU: {selectedVariant?.sku || 'N/A'}
 								</span>
 							</div>
 							
 							{#if product.description}
-								<p class="text-gray-600 leading-relaxed">{product.description}</p>
+								<p class="text-muted-foreground leading-relaxed">{product.description}</p>
 							{/if}
 						</div>
 
@@ -219,7 +208,7 @@
 								<div class="grid grid-cols-1 gap-2">
 									{#each product.variants as variant}
 										<button 
-											class="p-3 border rounded-lg text-left transition-colors {selectedVariant?.id === variant.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}"
+											class="p-3 border rounded-lg text-left transition-colors {selectedVariant?.id === variant.id ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}"
 											on:click={() => selectVariant(variant)}
 											disabled={variant.stock === 0}
 										>
@@ -227,7 +216,7 @@
 												<div>
 													<div class="font-medium">{formatPrice(variant.price)}</div>
 													{#if Object.keys(variant.attributes).length > 0}
-														<div class="text-sm text-gray-600">
+														<div class="text-sm text-muted-foreground">
 															{#each Object.entries(variant.attributes) as [key, value]}
 																<span class="mr-2">{key}: {value}</span>
 															{/each}
@@ -248,7 +237,7 @@
 						{#if selectedVariant}
 							<div class="border-t pt-6">
 								<div class="flex items-center justify-between mb-4">
-									<div class="text-3xl font-bold text-blue-600">
+									<div class="text-2xl font-bold bg-accent text-accent-foreground px-4 py-2 rounded-lg inline-block">
 										{formatPrice(selectedVariant.price)}
 									</div>
 									<div class="text-sm {isInStock ? 'text-green-600' : 'text-red-600'}">
@@ -262,7 +251,7 @@
 										<div class="flex items-center">
 											<label for="quantity" class="sr-only">Quantity</label>
 											<button 
-												class="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-100 transition-colors"
+												class="p-2 border border-border rounded-l-lg hover:bg-accent hover:text-accent-foreground transition-colors"
 												on:click={() => quantity = Math.max(1, quantity - 1)}
 											>
 												-
@@ -273,10 +262,10 @@
 												min="1" 
 												max={selectedVariant.stock}
 												bind:value={quantity}
-												class="w-16 p-2 border-t border-b border-gray-300 text-center"
+												class="w-16 p-2 border-t border-b border-border text-center bg-background text-foreground"
 											/>
 											<button 
-												class="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-100 transition-colors"
+												class="p-2 border border-border rounded-r-lg hover:bg-accent hover:text-accent-foreground transition-colors"
 												on:click={() => quantity = Math.min(selectedVariant.stock, quantity + 1)}
 											>
 												+
@@ -284,7 +273,7 @@
 										</div>
 
 										<button 
-											class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+											class="flex-1 bg-accent text-accent-foreground px-6 py-3 rounded-lg hover:bg-accent/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 											on:click={addToCart}
 											disabled={addingToCart || !isInStock}
 										>
@@ -304,7 +293,7 @@
 									</div>
 								{:else}
 									<button 
-										class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg cursor-not-allowed"
+										class="w-full bg-muted text-muted-foreground px-6 py-3 rounded-lg cursor-not-allowed"
 										disabled
 									>
 										Out of Stock
