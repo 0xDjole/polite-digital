@@ -1,0 +1,21 @@
+---
+// Enable server-side rendering for product detail pages
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ProductDetail from "@lib/EShop/ProductDetail/index.svelte";
+import { cmsApi, getBlockFromArray } from "@lib/index";
+import { defaultLocale, getLocale } from "@lib/i18n";
+
+const { getCollection } = cmsApi();
+const websiteCollection = await getCollection("website");
+
+const currLocale = getLocale(Astro.currentLocale);
+const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
+
+const slug = Astro.params.slug;
+---
+
+<BaseLayout title={`Product - ${siteData.title}`} description="Product details">
+	<ProductDetail {slug} client:load />
+</BaseLayout>

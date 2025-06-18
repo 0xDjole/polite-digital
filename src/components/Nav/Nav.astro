@@ -15,7 +15,18 @@ import { getLocale, locales } from "@lib/i18n";
 const { getCollection, getBlockObjectValues } = cmsApi();
 const websiteCollection = await getCollection("website");
 
-const navData = getBlockObjectValues(websiteCollection, "navigation_items", currLocale);
+const cmsNavData = getBlockObjectValues(websiteCollection, "navigation_items", currLocale);
+
+// Add Products link to navigation
+const productsNavItem = {
+	text: "Products",
+	link: "/products",
+	newTab: false,
+	icon: "mdi:shopping"
+};
+
+// Combine CMS navigation with Products link
+const navData = [productsNavItem, ...cmsNavData];
 ---
 
 <section

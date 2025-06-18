@@ -1,8 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-
+import ProductsPage from "@lib/EShop/Products/index.svelte";
 import { cmsApi, getBlockFromArray } from "@lib/index";
-import EShopCart from "@lib/EShop/Cart/index.svelte";
 import { defaultLocale, getLocale, locales } from "@lib/i18n";
 
 export function getStaticPaths() {
@@ -14,13 +13,13 @@ export function getStaticPaths() {
 	}));
 }
 
-const { getCollection, getBlockObjectValues } = cmsApi();
+const { getCollection } = cmsApi();
 const websiteCollection = await getCollection("website");
 
 const currLocale = getLocale(Astro.currentLocale);
 const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
 ---
 
-<BaseLayout title={`Cart - ${siteData.title}`} description="Your shopping cart">
-	<EShopCart client:load />
+<BaseLayout title={`Products - ${siteData.title}`} description="Browse our products">
+	<ProductsPage client:load />
 </BaseLayout>
