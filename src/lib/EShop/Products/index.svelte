@@ -3,6 +3,9 @@
 	import { eshopApi, getPrice, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
 
+
+	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
+
 	let products = [];
 	let loading = true;
 	let error = null;
@@ -29,6 +32,13 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	function getGalleryThumbnail(gallery) {
+		if (!gallery?.length) return null;
+		const item = gallery.find((g) => g.settings?.isThumbnail) || gallery[0];
+		const res = item.media.resolutions.thumbnail || item.media.resolutions.original;
+		return res?.url || null;
 	}
 
 	function getProductImage(product) {
@@ -120,15 +130,18 @@
 		{:else}
 			{#each products as product}
 				{@const defaultVariant = getDefaultVariant(product)}
-				{@const productImage = getProductImage(product)}
+			    {@const thumbPath = getGalleryThumbnail(product.gallery)}
+			    {@const thumbUrl = thumbPath ? `${STORAGE_URL}/${thumbPath}` : null}
+
+
 				
 				<a
 					href="/products/{product.slug}"
 					class="bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
 				>
-					{#if productImage}
+					{#if thumbUrl}
 						<img
-							src={productImage}
+							src={thumbUrl}
 							alt={product.name}
 							referrerpolicy="no-referrer"
 							class="w-full h-48 object-cover"
