@@ -437,22 +437,28 @@ export const cmsApi = () => ({
 export const eshopApi = {
 	// Get products
 	getProducts: async ({ businessId, categoryIds = null, status = "Published", limit = 20, cursor = null }) => {
-		let url = `${API_URL}/v1/eshop/products?businessId=${encodeURIComponent(businessId)}`;
+		let url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
+		
+		const params = [];
 		
 		if (categoryIds && categoryIds.length > 0) {
-			url += `&categoryIds=${encodeURIComponent(JSON.stringify(categoryIds))}`;
+			params.push(`categoryIds=${encodeURIComponent(JSON.stringify(categoryIds))}`);
 		}
 		
 		if (status) {
-			url += `&status=${encodeURIComponent(status)}`;
+			params.push(`status=${encodeURIComponent(status)}`);
 		}
 		
 		if (limit) {
-			url += `&limit=${limit}`;
+			params.push(`limit=${limit}`);
 		}
 		
 		if (cursor) {
-			url += `&cursor=${encodeURIComponent(cursor)}`;
+			params.push(`cursor=${encodeURIComponent(cursor)}`);
+		}
+
+		if (params.length > 0) {
+			url += `?${params.join('&')}`;
 		}
 
 		try {
@@ -477,7 +483,7 @@ export const eshopApi = {
 	// Get product by slug
 	getProductBySlug: async ({ businessId, slug }) => {
 		try {
-			const url = `${API_URL}/v1/eshop/products/slug/${encodeURIComponent(businessId)}/${encodeURIComponent(slug)}`;
+			const url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products/slug/${encodeURIComponent(businessId)}/${encodeURIComponent(slug)}`;
 			const res = await fetch(url);
 			if (!res.ok) throw new Error("Product not found");
 			const json = await res.json();
@@ -495,136 +501,18 @@ export const eshopApi = {
 		}
 	},
 
-	// Get or create cart
-	getCart: async ({ token, businessId }) => {
-		try {
-			const url = `${API_URL}/v1/eshop/cart?businessId=${encodeURIComponent(businessId)}`;
-			const res = await fetch(url, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-			if (!res.ok) throw new Error("Failed to get cart");
-			const json = await res.json();
-			return {
-				success: true,
-				data: json,
-			};
-		} catch (e) {
-			console.error("Error fetching cart:", e);
-			return {
-				success: false,
-				error: e.message,
-				data: null,
-			};
-		}
-	},
-
-	// Add to cart
-	addToCart: async ({ token, productId, variantId, quantity, businessId }) => {
-		try {
-			const res = await fetch(`${API_URL}/v1/eshop/cart/add`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({
-					productId,
-					variantId,
-					quantity,
-					businessId,
-				}),
-			});
-
-			if (!res.ok) {
-				const error = (await res.text()) || res.statusText;
-				throw new Error(error);
-			}
-
-			return {
-				success: true,
-			};
-		} catch (e) {
-			return {
-				success: false,
-				error: e.message,
-			};
-		}
-	},
-
-	// Update cart item
-	updateCartItem: async ({ token, cartItemId, quantity }) => {
-		try {
-			const res = await fetch(`${API_URL}/v1/eshop/cart/update`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({
-					cartItemId,
-					quantity,
-				}),
-			});
-
-			if (!res.ok) {
-				const error = (await res.text()) || res.statusText;
-				throw new Error(error);
-			}
-
-			return {
-				success: true,
-			};
-		} catch (e) {
-			return {
-				success: false,
-				error: e.message,
-			};
-		}
-	},
-
-	// Remove from cart
-	removeFromCart: async ({ token, cartItemId }) => {
-		try {
-			const res = await fetch(`${API_URL}/v1/eshop/cart/remove`, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({
-					cartItemId,
-				}),
-			});
-
-			if (!res.ok) {
-				const error = (await res.text()) || res.statusText;
-				throw new Error(error);
-			}
-
-			return {
-				success: true,
-			};
-		} catch (e) {
-			return {
-				success: false,
-				error: e.message,
-			};
-		}
-	},
-
-	// Checkout
-	checkout: async ({ token, cartId, paymentMethod, orderInfoBlocks, paymentIntentId = null }) => {
+	// Checkout (direct from cart items, no backend cart)
+	checkout: async ({ token, businessId, items, paymentMethod, orderInfoBlocks, paymentIntentId = null }) => {
 		try {
 			const payload = {
-				cartId,
+				businessId,
+				items,
 				paymentMethod,
 				orderInfoBlocks,
 				...(paymentIntentId && { paymentIntentId }),
 			};
 
-			const res = await fetch(`${API_URL}/v1/eshop/orders/checkout`, {
+			const res = await fetch(`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/orders/checkout`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -638,8 +526,10 @@ export const eshopApi = {
 				throw new Error(error);
 			}
 
+			const json = await res.json();
 			return {
 				success: true,
+				data: json,
 			};
 		} catch (e) {
 			return {

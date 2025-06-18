@@ -3,6 +3,9 @@
 	import { eshopApi, reservationApi, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
 	import { cartParts } from '@lib/Reservation/reservationStore.js';
+	import { actions } from '../eshopCartStore.js';
+	import QuantitySelector from '../QuantitySelector/index.svelte';
+	import Icon from '@iconify/svelte';
 
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
 
@@ -14,40 +17,18 @@
 	let quantity = 1;
 	let selectedImageIndex = 0;
 	let addingToCart = false;
-	let userToken = null;
-
-	async function getGuestToken() {
-		if (userToken) return userToken;
-		
-		const response = await reservationApi.getGuestToken();
-		if (response.success) {
-			userToken = response.token;
-			return userToken;
-		}
-		throw new Error('Failed to get guest token');
-	}
 
 	async function addToCart() {
 		if (!product || !selectedVariant) return;
 		
 		try {
 			addingToCart = true;
-			const token = await getGuestToken();
 			
-			const response = await eshopApi.addToCart({
-				token,
-				productId: product.id,
-				variantId: selectedVariant.id,
-				quantity,
-				businessId: BUSINESS_ID
-			});
-
-			if (response.success) {
-				showToast('Product added to cart!', 'success', 3000);
-				// Optionally refresh cart state or redirect to cart
-			} else {
-				throw new Error(response.error || 'Failed to add to cart');
-			}
+			// Use frontend cart store instead of backend API
+			actions.addItem(product, selectedVariant, quantity);
+			
+			// Reset quantity after adding to cart
+			quantity = 1;
 		} catch (err) {
 			showToast(`Error: ${err.message}`, 'error', 5000);
 			console.error('Error adding to cart:', err);
@@ -176,9 +157,7 @@
 							{/if}
 						{:else}
 							<div class="aspect-square bg-muted rounded-lg flex items-center justify-center">
-								<svg class="w-24 h-24 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-								</svg>
+								<Icon icon="mdi:image" class="w-24 h-24 text-muted-foreground" />
 							</div>
 						{/if}
 					</div>
@@ -248,29 +227,12 @@
 								<!-- Quantity and Add to Cart -->
 								{#if isInStock}
 									<div class="flex gap-4">
-										<div class="flex items-center">
-											<label for="quantity" class="sr-only">Quantity</label>
-											<button 
-												class="p-2 border border-border rounded-l-lg hover:bg-accent hover:text-accent-foreground transition-colors"
-												on:click={() => quantity = Math.max(1, quantity - 1)}
-											>
-												-
-											</button>
-											<input 
-												id="quantity"
-												type="number" 
-												min="1" 
-												max={selectedVariant.stock}
-												bind:value={quantity}
-												class="w-16 p-2 border-t border-b border-border text-center bg-background text-foreground"
-											/>
-											<button 
-												class="p-2 border border-border rounded-r-lg hover:bg-accent hover:text-accent-foreground transition-colors"
-												on:click={() => quantity = Math.min(selectedVariant.stock, quantity + 1)}
-											>
-												+
-											</button>
-										</div>
+										<QuantitySelector 
+											bind:quantity={quantity}
+											min={1}
+											max={selectedVariant.stock}
+											on:change={(e) => quantity = e.detail}
+										/>
 
 										<button 
 											class="flex-1 bg-accent text-accent-foreground px-6 py-3 rounded-lg hover:bg-accent/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

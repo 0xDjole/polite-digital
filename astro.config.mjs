@@ -10,7 +10,7 @@ import svelte from "@astrojs/svelte";
 
 // https://astro.build/config
 export default defineConfig({
-	output: "hybrid",
+	output: "static",
 	site: import.meta.env.PUBLIC_SITE_URL || "https://yepi.io",
 	image: {
 		// Allow any images coming from your CMS domain(s)
