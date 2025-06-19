@@ -9,7 +9,6 @@
 	import { createEventDispatcher } from 'svelte';
 	import QuantitySelector from '../QuantitySelector/index.svelte';
 	import Icon from '@iconify/svelte';
-	import { STRIPE_PUBLISHABLE_KEY } from '@lib/env';
 	import { loadStripe } from '@stripe/stripe-js';
 
 	let showCheckoutSection = $state(false);
@@ -156,27 +155,42 @@
 	onMount(async () => {
 		initEshopCartStore();
 		
-		if (STRIPE_PUBLISHABLE_KEY) {
-			stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
-		}
-
-		// Initialize order blocks and business object
-		if ($store.checkoutBlocks) {
-			orderBlocks = $store.checkoutBlocks.map(block => ({
-				...block,
-				value: block.value && block.value.length > 0 ? block.value : 
-					(block.type === 'text' ? [{ en: '' }] : 
-					 block.type === 'boolean' ? [false] : 
-					 block.type === 'number' ? [0] : [''])
-			}));
-		}
-
-		// Create business object for BlockManager
-		businessObject = {
-			id: BUSINESS_ID,
-			configs: {
-				checkoutBlocks: $store.checkoutBlocks || []
+		// Wait for store to load business configuration
+		const unsubscribe = store.subscribe(async (storeValue) => {
+			if (storeValue.loading) return; // Still loading
+			
+			// Load Stripe if business has it configured
+			if (storeValue.stripeConfig.enabled && storeValue.stripeConfig.publicKey && !stripe) {
+				try {
+					stripe = await loadStripe(storeValue.stripeConfig.publicKey);
+					console.log('Stripe loaded with business public key');
+				} catch (error) {
+					console.error('Failed to load Stripe:', error);
+				}
 			}
+			
+			// Initialize order blocks and business object
+			if (storeValue.checkoutBlocks) {
+				orderBlocks = storeValue.checkoutBlocks.map(block => ({
+					...block,
+					value: block.value && block.value.length > 0 ? block.value : 
+						(block.type === 'text' ? [{ en: '' }] : 
+						 block.type === 'boolean' ? [false] : 
+						 block.type === 'number' ? [0] : [''])
+				}));
+			}
+
+			// Create business object for BlockManager
+			businessObject = {
+				id: BUSINESS_ID,
+				configs: {
+					checkoutBlocks: storeValue.checkoutBlocks || []
+				}
+			};
+		});
+		
+		return () => {
+			unsubscribe();
 		};
 	});
 
@@ -264,6 +278,13 @@
 	$effect(() => {
 		if (showCheckoutSection && selectedPaymentMethod === 'CreditCard' && stripe && !individualElementsMounted) {
 			setupCardElement();
+		}
+	});
+
+	// Reset payment method to Cash if Stripe is disabled and CreditCard was selected
+	$effect(() => {
+		if (!$store.stripeConfig.enabled && selectedPaymentMethod === 'CreditCard') {
+			selectedPaymentMethod = 'Cash';
 		}
 	});
 
@@ -446,7 +467,7 @@
 									<label class="block text-sm font-medium text-card-foreground mb-3">
 										Payment Method <span class="text-destructive">*</span>
 									</label>
-									<div class="grid grid-cols-2 gap-3">
+									<div class="grid gap-3" class:grid-cols-2={$store.stripeConfig.enabled} class:grid-cols-1={!$store.stripeConfig.enabled}>
 										<label class="flex items-center p-3 rounded-lg cursor-pointer transition-all" 
 											   class:border-2={selectedPaymentMethod === 'Cash'}
 											   class:border-primary={selectedPaymentMethod === 'Cash'} 
@@ -468,26 +489,28 @@
 											</div>
 										</label>
 										
-										<label class="flex items-center p-3 rounded-lg cursor-pointer transition-all" 
-											   class:border-2={selectedPaymentMethod === 'CreditCard'}
-											   class:border-primary={selectedPaymentMethod === 'CreditCard'} 
-											   class:bg-accent={selectedPaymentMethod === 'CreditCard'}
-											   class:bg-muted={selectedPaymentMethod !== 'CreditCard'}>
-											<input 
-												type="radio" 
-												name="paymentMethod" 
-												value="CreditCard"
-												bind:group={selectedPaymentMethod}
-												class="mr-3 text-primary focus:ring-primary"
-											/>
-											<div class="flex items-center gap-3">
-												<Icon icon="mdi:credit-card" class="w-5 h-5 text-primary" />
-												<div>
-													<div class="font-medium text-card-foreground text-sm">Card</div>
-													<div class="text-xs text-muted-foreground">Pay with card</div>
+										{#if $store.stripeConfig.enabled}
+											<label class="flex items-center p-3 rounded-lg cursor-pointer transition-all" 
+												   class:border-2={selectedPaymentMethod === 'CreditCard'}
+												   class:border-primary={selectedPaymentMethod === 'CreditCard'} 
+												   class:bg-accent={selectedPaymentMethod === 'CreditCard'}
+												   class:bg-muted={selectedPaymentMethod !== 'CreditCard'}>
+												<input 
+													type="radio" 
+													name="paymentMethod" 
+													value="CreditCard"
+													bind:group={selectedPaymentMethod}
+													class="mr-3 text-primary focus:ring-primary"
+												/>
+												<div class="flex items-center gap-3">
+													<Icon icon="mdi:credit-card" class="w-5 h-5 text-primary" />
+													<div>
+														<div class="font-medium text-card-foreground text-sm">Card</div>
+														<div class="text-xs text-muted-foreground">Pay with card</div>
+													</div>
 												</div>
-											</div>
-										</label>
+											</label>
+										{/if}
 									</div>
 								</div>
 

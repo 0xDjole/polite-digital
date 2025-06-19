@@ -22,6 +22,11 @@ export const store = deepMap({
 	processingCheckout: false,
 	loading: false,
 	error: null,
+	// Stripe configuration
+	stripeConfig: {
+		publicKey: null,
+		enabled: false
+	}
 });
 
 // Computed values
@@ -116,14 +121,13 @@ export const actions = {
 		throw new Error('Failed to get guest token');
 	},
 	
-	// Load business checkout blocks
+	// Load business checkout blocks and configuration
 	async loadCheckoutBlocks() {
 		try {
 			store.setKey('loading', true);
 			store.setKey('error', null);
 			
-			// Get business details to fetch checkout blocks
-			// We'll use the collection API to get business configs
+			// Get business details to fetch checkout blocks and Stripe config
 			const response = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}`, {
 				method: 'GET',
 				headers: {
@@ -137,6 +141,13 @@ export const actions = {
 				store.setKey('checkoutBlocks', checkoutBlocks);
 				// Also set for DynamicForm compatibility
 				store.setKey('service', { reservationBlocks: checkoutBlocks });
+				
+				// Load Stripe configuration
+				const stripeConfig = {
+					publicKey: business.configs?.stripePublicKey || null,
+					enabled: business.configs?.stripeEnabled || false
+				};
+				store.setKey('stripeConfig', stripeConfig);
 			} else {
 				// Fallback to default checkout blocks if API fails
 				const defaultBlocks = [
