@@ -16,17 +16,6 @@ const { getCollection, getBlockObjectValues } = cmsApi();
 const websiteCollection = await getCollection("website");
 
 const cmsNavData = getBlockObjectValues(websiteCollection, "navigation_items", currLocale);
-
-// Add Products link to navigation
-const productsNavItem = {
-	text: "Products",
-	link: "/products",
-	newTab: false,
-	icon: "mdi:shopping"
-};
-
-// Combine CMS navigation with Products link
-const navData = [productsNavItem, ...cmsNavData];
 ---
 
 <section
@@ -52,7 +41,7 @@ const navData = [productsNavItem, ...cmsNavData];
 							<ul class="flex h-full items-center">
 								{
 									// if dropdown exists, setup the dropdown, otherwise it is just a link
-									navData.map((navItem) => <NavLink {navItem} />)
+									cmsNavData.map((navItem) => <NavLink {navItem} />)
 								}
 							</ul>
 						</nav>
