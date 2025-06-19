@@ -538,6 +538,47 @@ export const eshopApi = {
 			};
 		}
 	},
+
+	// Create payment intent for Stripe
+	createPaymentIntent: async ({ amount, currency, businessId }) => {
+		try {
+			const tokenResponse = await reservationApi.getGuestToken();
+			if (!tokenResponse.success) {
+				throw new Error('Failed to get guest token');
+			}
+			const token = tokenResponse.token;
+			
+			const res = await fetch(`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/payment/create-intent`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					amount,
+					currency,
+					businessId,
+				}),
+			});
+
+			if (!res.ok) {
+				const error = (await res.text()) || res.statusText;
+				throw new Error(error);
+			}
+
+			const json = await res.json();
+			return {
+				success: true,
+				data: json,
+			};
+		} catch (e) {
+			console.error('Payment intent creation failed:', e);
+			return {
+				success: false,
+				error: e.message,
+			};
+		}
+	},
 };
 
 export const reservationApi = {

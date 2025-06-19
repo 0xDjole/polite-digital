@@ -1,7 +1,7 @@
 // src/lib/EShop/eshopCartStore.js - Frontend-only e-shop cart store
 import { computed, deepMap } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
-import { BUSINESS_ID } from "../env";
+import { BUSINESS_ID, API_URL } from "../env";
 import { eshopApi, reservationApi } from "../index";
 import { showToast } from "../toast.js";
 
@@ -121,7 +121,7 @@ export const actions = {
 			
 			// Get business details to fetch checkout blocks
 			// We'll use the collection API to get business configs
-			const response = await fetch(`/api/businesses/${BUSINESS_ID}`, {
+			const response = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ export const actions = {
 	},
 	
 	// Process checkout
-	async checkout(formData, paymentMethod = 'Cash') {
+	async checkout(formData, paymentMethod = 'Cash', paymentIntentId = null) {
 		const items = cartItems.get();
 		if (!items.length) {
 			showToast('Cart is empty', 'error', 3000);
@@ -213,6 +213,7 @@ export const actions = {
 				items: orderItems,
 				paymentMethod,
 				orderInfoBlocks,
+				paymentIntentId,
 			});
 			
 			if (response.success) {
