@@ -4,6 +4,7 @@
 	import { showToast } from '@lib/toast.js';
 	import { cartParts } from '@lib/Reservation/reservationStore.js';
 	import Cart from '@lib/Reservation/Cart/index.svelte';
+	import { store as reservationStore } from '@lib/Reservation/reservationStore.js';
 	import { cartItems, cartTotal, cartItemCount, store, actions, initEshopCartStore } from '../eshopCartStore.js';
 	import { createEventDispatcher } from 'svelte';
 	import QuantitySelector from '../QuantitySelector/index.svelte';
@@ -45,6 +46,11 @@
 			showToast('Cart is empty', 'error', 3000);
 			return;
 		}
+		showCheckoutSection = true;
+	}
+
+	// Auto-show checkout when items are in cart
+	$: if ($cartItems.length > 0 && !showCheckoutSection) {
 		showCheckoutSection = true;
 	}
 
@@ -297,21 +303,6 @@
 						</span>
 					</div>
 
-					{#if !showCheckoutSection}
-						<button
-							class="bg-primary hover:bg-primary/90 w-full flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-primary-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-							disabled={$store.processingCheckout}
-							on:click={handleProceedToCheckout}
-						>
-							{#if $store.processingCheckout}
-								<Icon icon="mdi:loading" class="h-5 w-5 animate-spin" />
-								Processing...
-							{:else}
-								<Icon icon="mdi:credit-card" class="h-5 w-5" />
-								Checkout Products
-							{/if}
-						</button>
-					{/if}
 
 					<!-- Checkout Section -->
 					{#if showCheckoutSection}
@@ -335,29 +326,18 @@
 								handleCheckoutComplete(data);
 							}} class="space-y-6">
 								
-								<!-- Customer Information -->
-								{#each $store.checkoutBlocks as block}
-									<div>
-										<label class="block text-sm font-medium text-card-foreground mb-2">
-											{actions.getBlockLabel(block)}
-											{#if block.properties?.isRequired}
-												<span class="text-destructive">*</span>
-											{/if}
-										</label>
-										
-										{#if block.type === 'text'}
-											{#if block.properties?.options}
-												<select 
-													name={block.key}
-													required={block.properties?.isRequired}
-													class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground"
-												>
-													<option value="">Select...</option>
-													{#each block.properties.options as option}
-														<option value={option}>{option}</option>
-													{/each}
-												</select>
-											{:else}
+								<!-- Customer Information using simple form -->
+								{#if $store.checkoutBlocks && $store.checkoutBlocks.length > 0}
+									{#each $store.checkoutBlocks as block}
+										<div>
+											<label class="block text-sm font-medium text-card-foreground mb-2">
+												{actions.getBlockLabel(block)}
+												{#if block.properties?.isRequired}
+													<span class="text-destructive">*</span>
+												{/if}
+											</label>
+											
+											{#if block.type === 'text'}
 												<input 
 													type="text" 
 													name={block.key}
@@ -365,32 +345,82 @@
 													required={block.properties?.isRequired}
 													class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
 												/>
-											{/if}
-										{:else if block.type === 'boolean'}
-											<label class="flex items-center space-x-2 cursor-pointer">
+											{:else if block.type === 'boolean'}
+												<label class="flex items-center space-x-2 cursor-pointer">
+													<input 
+														type="checkbox" 
+														name={block.key}
+														class="rounded border-border text-primary focus:ring-ring focus:ring-2"
+													/>
+													<span class="text-sm text-card-foreground">{actions.getBlockLabel(block)}</span>
+												</label>
+											{:else if block.type === 'number'}
 												<input 
-													type="checkbox" 
+													type="number" 
 													name={block.key}
-													class="rounded border-border text-primary focus:ring-ring focus:ring-2"
+													min={block.properties?.min}
+													max={block.properties?.max}
+													required={block.properties?.isRequired}
+													class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground"
 												/>
-												<span class="text-sm text-card-foreground">{actions.getBlockLabel(block)}</span>
-											</label>
-										{:else if block.type === 'number'}
-											<input 
-												type="number" 
-												name={block.key}
-												min={block.properties?.min}
-												max={block.properties?.max}
-												required={block.properties?.isRequired}
-												class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground"
-											/>
-										{/if}
-										
-										{#if block.properties?.description}
-											<p class="text-xs text-muted-foreground mt-1">{block.properties.description}</p>
-										{/if}
+											{/if}
+											
+											{#if block.properties?.description}
+												<p class="text-xs text-muted-foreground mt-1">{block.properties.description}</p>
+											{/if}
+										</div>
+									{/each}
+								{:else}
+									<!-- Fallback simple form -->
+									<div>
+										<label class="block text-sm font-medium text-card-foreground mb-2">
+											Email Address <span class="text-destructive">*</span>
+										</label>
+										<input 
+											type="email" 
+											name="email"
+											placeholder="your@email.com"
+											required
+											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
+										/>
 									</div>
-								{/each}
+									<div>
+										<label class="block text-sm font-medium text-card-foreground mb-2">
+											Full Name <span class="text-destructive">*</span>
+										</label>
+										<input 
+											type="text" 
+											name="fullName"
+											placeholder="John Doe"
+											required
+											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
+										/>
+									</div>
+									<div>
+										<label class="block text-sm font-medium text-card-foreground mb-2">
+											Phone Number <span class="text-destructive">*</span>
+										</label>
+										<input 
+											type="text" 
+											name="phoneNumber"
+											placeholder="+387 XX XXX XXX"
+											required
+											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
+										/>
+									</div>
+									<div>
+										<label class="block text-sm font-medium text-card-foreground mb-2">
+											Shipping Address <span class="text-destructive">*</span>
+										</label>
+										<input 
+											type="text" 
+											name="shippingAddress"
+											placeholder="Street, City, Postal Code"
+											required
+											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
+										/>
+									</div>
+								{/if}
 
 								<!-- Payment Method -->
 								<div>
@@ -398,10 +428,11 @@
 										Payment Method <span class="text-destructive">*</span>
 									</label>
 									<div class="grid grid-cols-2 gap-3">
-										<label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all" 
+										<label class="flex items-center p-3 rounded-lg cursor-pointer transition-all" 
+											   class:border-2={selectedPaymentMethod === 'Cash'}
 											   class:border-primary={selectedPaymentMethod === 'Cash'} 
 											   class:bg-accent={selectedPaymentMethod === 'Cash'}
-											   class:border-border={selectedPaymentMethod !== 'Cash'}>
+											   class:bg-muted={selectedPaymentMethod !== 'Cash'}>
 											<input 
 												type="radio" 
 												name="paymentMethod" 
@@ -410,18 +441,19 @@
 												class="mr-3 text-primary focus:ring-primary"
 											/>
 											<div class="flex items-center gap-3">
-												<Icon icon="mdi:cash" class="w-6 h-6 text-primary" />
+												<Icon icon="mdi:cash" class="w-5 h-5 text-primary" />
 												<div>
-													<div class="font-medium text-card-foreground">Cash</div>
-													<div class="text-sm text-muted-foreground">Pay on delivery</div>
+													<div class="font-medium text-card-foreground text-sm">Cash</div>
+													<div class="text-xs text-muted-foreground">Pay on delivery</div>
 												</div>
 											</div>
 										</label>
 										
-										<label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all" 
+										<label class="flex items-center p-3 rounded-lg cursor-pointer transition-all" 
+											   class:border-2={selectedPaymentMethod === 'CreditCard'}
 											   class:border-primary={selectedPaymentMethod === 'CreditCard'} 
 											   class:bg-accent={selectedPaymentMethod === 'CreditCard'}
-											   class:border-border={selectedPaymentMethod !== 'CreditCard'}>
+											   class:bg-muted={selectedPaymentMethod !== 'CreditCard'}>
 											<input 
 												type="radio" 
 												name="paymentMethod" 
@@ -430,10 +462,10 @@
 												class="mr-3 text-primary focus:ring-primary"
 											/>
 											<div class="flex items-center gap-3">
-												<Icon icon="mdi:credit-card" class="w-6 h-6 text-primary" />
+												<Icon icon="mdi:credit-card" class="w-5 h-5 text-primary" />
 												<div>
-													<div class="font-medium text-card-foreground">Card</div>
-													<div class="text-sm text-muted-foreground">Pay with card</div>
+													<div class="font-medium text-card-foreground text-sm">Card</div>
+													<div class="text-xs text-muted-foreground">Pay with card</div>
 												</div>
 											</div>
 										</label>
@@ -511,20 +543,20 @@
 									<button 
 										type="button"
 										on:click={handleCheckoutCancel}
-										class="flex-1 px-6 py-3 border border-border text-card-foreground rounded-lg hover:bg-accent transition-colors"
+										class="flex-1 px-4 py-2 text-sm border border-border text-card-foreground rounded-lg hover:bg-accent transition-colors"
 									>
 										Cancel
 									</button>
 									<button 
 										type="submit"
 										disabled={$store.processingCheckout || paymentProcessing}
-										class="flex-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+										class="flex-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
 									>
 										{#if $store.processingCheckout || paymentProcessing}
-											<Icon icon="mdi:loading" class="h-5 w-5 animate-spin" />
+											<Icon icon="mdi:loading" class="h-4 w-4 animate-spin" />
 											Processing...
 										{:else}
-											<Icon icon={selectedPaymentMethod === 'CreditCard' ? 'mdi:credit-card' : 'mdi:cash'} class="h-5 w-5" />
+											<Icon icon={selectedPaymentMethod === 'CreditCard' ? 'mdi:credit-card' : 'mdi:cash'} class="h-4 w-4" />
 											Place Order • {formatPrice($cartTotal)}
 										{/if}
 									</button>

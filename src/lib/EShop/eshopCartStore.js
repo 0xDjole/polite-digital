@@ -15,6 +15,9 @@ export const cartItems = persistentAtom("eshopCart", [], {
 export const store = deepMap({
 	businessId: BUSINESS_ID,
 	checkoutBlocks: [], // Business checkout form blocks
+	service: { // Mock service object for DynamicForm compatibility
+		reservationBlocks: []
+	},
 	userToken: null,
 	processingCheckout: false,
 	loading: false,
@@ -132,6 +135,8 @@ export const actions = {
 				const business = await response.json();
 				const checkoutBlocks = business.configs?.checkoutBlocks || [];
 				store.setKey('checkoutBlocks', checkoutBlocks);
+				// Also set for DynamicForm compatibility
+				store.setKey('service', { reservationBlocks: checkoutBlocks });
 			} else {
 				// Fallback to default checkout blocks if API fails
 				const defaultBlocks = [
@@ -159,6 +164,8 @@ export const actions = {
 					}
 				];
 				store.setKey('checkoutBlocks', defaultBlocks);
+				// Also set for DynamicForm compatibility
+				store.setKey('service', { reservationBlocks: defaultBlocks });
 			}
 		} catch (err) {
 			console.error('Error loading checkout blocks:', err);
