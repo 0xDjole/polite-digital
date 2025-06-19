@@ -12,17 +12,26 @@
 	import { STRIPE_PUBLISHABLE_KEY } from '@lib/env';
 	import { loadStripe } from '@stripe/stripe-js';
 
-	let showCheckoutSection = false;
-	let checkoutFormData = {};
-	let selectedPaymentMethod = 'Cash';
-	let stripe = null;
-	let elements = null;
-	let cardNumberElement = null;
-	let cardExpiryElement = null;
-	let cardCvcElement = null;
-	let individualElementsMounted = false;
-	let paymentProcessing = false;
-	let paymentError = null;
+	let showCheckoutSection = $state(false);
+	let checkoutFormData = $state({});
+	let selectedPaymentMethod = $state('Cash');
+	let stripe = $state(null);
+	let elements = $state(null);
+	let cardNumberElement = $state(null);
+	let cardExpiryElement = $state(null);
+	let cardCvcElement = $state(null);
+	let individualElementsMounted = $state(false);
+	let paymentProcessing = $state(false);
+	let paymentError = $state(null);
+	let orderBlocks = $state([]);
+	let businessObject = $state(null);
+	
+	// Form data variables
+	let email = $state('');
+	let fullName = $state('');
+	let phoneNumber = $state('');
+	let shippingAddress = $state('');
+	let specialInstructions = $state('');
 
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
@@ -50,9 +59,11 @@
 	}
 
 	// Auto-show checkout when items are in cart
-	$: if ($cartItems.length > 0 && !showCheckoutSection) {
-		showCheckoutSection = true;
-	}
+	$effect(() => {
+		if ($cartItems.length > 0 && !showCheckoutSection) {
+			showCheckoutSection = true;
+		}
+	});
 
 	function handleCheckoutCancel() {
 		showCheckoutSection = false;
@@ -61,7 +72,7 @@
 		paymentError = null;
 	}
 
-	async function handleCheckoutComplete(formData) {
+	async function handleCheckoutComplete() {
 		paymentProcessing = true;
 		paymentError = null;
 
@@ -95,7 +106,7 @@
 						payment_method: {
 							card: cardNumberElement,
 							billing_details: {
-								name: formData.customerName || formData.name || ''
+								name: fullName || ''
 							}
 						}
 					}
@@ -108,7 +119,16 @@
 				paymentIntentId = paymentIntent.id;
 			}
 
-			const success = await actions.checkout(formData, selectedPaymentMethod, paymentIntentId);
+			// Create form data from local variables
+			const checkoutData = {
+				email,
+				fullName,
+				phoneNumber,
+				shippingAddress,
+				specialInstructions
+			};
+
+			const success = await actions.checkout(checkoutData, selectedPaymentMethod, paymentIntentId);
 			
 			if (success) {
 				showCheckoutSection = false;
@@ -138,6 +158,41 @@
 		
 		if (STRIPE_PUBLISHABLE_KEY) {
 			stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
+		}
+
+		// Initialize order blocks and business object
+		if ($store.checkoutBlocks) {
+			orderBlocks = $store.checkoutBlocks.map(block => ({
+				...block,
+				value: block.value && block.value.length > 0 ? block.value : 
+					(block.type === 'text' ? [{ en: '' }] : 
+					 block.type === 'boolean' ? [false] : 
+					 block.type === 'number' ? [0] : [''])
+			}));
+		}
+
+		// Create business object for BlockManager
+		businessObject = {
+			id: BUSINESS_ID,
+			configs: {
+				checkoutBlocks: $store.checkoutBlocks || []
+			}
+		};
+	});
+
+	// Update order blocks when checkout blocks change
+	$effect(() => {
+		if ($store.checkoutBlocks) {
+			orderBlocks = $store.checkoutBlocks.map(block => ({
+				...block,
+				value: block.value && block.value.length > 0 ? block.value : 
+					(block.type === 'text' ? [{ en: '' }] : 
+					 block.type === 'boolean' ? [false] : 
+					 block.type === 'number' ? [0] : [''])
+			}));
+			if (businessObject) {
+				businessObject.configs.checkoutBlocks = $store.checkoutBlocks;
+			}
 		}
 	});
 
@@ -194,23 +249,27 @@
 		}
 	}
 
-	$: if (selectedPaymentMethod !== 'CreditCard' && individualElementsMounted) {
-		if (cardNumberElement) cardNumberElement.destroy();
-		if (cardExpiryElement) cardExpiryElement.destroy();
-		if (cardCvcElement) cardCvcElement.destroy();
-		cardNumberElement = null;
-		cardExpiryElement = null;
-		cardCvcElement = null;
-		individualElementsMounted = false;
-	}
+	$effect(() => {
+		if (selectedPaymentMethod !== 'CreditCard' && individualElementsMounted) {
+			if (cardNumberElement) cardNumberElement.destroy();
+			if (cardExpiryElement) cardExpiryElement.destroy();
+			if (cardCvcElement) cardCvcElement.destroy();
+			cardNumberElement = null;
+			cardExpiryElement = null;
+			cardCvcElement = null;
+			individualElementsMounted = false;
+		}
+	});
 
-	$: if (showCheckoutSection && selectedPaymentMethod === 'CreditCard' && stripe && !individualElementsMounted) {
-		setupCardElement();
-	}
+	$effect(() => {
+		if (showCheckoutSection && selectedPaymentMethod === 'CreditCard' && stripe && !individualElementsMounted) {
+			setupCardElement();
+		}
+	});
 
-	$: hasEshopItems = $cartItems?.length > 0;
-	$: hasReservationItems = $cartParts?.length > 0;
-	$: totalEshopItems = $cartItemCount;
+	let hasEshopItems = $derived($cartItems?.length > 0);
+	let hasReservationItems = $derived($cartParts?.length > 0);
+	let totalEshopItems = $derived($cartItemCount);
 </script>
 
 <div class="bg-card mx-auto mt-20 max-w-4xl space-y-6 rounded-xl p-6 shadow-lg border">
@@ -317,68 +376,18 @@
 								</button>
 							</div>
 
-							<form on:submit|preventDefault={(e) => {
-								const formData = new FormData(e.target);
-								const data = {};
-								for (let [key, value] of formData.entries()) {
-									data[key] = value;
-								}
-								handleCheckoutComplete(data);
+							<form on:submit|preventDefault={() => {
+								handleCheckoutComplete();
 							}} class="space-y-6">
 								
 								<!-- Customer Information using simple form -->
-								{#if $store.checkoutBlocks && $store.checkoutBlocks.length > 0}
-									{#each $store.checkoutBlocks as block}
-										<div>
-											<label class="block text-sm font-medium text-card-foreground mb-2">
-												{actions.getBlockLabel(block)}
-												{#if block.properties?.isRequired}
-													<span class="text-destructive">*</span>
-												{/if}
-											</label>
-											
-											{#if block.type === 'text'}
-												<input 
-													type="text" 
-													name={block.key}
-													placeholder={block.properties?.placeholder || ''}
-													required={block.properties?.isRequired}
-													class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
-												/>
-											{:else if block.type === 'boolean'}
-												<label class="flex items-center space-x-2 cursor-pointer">
-													<input 
-														type="checkbox" 
-														name={block.key}
-														class="rounded border-border text-primary focus:ring-ring focus:ring-2"
-													/>
-													<span class="text-sm text-card-foreground">{actions.getBlockLabel(block)}</span>
-												</label>
-											{:else if block.type === 'number'}
-												<input 
-													type="number" 
-													name={block.key}
-													min={block.properties?.min}
-													max={block.properties?.max}
-													required={block.properties?.isRequired}
-													class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground"
-												/>
-											{/if}
-											
-											{#if block.properties?.description}
-												<p class="text-xs text-muted-foreground mt-1">{block.properties.description}</p>
-											{/if}
-										</div>
-									{/each}
-								{:else}
-									<!-- Fallback simple form -->
 									<div>
 										<label class="block text-sm font-medium text-card-foreground mb-2">
 											Email Address <span class="text-destructive">*</span>
 										</label>
 										<input 
 											type="email" 
-											name="email"
+											bind:value={email}
 											placeholder="your@email.com"
 											required
 											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
@@ -390,7 +399,7 @@
 										</label>
 										<input 
 											type="text" 
-											name="fullName"
+											bind:value={fullName}
 											placeholder="John Doe"
 											required
 											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
@@ -402,7 +411,7 @@
 										</label>
 										<input 
 											type="text" 
-											name="phoneNumber"
+											bind:value={phoneNumber}
 											placeholder="+387 XX XXX XXX"
 											required
 											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
@@ -414,13 +423,23 @@
 										</label>
 										<input 
 											type="text" 
-											name="shippingAddress"
+											bind:value={shippingAddress}
 											placeholder="Street, City, Postal Code"
 											required
 											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
 										/>
 									</div>
-								{/if}
+									<div>
+										<label class="block text-sm font-medium text-card-foreground mb-2">
+											Special Instructions
+										</label>
+										<input 
+											type="text" 
+											bind:value={specialInstructions}
+											placeholder="Any special delivery instructions..."
+											class="w-full p-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-ring focus:border-ring transition-colors text-foreground placeholder:text-muted-foreground"
+										/>
+									</div>
 
 								<!-- Payment Method -->
 								<div>

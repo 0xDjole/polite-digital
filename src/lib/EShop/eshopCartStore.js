@@ -189,13 +189,22 @@ export const actions = {
 	prepareOrderInfoBlocks(formData) {
 		const blocks = store.get().checkoutBlocks;
 		
-		return blocks.map(block => ({
-			id: block.id,
-			key: block.key,
-			type: block.type,
-			value: [formData[block.key] || ''],
-			properties: block.properties
-		}));
+		return blocks.map(block => {
+			let value = formData[block.key] || '';
+			
+			// For text blocks, ensure value is localized object with "en" key
+			if (block.type === 'text' && typeof value === 'string') {
+				value = { en: value };
+			}
+			
+			return {
+				id: block.id,
+				key: block.key,
+				type: block.type,
+				value: [value],
+				properties: block.properties
+			};
+		});
 	},
 	
 	// Process checkout
