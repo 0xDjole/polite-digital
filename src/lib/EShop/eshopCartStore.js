@@ -219,11 +219,11 @@ export const actions = {
 	},
 	
 	// Process checkout
-	async checkout(formData, paymentMethod = 'Cash', paymentIntentId = null) {
+	async checkout(formData, paymentMethod = 'Cash') {
 		const items = cartItems.get();
 		if (!items.length) {
 			showToast('Cart is empty', 'error', 3000);
-			return false;
+			return { success: false, error: 'Cart is empty' };
 		}
 		
 		try {
@@ -240,22 +240,26 @@ export const actions = {
 				items: orderItems,
 				paymentMethod,
 				orderInfoBlocks,
-				paymentIntentId,
 			});
 			
 			if (response.success) {
-				showToast('Order placed successfully!', 'success', 6000);
-				this.clearCart();
-				return true;
+				// Don't clear cart yet - let the calling code decide when to clear
+				return {
+					success: true,
+					data: {
+						orderId: response.data.orderId,
+						orderNumber: response.data.orderNumber,
+						clientSecret: response.data.clientSecret
+					}
+				};
 			} else {
 				throw new Error(response.error || 'Failed to place order');
 			}
 		} catch (err) {
 			const errorMessage = `Checkout failed: ${err.message}`;
-			showToast(errorMessage, 'error', 8000);
 			store.setKey('error', errorMessage);
 			console.error('Checkout error:', err);
-			return false;
+			return { success: false, error: errorMessage };
 		} finally {
 			store.setKey('processingCheckout', false);
 		}

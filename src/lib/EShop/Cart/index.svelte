@@ -76,31 +76,45 @@
 		paymentError = null;
 
 		try {
-			let paymentIntentId = null;
+			// 1. First, create order (for both cash and credit card)
+			const checkoutData = {
+				email,
+				fullName,
+				phoneNumber,
+				shippingAddress,
+				specialInstructions
+			};
 
+			console.log('Creating order...');
+			const checkoutResponse = await actions.checkout(checkoutData, selectedPaymentMethod);
+			
+			if (!checkoutResponse.success) {
+				throw new Error(checkoutResponse.error || 'Failed to create order');
+			}
+
+			const { orderId, clientSecret } = checkoutResponse.data;
+
+			// 2. For cash payments, we're done
+			if (selectedPaymentMethod === 'Cash') {
+				showToast('Order placed successfully! Pay on delivery.', 'success', 6000);
+				showCheckoutSection = false;
+				actions.clearCart();
+				return;
+			}
+
+			// 3. For credit card, confirm payment
 			if (selectedPaymentMethod === 'CreditCard') {
 				if (!stripe || !cardNumberElement) {
 					throw new Error('Payment system not initialized');
 				}
 
-				console.log('Creating payment intent for amount:', $cartTotal.basePrice);
-				const paymentIntentResponse = await eshopApi.createPaymentIntent({
-					amount: Math.round($cartTotal.basePrice * 100),
-					currency: $cartTotal.currency.toLowerCase(),
-					businessId: BUSINESS_ID
-				});
-
-				console.log('Payment intent response:', paymentIntentResponse);
-				if (!paymentIntentResponse.success) {
-					throw new Error(paymentIntentResponse.error || 'Failed to create payment intent');
-				}
-				
-				if (!paymentIntentResponse.data?.clientSecret) {
-					throw new Error('No client secret received');
+				if (!clientSecret) {
+					throw new Error('No payment client secret received');
 				}
 
+				console.log('Confirming payment...');
 				const { error, paymentIntent } = await stripe.confirmCardPayment(
-					paymentIntentResponse.data.clientSecret,
+					clientSecret,
 					{
 						payment_method: {
 							card: cardNumberElement,
@@ -112,41 +126,35 @@
 				);
 
 				if (error) {
-					throw new Error(error.message);
+					throw new Error(`Payment failed: ${error.message}`);
 				}
 
-				paymentIntentId = paymentIntent.id;
+				if (paymentIntent.status === 'succeeded') {
+					showToast('Payment successful! Order confirmed.', 'success', 6000);
+				} else {
+					throw new Error('Payment was not completed successfully');
+				}
 			}
 
-			// Create form data from local variables
-			const checkoutData = {
-				email,
-				fullName,
-				phoneNumber,
-				shippingAddress,
-				specialInstructions
-			};
-
-			const success = await actions.checkout(checkoutData, selectedPaymentMethod, paymentIntentId);
+			// Success - clean up and reset
+			showCheckoutSection = false;
+			checkoutFormData = {};
+			selectedPaymentMethod = 'Cash';
+			actions.clearCart();
 			
-			if (success) {
-				showCheckoutSection = false;
-				checkoutFormData = {};
-				selectedPaymentMethod = 'Cash';
-				
-				if (individualElementsMounted) {
-					if (cardNumberElement) cardNumberElement.destroy();
-					if (cardExpiryElement) cardExpiryElement.destroy();
-					if (cardCvcElement) cardCvcElement.destroy();
-					cardNumberElement = null;
-					cardExpiryElement = null;
-					cardCvcElement = null;
-					individualElementsMounted = false;
-				}
+			if (individualElementsMounted) {
+				if (cardNumberElement) cardNumberElement.destroy();
+				if (cardExpiryElement) cardExpiryElement.destroy();
+				if (cardCvcElement) cardCvcElement.destroy();
+				cardNumberElement = null;
+				cardExpiryElement = null;
+				cardCvcElement = null;
+				individualElementsMounted = false;
 			}
+
 		} catch (error) {
 			console.error('Checkout error:', error);
-			paymentError = error.message || 'Payment failed. Please try again.';
+			paymentError = error.message || 'Checkout failed. Please try again.';
 		} finally {
 			paymentProcessing = false;
 		}
