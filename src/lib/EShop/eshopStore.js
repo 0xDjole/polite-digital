@@ -1,4 +1,4 @@
-// src/lib/EShop/eshopCartStore.js - Frontend-only e-shop cart store
+// src/lib/EShop/eshopStore.js - Frontend-only e-shop store
 import { computed, deepMap } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
 import { BUSINESS_ID, API_URL } from "../env";
@@ -299,9 +299,9 @@ export const actions = {
 };
 
 // Initialize the store
-export function initEshopCartStore() {
+export function initEshopStore() {
 	// Load checkout blocks on initialization
 	actions.loadCheckoutBlocks();
 }
 
-export default { store, actions, cartItems, cartTotal, cartItemCount, initEshopCartStore };
+export default { store, actions, cartItems, cartTotal, cartItemCount, initEshopStore };

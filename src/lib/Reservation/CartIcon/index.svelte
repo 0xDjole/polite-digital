@@ -1,8 +1,8 @@
 <script>
     import Icon from '@iconify/svelte';
     import { store, initReservationStore } from '../reservationStore.js';
-    import { initEshopCartStore } from '../../EShop/eshopCartStore.js';
-    import { unifiedCartCount } from '../../unifiedCartStore.js';
+    import { initEshopStore } from '../../EShop/eshopStore.js';
+    import { totalCartItems } from '../../Cart/cartStore.js';
     import { onMount } from 'svelte';
 	import {  getLocale, getRelativeLocaleUrl } from '@lib/i18n/index.js';
     
@@ -10,7 +10,7 @@
     
     onMount(() => {
         initReservationStore();
-        initEshopCartStore();
+        initEshopStore();
     });
 </script>
 
@@ -20,11 +20,11 @@
     aria-label="Shopping cart"
 >
     <Icon icon="mdi:cart" class="h-5 w-5 text-primary" />
-    {#if $unifiedCartCount > 0}
+    {#if $totalCartItems > 0}
         <div
-            class="bg-primary-600 absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-bold text-white shadow-sm"
+            class="bg-violet-500 absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-bold text-white shadow-sm"
         >
-            {$unifiedCartCount}
+            {$totalCartItems}
         </div>
     {/if}
 </a>

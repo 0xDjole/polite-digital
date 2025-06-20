@@ -3,7 +3,7 @@
 	import { eshopApi, reservationApi, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
 	import { cartParts } from '@lib/Reservation/reservationStore.js';
-	import { actions } from '../eshopCartStore.js';
+	import { actions } from '../eshopStore.js';
 	import QuantitySelector from '../QuantitySelector/index.svelte';
 	import AttributeBlocks from '../AttributeBlocks/index.svelte';
 	import Icon from '@iconify/svelte';
@@ -188,7 +188,7 @@
 								<div class="grid grid-cols-1 gap-2">
 									{#each product.variants as variant}
 										<button 
-											class="p-3 border rounded-lg text-left transition-colors {selectedVariant?.id === variant.id ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}"
+											class="p-3 border rounded-lg text-left transition-all {selectedVariant?.id === variant.id ? 'border-primary bg-success text-success-foreground' : 'border-transparent bg-muted hover:bg-accent'}"
 											on:click={() => selectVariant(variant)}
 											disabled={variant.stock === 0}
 										>

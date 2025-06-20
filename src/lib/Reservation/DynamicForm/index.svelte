@@ -29,25 +29,37 @@
 {#if $store.service}
 	{#each $store.service.reservationBlocks as block, idx (block.id)}
 		<div class="space-y-2 mb-4">
-			<label class="text-secondary mb-1 block font-medium">
+			<label class="mb-1 block font-medium text-foreground">
 				{getBlockLabel(block)}
 			</label>
 
 			{#if block.type === 'text'}
-				<div class="relative">
-					<select
-						class="border-secondary bg-secondary focus:border-primary-500 focus:ring-primary-500 w-full appearance-none rounded-xl border p-3 pr-10 text-primary shadow-sm focus:ring-2 focus:outline-none {block.properties?.isRequired && !block.value?.[0] ? 'border-red-500' : ''}"
+				{#if block.properties?.options && block.properties.options.length > 0}
+					<!-- Dropdown for fields with options -->
+					<div class="relative">
+						<select
+							class="w-full appearance-none rounded-lg border-0 bg-muted px-3 py-2 pr-10 text-foreground focus:bg-background {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
+							value={block.value?.[0] ?? ''}
+							on:change={(e)=>update(idx, e.target.value)}>
+							<option value="" disabled>{t('form.select', 'Select…')}</option>
+							{#each block.properties.options as opt}
+								<option value={opt}>{typeof opt === 'object' ? opt[currLocale] || opt.en : opt}</option>
+							{/each}
+						</select>
+						<Icon icon="mdi:chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none text-muted-foreground" />
+					</div>
+				{:else}
+					<!-- Regular text input -->
+					<input
+						type="text"
 						value={block.value?.[0] ?? ''}
-						on:change={(e)=>update(idx, e.target.value)}>
-						<option value="" disabled>{t('form.select', 'Select…')}</option>
-						{#each block.properties.options as opt}
-							<option value={opt}>{typeof opt === 'object' ? opt[currLocale] || opt.en : opt}</option>
-						{/each}
-					</select>
-					<Icon icon="mdi:chevron-down" class="text-muted absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none" />
-				</div>
+						placeholder={block.properties?.placeholder || ''}
+						on:input={(e)=>update(idx, e.target.value)}
+						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
+					/>
+				{/if}
 				{#if block.properties?.isRequired && !block.value?.[0]}
-					<div class="mt-1 text-xs text-red-400">{t('form.fieldRequired', 'This field is required')}</div>
+					<div class="mt-1 text-xs text-destructive">{t('form.fieldRequired', 'This field is required')}</div>
 				{/if}
 
 			{:else if block.type === 'boolean'}
@@ -56,18 +68,18 @@
 						<input type="checkbox" class="sr-only"
 							checked={block.value?.[0] ?? false}
 							on:change={(e)=>update(idx, e.target.checked)}/>
-						<div class="bg-tertiary h-8 w-14 rounded-full group-hover:bg-secondary"></div>
-						<div class="dot absolute top-1 left-1 h-6 w-6 rounded-full transition
-						            {block.value?.[0] ? 'translate-x-6 bg-primary-500' : 'bg-white'}"></div>
+						<div class="h-6 w-11 rounded-full transition-colors {block.value?.[0] ? 'bg-primary' : 'bg-muted'}"></div>
+						<div class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform
+						            {block.value?.[0] ? 'translate-x-5' : ''}"></div>
 					</div>
-					<span class="text-secondary">{getBlockLabel(block)}</span>
+					<span class="text-foreground">{getBlockLabel(block)}</span>
 				</label>
 
 			{:else if block.type === 'number'}
 				<div class="space-y-2">
-					<div class="flex items-center justify-between text-muted text-sm">
+					<div class="flex items-center justify-between text-sm text-muted-foreground">
 						<span>{block.properties.range.min}</span>
-						<span class="bg-primary-900/30 text-secondary rounded-full px-3 py-1 font-mono">
+						<span class="rounded-full bg-accent px-3 py-1 font-mono text-foreground">
 							{block.value?.[0] ?? block.properties.range.min}
 						</span>
 						<span>{block.properties.range.max}</span>
@@ -77,12 +89,12 @@
 							max={block.properties.range.max}
 							value={block.value?.[0] ?? block.properties.range.min}
 							on:input={(e)=>update(idx, Number(e.target.value))}
-							class="bg-tertiary accent-primary-600 h-2 w-full appearance-none rounded-lg focus:ring-primary-500/30 focus:outline-none"/>
+							class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"/>
 				</div>
 			{/if}
 
 			{#if block.properties?.description}
-				<p class="text-muted mt-1 text-sm italic">
+				<p class="mt-1 text-sm italic text-muted-foreground">
 					{typeof block.properties.description === 'object' 
 						? block.properties.description[currLocale] || block.properties.description.en 
 						: block.properties.description}
