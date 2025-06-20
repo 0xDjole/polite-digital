@@ -26,7 +26,9 @@ export const store = deepMap({
 	stripeConfig: {
 		publicKey: null,
 		enabled: false
-	}
+	},
+	// Allowed payment methods from business config
+	allowedPaymentMethods: ['Cash'] // Default to cash only
 });
 
 // Computed values
@@ -137,15 +139,19 @@ export const actions = {
 			
 			if (response.ok) {
 				const business = await response.json();
-				const checkoutBlocks = business.configs?.checkoutBlocks || [];
+				const checkoutBlocks = business.configs?.orderConfigs?.checkoutBlocks || [];
 				store.setKey('checkoutBlocks', checkoutBlocks);
 				// Also set for DynamicForm compatibility
 				store.setKey('service', { reservationBlocks: checkoutBlocks });
 				
+				// Load allowed payment methods
+				const allowedPaymentMethods = business.configs?.orderConfigs?.allowedPaymentMethods || ['Cash'];
+				store.setKey('allowedPaymentMethods', allowedPaymentMethods);
+				
 				// Load Stripe configuration
 				const stripeConfig = {
-					publicKey: business.configs?.stripePublicKey || null,
-					enabled: business.configs?.stripeEnabled || false
+					publicKey: business.configs?.orderConfigs?.stripePublicKey || null,
+					enabled: allowedPaymentMethods.includes('CREDIT_CARD') || false
 				};
 				store.setKey('stripeConfig', stripeConfig);
 			} else {
