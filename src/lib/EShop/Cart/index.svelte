@@ -318,7 +318,7 @@
 		<div class="text-destructive/80 mb-4">{$store.error}</div>
 	</div>
 {:else if $cartItems.length === 0}
-	<div class="bg-accent rounded-lg p-6 text-center">
+	<div class="bg-muted rounded-lg p-6 text-center">
 		<div class="text-muted-foreground bg-card mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
 			<Icon icon="mdi:shopping-outline" class="h-8 w-8" />
 		</div>
@@ -330,10 +330,10 @@
 {:else}
 	<div class="space-y-3">
 		{#each $cartItems as item (item.id)}
-			<div class="bg-accent rounded-lg border p-4">
+			<div class="bg-primary rounded-lg border p-4">
 				<div class="flex items-center justify-between">
 					<div class="flex-1">
-						<h3 class="font-medium text-card-foreground">{item.productName}</h3>
+						<h3 class="font-medium text-primary-foreground">{item.productName}</h3>
 						
 						{#if item.variantAttributes && item.variantAttributes.length > 0}
 							<div class="mt-1">
@@ -344,7 +344,7 @@
 							</div>
 						{/if}
 						
-						<div class="mt-2 text-lg font-semibold text-primary">
+						<div class="mt-2 text-lg font-semibold text-primary-foreground">
 							{formatPrice(item.price)} each
 						</div>
 					</div>
@@ -357,7 +357,7 @@
 							on:change={(e) => handleQuantityUpdate(item.id, e.detail)}
 						/>
 
-						<div class="text-lg font-bold text-card-foreground min-w-[80px] text-right">
+						<div class="text-lg font-bold text-primary-foreground min-w-[80px] text-right">
 							{formatPrice({
 								...item.price,
 								basePrice: item.price.basePrice * item.quantity
@@ -480,11 +480,11 @@
 										type="button"
 										class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
 										class:border-primary={selectedPaymentMethod === 'Cash'}
-										class:bg-accent={selectedPaymentMethod === 'Cash'}
+										class:bg-primary={selectedPaymentMethod === 'Cash'}
 										class:shadow-sm={selectedPaymentMethod === 'Cash'}
 										class:border-transparent={selectedPaymentMethod !== 'Cash'}
 										class:bg-muted={selectedPaymentMethod !== 'Cash'}
-										class:hover:bg-accent={selectedPaymentMethod !== 'Cash'}
+										class:hover:bg-muted={selectedPaymentMethod !== 'Cash'}
 										on:click={() => selectedPaymentMethod = 'Cash'}
 									>
 										{#if selectedPaymentMethod === 'Cash'}
@@ -497,8 +497,8 @@
 												<Icon icon="mdi:cash" class="w-6 h-6 text-primary" />
 											</div>
 											<div class="text-left">
-												<div class="font-semibold text-card-foreground">Cash Payment</div>
-												<div class="text-sm text-muted-foreground">Pay when you receive</div>
+												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'Cash'} class:text-card-foreground={selectedPaymentMethod !== 'Cash'}>Cash Payment</div>
+												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'Cash'} class:text-muted-foreground={selectedPaymentMethod !== 'Cash'}>Pay when you receive</div>
 											</div>
 										</div>
 									</button>
@@ -509,11 +509,11 @@
 										type="button"
 										class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
 										class:border-primary={selectedPaymentMethod === 'CreditCard'}
-										class:bg-accent={selectedPaymentMethod === 'CreditCard'}
+										class:bg-primary={selectedPaymentMethod === 'CreditCard'}
 										class:shadow-sm={selectedPaymentMethod === 'CreditCard'}
 										class:border-transparent={selectedPaymentMethod !== 'CreditCard'}
 										class:bg-muted={selectedPaymentMethod !== 'CreditCard'}
-										class:hover:bg-accent={selectedPaymentMethod !== 'CreditCard'}
+										class:hover:bg-muted={selectedPaymentMethod !== 'CreditCard'}
 										on:click={() => selectedPaymentMethod = 'CreditCard'}
 									>
 										{#if selectedPaymentMethod === 'CreditCard'}
@@ -526,8 +526,8 @@
 												<Icon icon="mdi:credit-card" class="w-6 h-6 text-primary" />
 											</div>
 											<div class="text-left">
-												<div class="font-semibold text-card-foreground">Card Payment</div>
-												<div class="text-sm text-muted-foreground">Secure online payment</div>
+												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'CreditCard'} class:text-card-foreground={selectedPaymentMethod !== 'CreditCard'}>Card Payment</div>
+												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'CreditCard'} class:text-muted-foreground={selectedPaymentMethod !== 'CreditCard'}>Secure online payment</div>
 											</div>
 										</div>
 									</button>
@@ -537,7 +537,7 @@
 
 						<!-- Credit Card Details -->
 						{#if selectedPaymentMethod === 'CreditCard'}
-							<div class="bg-accent rounded-lg border p-6">
+							<div class="bg-muted rounded-lg border p-6">
 								<div class="flex items-center gap-2 mb-4">
 									<Icon icon="mdi:credit-card" class="w-5 h-5 text-primary" />
 									<h4 class="font-medium text-card-foreground">Card Details</h4>

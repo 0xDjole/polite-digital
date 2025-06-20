@@ -26,7 +26,7 @@
 
 	<!-- Show empty cart message only if both carts are empty -->
 	{#if $isCartEmpty}
-		<div class="bg-accent rounded-lg p-12 text-center">
+		<div class="bg-muted rounded-lg p-12 text-center">
 			<div class="text-muted-foreground bg-card mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full">
 				<Icon icon="mdi:cart-outline" class="h-12 w-12" />
 			</div>
@@ -47,9 +47,7 @@
 			<div class="space-y-4">
 				{#if $showBothSections}
 					<h2 class="text-2xl font-semibold text-card-foreground flex items-center gap-2">
-						<div class="flex items-center justify-center w-8 h-8 rounded-full bg-accent">
-							<Icon icon="mdi:shopping" class="w-5 h-5 text-primary" />
-						</div>
+						<Icon icon="mdi:shopping" class="w-5 h-5 text-primary" />
 						Products
 					</h2>
 				{/if}
@@ -62,9 +60,7 @@
 			<div class="border-t pt-6">
 				{#if $showBothSections}
 					<h2 class="text-2xl font-semibold text-card-foreground flex items-center gap-2 mb-4">
-						<div class="flex items-center justify-center w-8 h-8 rounded-full bg-accent">
-							<Icon icon="mdi:calendar" class="w-5 h-5 text-primary" />
-						</div>
+						<Icon icon="mdi:calendar" class="w-5 h-5 text-primary" />
 						Reservations
 					</h2>
 				{/if}

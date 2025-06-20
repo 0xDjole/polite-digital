@@ -169,10 +169,3 @@
 	</div>
 </div>
 
-{#if $store?.parts?.length}
- 	 <a href={getRelativeLocaleUrl(getLocale(), '/cart')}
-	   class="bg-primary-600 hover:bg-primary-700 fixed right-4 bottom-4 z-30 flex items-center gap-2 rounded-full px-5 py-3 text-white shadow-lg transition-all">
-		<Icon icon="mdi:cart" class="h-5 w-5" />
-		{t('cart.viewCart')} ({$store.parts.length})
-	</a>
-{/if}

@@ -55,6 +55,9 @@ const currLocale = getLocale(Astro.currentLocale);
 		
 		<!-- Toast notifications -->
 		<div id="toast-container"></div>
+		
+		<!-- Floating cart -->
+		<div id="floating-cart-container"></div>
 
 		<!-- GSAP animations handled in BaseHead -->
 		
@@ -62,9 +65,11 @@ const currLocale = getLocale(Astro.currentLocale);
 		<script>
 			import { mount } from "svelte";
 			import Toast from "@components/Toast/Toast.svelte";
+			import FloatingCart from "@lib/Cart/FloatingCart.svelte";
 			
 			// Mount toast component
 			let toastComponent;
+			let floatingCartComponent;
 			
 			function mountToast() {
 				const container = document.getElementById('toast-container');
@@ -73,11 +78,22 @@ const currLocale = getLocale(Astro.currentLocale);
 				}
 			}
 			
+			function mountFloatingCart() {
+				const container = document.getElementById('floating-cart-container');
+				if (container && !floatingCartComponent) {
+					floatingCartComponent = mount(FloatingCart, { target: container });
+				}
+			}
+			
 			// Mount on initial load
 			mountToast();
+			mountFloatingCart();
 			
 			// Mount after view transitions
-			document.addEventListener("astro:after-swap", mountToast);
+			document.addEventListener("astro:after-swap", () => {
+				mountToast();
+				mountFloatingCart();
+			});
 		</script>
 	</body>
 </html>
