@@ -5,6 +5,7 @@
 	import { cartParts } from '@lib/Reservation/reservationStore.js';
 	import { actions } from '../eshopCartStore.js';
 	import QuantitySelector from '../QuantitySelector/index.svelte';
+	import AttributeBlocks from '../AttributeBlocks/index.svelte';
 	import Icon from '@iconify/svelte';
 
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
@@ -194,11 +195,12 @@
 											<div class="flex justify-between items-center">
 												<div>
 													<div class="font-medium">{formatPrice(variant.price)}</div>
-													{#if Object.keys(variant.attributes).length > 0}
+													{#if variant.attributes && variant.attributes.length > 0}
 														<div class="text-sm text-muted-foreground">
-															{#each Object.entries(variant.attributes) as [key, value]}
-																<span class="mr-2">{key}: {value}</span>
-															{/each}
+															<AttributeBlocks 
+																blocks={variant.attributes} 
+																variant="inline" 
+															/>
 														</div>
 													{/if}
 												</div>

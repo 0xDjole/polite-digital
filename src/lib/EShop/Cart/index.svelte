@@ -8,6 +8,7 @@
 	import { cartItems, cartTotal, cartItemCount, store, actions, initEshopCartStore } from '../eshopCartStore.js';
 	import { createEventDispatcher } from 'svelte';
 	import QuantitySelector from '../QuantitySelector/index.svelte';
+	import AttributeBlocks from '../AttributeBlocks/index.svelte';
 	import Icon from '@iconify/svelte';
 	import { loadStripe } from '@stripe/stripe-js';
 
@@ -338,13 +339,12 @@
 							<div class="flex-1">
 								<h3 class="font-medium text-card-foreground">{item.productName}</h3>
 								
-								{#if Object.keys(item.variantAttributes).length > 0}
-									<div class="mt-1 flex flex-wrap gap-1">
-										{#each Object.entries(item.variantAttributes) as [key, value]}
-											<span class="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded">
-												{key}: {value}
-											</span>
-										{/each}
+								{#if item.variantAttributes && item.variantAttributes.length > 0}
+									<div class="mt-1">
+										<AttributeBlocks 
+											blocks={item.variantAttributes} 
+											variant="badges" 
+										/>
 									</div>
 								{/if}
 								
