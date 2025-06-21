@@ -71,4 +71,15 @@ const testimonialData = getBlockObjectValues(websiteCollection, "testimonials", 
 	.join-text {
 		@apply text-xl font-semibold;
 	}
+
+	/* Mobile fixes - keep horizontal scroll but fix width */
+	@media (max-width: 768px) {
+		.testimonial-track > * {
+			@apply min-w-[280px];
+		}
+
+		.cta {
+			@apply min-w-[280px];
+		}
+	}
 </style>
