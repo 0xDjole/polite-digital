@@ -38,3 +38,37 @@ const testimonialData = getBlockObjectValues(websiteCollection, "testimonials", 
 </section>
 
 <script src="./index.ts"></script>
+
+<style>
+	@import "tailwindcss/theme" theme(reference);
+	@import "@/styles/tailwind-theme.css" theme(reference);
+
+	.testimonial-pin-section {
+		@apply relative h-screen overflow-hidden;
+	}
+
+	.colored-title {
+		@apply inline text-5xl font-bold md:text-6xl;
+	}
+
+	.testimonial-heading {
+		@apply text-5xl font-bold mt-8 text-center md:text-7xl;
+	}
+
+	.testimonial-track {
+		@apply flex gap-4 lg:gap-6;
+	}
+
+	.cta {
+		@apply flex flex-col items-center justify-center gap-4 p-8;
+		min-width: 300px;
+	}
+
+	.heart-emoji {
+		@apply text-6xl;
+	}
+
+	.join-text {
+		@apply text-xl font-semibold;
+	}
+</style>
