@@ -4,6 +4,8 @@ import { animations } from '../../lib/animation';
 
 // Store gear animation instance globally
 let gearAnimation = null;
+// Store ScrollTrigger instances for this component
+let workflowScrollTriggers = [];
 
 function init() {
   const { gsap, ScrollTrigger } = animations();
@@ -12,6 +14,10 @@ function init() {
   const gearContainer = document.getElementById('gear-lottie');
   
   if (!gearContainer || !section) return;
+
+  // Clean up existing ScrollTriggers for this component
+  workflowScrollTriggers.forEach(st => st.kill());
+  workflowScrollTriggers = [];
 
   // Clean up existing gear animation if it exists
   if (gearAnimation) {
@@ -44,7 +50,7 @@ function init() {
       { y: section?.scrollHeight - colLeft?.offsetHeight, duration: 1, ease: "none" }
     );
 
-    ScrollTrigger.create({
+    const desktopST = ScrollTrigger.create({
       animation: timeline,
       trigger: section,
       start: "top center",
@@ -55,9 +61,10 @@ function init() {
         gearAnimation.goToAndStop(frame, true);
       },
     });
+    workflowScrollTriggers.push(desktopST);
   } else {
     // Mobile: Just animate the gear without pinning
-    ScrollTrigger.create({
+    const mobileST = ScrollTrigger.create({
       trigger: section,
       start: "top 80%",
       end: "bottom 20%",
@@ -67,6 +74,7 @@ function init() {
         gearAnimation.goToAndStop(frame, true);
       },
     });
+    workflowScrollTriggers.push(mobileST);
   }
 
   // Highlight each line individually - snap effect
@@ -85,7 +93,7 @@ function init() {
     
     // Create individual triggers for each line
     allElements.forEach((element, index) => {
-      ScrollTrigger.create({
+      const lineST = ScrollTrigger.create({
         trigger: element,
         start: 'center 60%',
         end: 'center 40%',
@@ -102,16 +110,18 @@ function init() {
           element.style.color = '#8B5CF6';
         }
       });
+      workflowScrollTriggers.push(lineST);
     });
     
     // Reset all when leaving the entire item
-    ScrollTrigger.create({
+    const itemST = ScrollTrigger.create({
       trigger: item,
       start: 'top 80%',
       end: 'bottom 20%',
       onLeave: () => allElements.forEach(el => el.style.color = ''),
       onLeaveBack: () => allElements.forEach(el => el.style.color = '')
     });
+    workflowScrollTriggers.push(itemST);
   });
 }
 
@@ -123,9 +133,7 @@ let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    // Kill all ScrollTriggers and reinitialize
-    const { ScrollTrigger } = animations();
-    ScrollTrigger.getAll().forEach(st => st.kill());
+    // Only kill ScrollTriggers from this component and reinitialize
     init();
   }, 250);
 });
