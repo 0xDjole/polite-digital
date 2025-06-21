@@ -2,6 +2,9 @@ import lottie from 'lottie-web';
 import gearAnimationData from '@assets/videos/gear.json';
 import { animations } from '../../lib/animation';
 
+// Store gear animation instance globally
+let gearAnimation = null;
+
 function init() {
   const { gsap, ScrollTrigger } = animations();
   
@@ -10,8 +13,16 @@ function init() {
   
   if (!gearContainer || !section) return;
 
+  // Clean up existing gear animation if it exists
+  if (gearAnimation) {
+    gearAnimation.destroy();
+  }
+  
+  // Clear the container to prevent duplicates
+  gearContainer.innerHTML = '';
+  
   // Load gear animation
-  const gearAnimation = lottie.loadAnimation({
+  gearAnimation = lottie.loadAnimation({
     container: gearContainer,
     renderer: 'svg',
     loop: false,
@@ -19,27 +30,44 @@ function init() {
     animationData: gearAnimationData,
   });
 
-  // Pin and animate like work page
-  const colLeft = document.querySelector('.left-column');
-  const timeline = gsap.timeline({ paused: true });
+  // Check if mobile using matchMedia (most reliable)
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  
+  if (!isMobile) {
+    // Desktop: Pin and animate
+    const colLeft = document.querySelector('.left-column');
+    const timeline = gsap.timeline({ paused: true });
 
-  timeline.fromTo(
-    colLeft,
-    { y: 0 },
-    { y: section?.scrollHeight - colLeft?.offsetHeight, duration: 1, ease: "none" }
-  );
+    timeline.fromTo(
+      colLeft,
+      { y: 0 },
+      { y: section?.scrollHeight - colLeft?.offsetHeight, duration: 1, ease: "none" }
+    );
 
-  ScrollTrigger.create({
-    animation: timeline,
-    trigger: section,
-    start: "top center",
-    end: "bottom center",
-    scrub: true,
-    onUpdate: (self) => {
-      const frame = self.progress * (gearAnimation.totalFrames - 1);
-      gearAnimation.goToAndStop(frame, true);
-    },
-  });
+    ScrollTrigger.create({
+      animation: timeline,
+      trigger: section,
+      start: "top center",
+      end: "bottom center",
+      scrub: true,
+      onUpdate: (self) => {
+        const frame = self.progress * (gearAnimation.totalFrames - 1);
+        gearAnimation.goToAndStop(frame, true);
+      },
+    });
+  } else {
+    // Mobile: Just animate the gear without pinning
+    ScrollTrigger.create({
+      trigger: section,
+      start: "top 80%",
+      end: "bottom 20%",
+      scrub: true,
+      onUpdate: (self) => {
+        const frame = self.progress * (gearAnimation.totalFrames - 1);
+        gearAnimation.goToAndStop(frame, true);
+      },
+    });
+  }
 
   // Highlight each line individually - snap effect
   const workflowItems = document.querySelectorAll('.workflow-item');
@@ -89,3 +117,15 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('astro:after-swap', init);
+
+// Reinitialize on window resize (for responsive testing)
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    // Kill all ScrollTriggers and reinitialize
+    const { ScrollTrigger } = animations();
+    ScrollTrigger.getAll().forEach(st => st.kill());
+    init();
+  }, 250);
+});
