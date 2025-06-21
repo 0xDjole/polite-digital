@@ -12,7 +12,7 @@ const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
 const logo = siteData.logo;
 ---
 
-<div
+<a
 	class="primary-focus flex items-center align-middle"
 	href={getRelativeLocaleUrl(Astro.currentLocale, "/")}
 >
@@ -30,4 +30,4 @@ const logo = siteData.logo;
 		/>
 	</div>
 	<div class="text-primary text-2xl">{siteData.name}</div>
-</div>
+</a>

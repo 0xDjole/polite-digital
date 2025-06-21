@@ -15,9 +15,14 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 <section id="pricing-4" class="my-24 md:my-36">
 	<div class="site-container">
 		<div class="flex justify-center">
-			<p class="colored-title pricing-title gsap-fade-up inline text-4xl md:text-5xl font-bold">Pricing</p>
+			<p class="colored-title pricing-title gsap-fade-up inline text-4xl font-bold md:text-5xl">
+				Pricing
+			</p>
 		</div>
-		<h2 class="pricing-heading text-5xl md:text-6xl font-bold gsap-fade-up mt-8 text-center" data-delay="0.2">
+		<h2
+			class="pricing-heading gsap-fade-up mt-8 text-center text-5xl font-bold md:text-6xl"
+			data-delay="0.2"
+		>
 			A plan for every business
 		</h2>
 
@@ -130,4 +135,191 @@ const pricingData = getBlockObjectValues(websiteCollection, "pricing_plans", cur
 	</div>
 </section>
 
-<script src="./pricing.ts"></script>
+<script src="./index.ts"></script>
+
+<style>
+	@import "tailwindcss/theme" theme(reference);
+	@import "@/styles/tailwind-theme.css" theme(reference);
+
+	.pricing-section {
+		@apply my-16 px-4 md:my-24 md:px-6 lg:my-36;
+	}
+
+	.pricing-container {
+		@apply max-w-7xl mx-auto;
+	}
+
+	.pricing-header {
+		@apply text-center mb-12;
+	}
+
+	.pricing-title {
+		@apply inline text-3xl font-bold md:text-4xl lg:text-5xl;
+	}
+
+	.pricing-heading {
+		@apply mt-6 text-4xl font-bold md:mt-8 md:text-5xl lg:text-6xl;
+	}
+
+	.pricing-toggle {
+		@apply mt-6 flex justify-center;
+	}
+
+	.toggle-label {
+		@apply relative inline-flex cursor-pointer items-center rounded-lg border p-2 select-none;
+		background: var(--bg-muted);
+		border-color: var(--border-primary);
+	}
+
+	.toggle-text {
+		@apply text-sm font-medium;
+		color: var(--text-secondary);
+	}
+
+	.toggle-text-left {
+		@apply mr-3;
+	}
+
+	.toggle-text-right {
+		@apply ml-3;
+	}
+
+	.pricing-grid {
+		@apply mx-auto mt-12 grid w-full gap-4 md:gap-6;
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 640px) {
+		.pricing-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.pricing-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	@media (min-width: 1280px) {
+		.pricing-grid {
+			grid-template-columns: repeat(4, 1fr);
+		}
+	}
+
+	.pricing-plan {
+		@apply relative mx-auto h-full w-full overflow-hidden rounded-2xl transition-all duration-300;
+	}
+
+	.pricing-plan.featured {
+		background: var(--gradient-brand);
+	}
+
+	.pricing-plan.standard {
+		background: var(--bg-tertiary);
+	}
+
+	.pricing-plan-inner {
+		@apply relative h-full p-px;
+	}
+
+	.pricing-plan-content {
+		@apply relative z-10 flex h-full flex-col overflow-hidden rounded-2xl;
+		background: var(--bg-card);
+	}
+
+	.pricing-plan-wrapper {
+		@apply mx-auto flex h-full w-full flex-col px-4 pb-6 md:px-6;
+		max-width: 20rem;
+	}
+
+	.pricing-plan-header {
+		@apply flex w-full justify-between pt-6 mb-4;
+	}
+
+	.pricing-plan-name {
+		@apply text-lg font-semibold;
+	}
+
+	.pricing-plan-name.featured {
+		background: var(--gradient-brand);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.pricing-plan-name.standard {
+		color: var(--text-primary);
+	}
+
+	.pricing-badge {
+		@apply flex w-full items-center justify-end;
+	}
+
+	.pricing-badge-inner {
+		@apply flex gap-2 rounded-full px-3 py-1 text-sm font-medium;
+		background: var(--bg-brand);
+		color: var(--text-brand);
+	}
+
+	.pricing-description {
+		@apply mb-3;
+		color: var(--text-secondary);
+	}
+
+	.pricing-price {
+		@apply font-semibold;
+	}
+
+	.pricing-price-amount {
+		@apply text-4xl font-semibold md:text-5xl;
+		color: var(--text-price);
+	}
+
+	.pricing-price-period {
+		@apply text-2xl md:text-3xl;
+		color: var(--text-secondary);
+	}
+
+	.pricing-price-note {
+		@apply mt-1 text-sm font-normal;
+		color: var(--text-muted);
+	}
+
+	.pricing-features {
+		@apply my-6 flex w-full flex-col gap-2;
+	}
+
+	.pricing-feature {
+		@apply flex items-center;
+		color: var(--text-secondary);
+	}
+
+	.pricing-feature-icon {
+		@apply mr-2 h-5 w-5 flex-shrink-0;
+		color: var(--text-check);
+	}
+
+	.pricing-cta {
+		@apply mt-auto;
+	}
+
+	/* Mobile adjustments */
+	@media (max-width: 768px) {
+		.pricing-grid {
+			@apply gap-4 px-4;
+		}
+
+		.pricing-plan-wrapper {
+			@apply px-4;
+		}
+
+		.pricing-price-amount {
+			@apply text-3xl;
+		}
+
+		.pricing-price-period {
+			@apply text-xl;
+		}
+	}
+</style>
