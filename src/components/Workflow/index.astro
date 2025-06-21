@@ -78,150 +78,123 @@
 	</div>
 </section>
 
-<script src="./Workflow.ts"></script>
+<script src="./index.ts"></script>
 
 <style>
+	@import "tailwindcss/theme" theme(reference);
+	@import "@/styles/tailwind-theme.css" theme(reference);
+
 	.workflow-section {
+		@apply py-16 md:py-24;
 		min-height: 200vh;
-		padding: 4rem 0;
 		background: var(--bg-primary);
 	}
 
 	.workflow-container {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 2rem;
+		@apply mx-auto max-w-6xl px-8;
 	}
 
 	.workflow-content {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 4rem;
-		align-items: start;
+		@apply grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-16;
 	}
 
 	.left-column {
-		height: fit-content;
+		@apply h-fit;
 	}
 
 	.workflow-header {
-		text-align: center;
+		@apply text-center;
 	}
 
 	.workflow-title {
-		font-size: clamp(3rem, 8vw, 6rem);
-		font-weight: 900;
-		line-height: 0.9;
-		margin-bottom: 2rem;
-		text-transform: uppercase;
-		letter-spacing: -0.02em;
+		@apply mb-8 text-4xl leading-none font-black tracking-tight uppercase md:text-5xl lg:text-6xl xl:text-7xl;
 	}
 
 	.workflow-title span {
-		display: block;
+		@apply block;
 	}
 
 	.main-text-gradient {
-		background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
+		@apply bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent;
 	}
 
 	.gear-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin-top: 2rem;
+		@apply mt-8 flex items-center justify-center;
 	}
 
 	.gear-animation {
-		width: 200px;
-		height: 200px;
+		@apply h-48 w-48 md:h-52 md:w-52 lg:h-56 lg:w-56;
 		filter: drop-shadow(0 10px 30px color-mix(in srgb, var(--color-primary-500) 30%, transparent));
 	}
 
 	.right-column {
-		padding: 2rem 0;
+		@apply py-8 md:py-16;
 	}
 
 	.workflow-item {
-		margin-bottom: 4rem;
-		padding: 2rem;
-		border-radius: 24px;
+		@apply mb-16 rounded-3xl border p-8 transition-all duration-500;
 		background: var(--bg-card);
 		backdrop-filter: blur(10px);
-		border: 1px solid var(--border-primary);
-		transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		border-color: var(--border-primary);
 	}
 
 	.step-number {
-		font-size: 1rem;
-		font-weight: 700;
+		@apply mb-4 text-sm font-bold tracking-wider uppercase;
 		color: var(--text-price);
-		margin-bottom: 1rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
 	}
 
 	.step-title {
-		font-size: 2.5rem;
-		font-weight: 800;
+		@apply mb-6 text-3xl leading-tight font-extrabold md:text-4xl;
 		color: var(--text-primary);
-		margin-bottom: 1.5rem;
-		line-height: 1.2;
 	}
 
 	.step-description {
-		font-size: 1.125rem;
+		@apply mb-8 text-lg leading-relaxed;
 		color: var(--text-secondary);
-		line-height: 1.6;
-		margin-bottom: 2rem;
 	}
 
 	.step-features {
-		list-style: none;
-		padding: 0;
-		margin: 0;
+		@apply m-0 list-none space-y-3 p-0;
 	}
 
 	.step-features li {
-		position: relative;
-		padding-left: 2rem;
-		margin-bottom: 0.75rem;
+		@apply relative pl-8 text-base leading-relaxed;
 		color: var(--text-secondary);
-		font-size: 1rem;
-		line-height: 1.5;
 	}
 
 	.step-features li::before {
+		@apply absolute top-0 left-0 text-lg font-bold;
 		content: "✓";
-		position: absolute;
-		left: 0;
-		top: 0;
 		color: var(--text-price);
-		font-weight: bold;
-		font-size: 1.1rem;
 	}
 
 	@media (max-width: 768px) {
 		.workflow-content {
-			grid-template-columns: 1fr;
-			gap: 2rem;
+			@apply grid-cols-1 gap-8;
 		}
 
 		.left-column {
-			position: relative;
-			top: auto;
+			@apply relative;
 		}
 
 		.workflow-title {
-			font-size: 3rem;
+			@apply text-4xl md:text-5xl;
 		}
 
 		.gear-animation {
-			width: 150px;
-			height: 150px;
+			@apply h-36 w-36 md:h-40 md:w-40;
+		}
+
+		.workflow-item {
+			@apply mb-12 p-6;
+		}
+
+		.step-title {
+			@apply text-2xl md:text-3xl;
+		}
+
+		.step-description {
+			@apply text-base md:text-lg;
 		}
 	}
 </style>
