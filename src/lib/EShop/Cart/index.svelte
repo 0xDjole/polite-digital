@@ -32,7 +32,17 @@
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
 		const roundedPrice = Number(priceOption.basePrice).toFixed(2);
-		return `${roundedPrice} ${priceOption.currency}`;
+		
+		// Format based on currency
+		if (priceOption.currency === 'USD') {
+			return `$${roundedPrice}`;
+		} else if (priceOption.currency === 'EUR') {
+			return `€${roundedPrice}`;
+		} else if (priceOption.currency === 'GBP') {
+			return `£${roundedPrice}`;
+		} else {
+			return `${roundedPrice} ${priceOption.currency}`;
+		}
 	}
 
 	function handleQuantityUpdate(itemId, newQuantity) {
@@ -231,14 +241,17 @@
 
 		elements = stripe.elements();
 		
+		// Get theme-aware colors
+		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+		
 		const style = {
 			base: {
-				color: '#000000',
+				color: isDark ? '#ffffff' : '#000000',
 				fontFamily: 'Inter, system-ui, sans-serif',
 				fontSmoothing: 'antialiased',
 				fontSize: '16px',
 				'::placeholder': {
-					color: '#9ca3af'
+					color: isDark ? '#6b7280' : '#9ca3af'
 				}
 			},
 			invalid: {
@@ -345,9 +358,6 @@
 							</div>
 						{/if}
 						
-						<div class="cart-item-price">
-							{formatPrice(item.price)} each
-						</div>
 					</div>
 
 					<div class="cart-item-actions">
@@ -557,8 +567,7 @@
 										</label>
 										<div 
 											id="card-number-element" 
-											class="p-3 bg-background border border-border rounded-lg min-h-[48px]"
-											style="background-color: white; color: black;"
+											class="card-input"
 										>
 										</div>
 									</div>
@@ -570,8 +579,7 @@
 											</label>
 											<div 
 												id="card-expiry-element" 
-												class="p-3 bg-background border border-border rounded-lg min-h-[48px]"
-												style="background-color: white; color: black;"
+												class="card-input"
 											>
 											</div>
 										</div>
@@ -582,8 +590,7 @@
 											</label>
 											<div 
 												id="card-cvc-element" 
-												class="p-3 bg-background border border-border rounded-lg min-h-[48px]"
-												style="background-color: white; color: black;"
+												class="card-input"
 											>
 											</div>
 										</div>
@@ -862,7 +869,9 @@
 	}
 
 	.card-input {
-		@apply p-4 bg-background border border-border rounded-lg min-h-[56px] md:p-3 md:min-h-[48px];
+		@apply p-4 border border-border rounded-lg min-h-[56px] md:p-3 md:min-h-[48px];
+		background-color: var(--bg-background);
+		color: var(--text-foreground);
 	}
 
 	.security-notice {
