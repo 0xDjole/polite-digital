@@ -33,15 +33,15 @@
 	$: canIncrement = quantity < max && !disabled;
 </script>
 
-<div class="flex items-center bg-muted rounded-lg border border-border overflow-hidden shadow-sm">
+<div class="quantity-selector">
 	<button 
 		type="button"
-		class="flex items-center justify-center w-10 h-10 text-muted-foreground hover:text-foreground hover:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+		class="quantity-button"
 		disabled={!canDecrement}
 		on:click={decrement}
 		aria-label="Decrease quantity"
 	>
-		<Icon icon="mdi:minus" class="w-4 h-4" />
+		<Icon icon="mdi:minus" class="quantity-icon" />
 	</button>
 	
 	<input 
@@ -51,30 +51,49 @@
 		{disabled}
 		bind:value={quantity}
 		on:input={handleInput}
-		class="w-16 h-10 text-center bg-transparent border-0 text-foreground font-medium focus:outline-none focus:ring-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+		class="quantity-input"
 		style="-moz-appearance: textfield;"
 	/>
 	
 	<button 
 		type="button"
-		class="flex items-center justify-center w-10 h-10 text-muted-foreground hover:text-foreground hover:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+		class="quantity-button"
 		disabled={!canIncrement}
 		on:click={increment}
 		aria-label="Increase quantity"
 	>
-		<Icon icon="mdi:plus" class="w-4 h-4" />
+		<Icon icon="mdi:plus" class="quantity-icon" />
 	</button>
 </div>
 
 <style>
+	@import "tailwindcss/theme" theme(reference);
+	@import "@/styles/tailwind-theme.css" theme(reference);
+
+	.quantity-selector {
+		@apply flex items-center bg-muted rounded-lg border border-border overflow-hidden shadow-sm;
+	}
+
+	.quantity-button {
+		@apply flex items-center justify-center w-8 h-8 text-muted-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed md:w-10 md:h-10;
+	}
+
+	.quantity-icon {
+		@apply w-3 h-3 md:w-4 md:h-4;
+	}
+
+	.quantity-input {
+		@apply w-12 h-8 text-center bg-transparent border-0 text-foreground font-medium focus:outline-none focus:ring-0 appearance-none text-sm md:w-16 md:h-10 md:text-base;
+	}
+
 	/* Hide number input spinners in all browsers */
-	input[type="number"]::-webkit-outer-spin-button,
-	input[type="number"]::-webkit-inner-spin-button {
+	.quantity-input::-webkit-outer-spin-button,
+	.quantity-input::-webkit-inner-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
 	}
 	
-	input[type="number"] {
+	.quantity-input {
 		-moz-appearance: textfield;
 	}
 </style>
