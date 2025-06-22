@@ -433,7 +433,10 @@ export const actions = {
 
 			if (type === "month") {
 				const avail = new Set(
-					result.data.map((i) => new Date(i.from * 1000).toISOString().slice(0, 10)),
+					result.data.map((i) => {
+						const date = new Date(i.from * 1000);
+						return date.toISOString().slice(0, 10);
+					}),
 				);
 				store.setKey(
 					"days",
@@ -487,34 +490,40 @@ export const actions = {
 	// Date selection
 	selectDate(cell) {
 		if (!cell.date || !cell.available) return;
-		const iso = cell.date.toISOString().slice(0, 10);
+		// Store date components directly to avoid timezone issues
+		const dateInfo = {
+			year: cell.date.getFullYear(),
+			month: cell.date.getMonth() + 1,
+			day: cell.date.getDate(),
+			iso: `${cell.date.getFullYear()}-${String(cell.date.getMonth() + 1).padStart(2, '0')}-${String(cell.date.getDate()).padStart(2, '0')}`
+		};
 		const state = store.get();
 
 		if (state.isMultiDay) {
 			if (!state.startDate) {
-				store.setKey("startDate", iso);
+				store.setKey("startDate", dateInfo.iso);
 				store.setKey("selectedSlot", null);
-				store.setKey("selectedDate", iso);
+				store.setKey("selectedDate", dateInfo.iso);
 				store.setKey("endDate", null);
 			} else if (!state.endDate) {
 				const start = new Date(state.startDate).getTime();
 				const cellT = cell.date.getTime();
 				if (cellT < start) {
 					store.setKey("endDate", state.startDate);
-					store.setKey("startDate", iso);
+					store.setKey("startDate", dateInfo.iso);
 				} else {
-					store.setKey("endDate", iso);
+					store.setKey("endDate", dateInfo.iso);
 				}
 			} else {
-				store.setKey("startDate", iso);
-				store.setKey("selectedDate", iso);
+				store.setKey("startDate", dateInfo.iso);
+				store.setKey("selectedDate", dateInfo.iso);
 				store.setKey("endDate", null);
 				store.setKey("selectedSlot", null);
 			}
 		} else {
 			store.setKey("selectedSlot", null);
-			store.setKey("selectedDate", iso);
-			this.fetchAvailability("day", iso);
+			store.setKey("selectedDate", dateInfo.iso);
+			this.fetchAvailability("day", dateInfo.iso);
 		}
 	},
 
@@ -577,7 +586,7 @@ export const actions = {
 	},
 	isSelectedDay(cell) {
 		if (cell.blank || !cell.date) return false;
-		const iso = cell.date.toISOString().slice(0, 10);
+		const iso = `${cell.date.getFullYear()}-${String(cell.date.getMonth() + 1).padStart(2, '0')}-${String(cell.date.getDate()).padStart(2, '0')}`;
 		const state = store.get();
 		return iso === state.startDate || iso === state.endDate || iso === state.selectedDate;
 	},

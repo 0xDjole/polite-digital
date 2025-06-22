@@ -2,7 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import { store, actions } from '../reservationStore.js';
 	import DynamicForm from '../DynamicForm/index.svelte';
-	import { t } from '../../../lib/i18n/index';
+	import { t, getLocale } from '../../../lib/i18n/index';
 </script>
 
 {#if $store.selectedSlot}
@@ -62,12 +62,16 @@
 						</p>
 					{:else}
 						<p class="font-medium text-primary">
-							{new Date($store.selectedDate).toLocaleDateString(undefined, {
-								weekday:'long',
-								year:'numeric',
-								month:'long',
-								day:'numeric'
-							})}
+							{(() => {
+								const [year, month, day] = $store.selectedDate.split('-').map(Number);
+								const date = new Date(year, month - 1, day, 12, 0, 0);
+								return date.toLocaleDateString(getLocale(), {
+									weekday:'long',
+									year:'numeric',
+									month:'long',
+									day:'numeric'
+								});
+							})()}
 						</p>
 						<p class="text-secondary mt-1 text-sm">{$store.selectedSlot.timeText}</p>
 					{/if}
