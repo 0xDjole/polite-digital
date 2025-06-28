@@ -139,18 +139,18 @@ export const actions = {
 			
 			if (response.ok) {
 				const business = await response.json();
-				const checkoutBlocks = business.configs?.orderConfigs?.checkoutBlocks || [];
+				const checkoutBlocks = business.configs?.checkoutBlocks || [];
 				store.setKey('checkoutBlocks', checkoutBlocks);
 				// Also set for DynamicForm compatibility
 				store.setKey('service', { reservationBlocks: checkoutBlocks });
 				
 				// Load allowed payment methods
-				const allowedPaymentMethods = business.configs?.orderConfigs?.allowedPaymentMethods || ['Cash'];
+				const allowedPaymentMethods = business.configs?.allowedPaymentMethods || ['Cash'];
 				store.setKey('allowedPaymentMethods', allowedPaymentMethods);
 				
 				// Load Stripe configuration
 				const stripeConfig = {
-					publicKey: business.configs?.orderConfigs?.stripePublicKey || null,
+					publicKey: business.configs?.stripePublicKey || null,
 					enabled: allowedPaymentMethods.includes('CREDIT_CARD') || false
 				};
 				store.setKey('stripeConfig', stripeConfig);
