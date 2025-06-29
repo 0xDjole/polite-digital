@@ -57,6 +57,8 @@ export const store = deepMap({
 	// Service & config
 	guestToken: null,
 	service: null,
+	business: null,
+	reservationBlocks: [], // Business-level reservation blocks for cart
 	apiUrl: API_URL,
 	businessId: BUSINESS_ID,
 	storageUrl: STORAGE_URL,
@@ -357,6 +359,27 @@ export const actions = {
 			to,
 			timeText: formatTimeSlot(from, to, state.timezone),
 		});
+	},
+
+	// Load business configuration
+	async loadBusinessConfig() {
+		try {
+			const { businessId } = store.get();
+			const response = await fetch(`${API_URL}/v1/businesses/${businessId}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			
+			if (response.ok) {
+				const business = await response.json();
+				store.setKey('business', business);
+				store.setKey('reservationBlocks', business.configs?.reservationBlocks || []);
+			}
+		} catch (err) {
+			console.error('Error loading business config:', err);
+		}
 	},
 
 	// Provider management
@@ -762,6 +785,7 @@ export const actions = {
 			const result = await reservationApi.checkout({
 				token,
 				businessId: state.businessId,
+				blocks: state.reservationBlocks || [], // Business-level blocks for cart
 				parts: state.parts,
 			});
 
@@ -809,6 +833,7 @@ export const actions = {
 
 export function initReservationStore() {
 	actions.updateCalendarGrid();
+	actions.loadBusinessConfig();
 
 	const savedParts = cartParts.get();
 	if (savedParts && savedParts.length > 0) {

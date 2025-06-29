@@ -1,8 +1,62 @@
 <script>
 	import Icon from '@iconify/svelte';
 	import { store, actions } from '../reservationStore.js';
-	import DynamicForm from '../DynamicForm/index.svelte';
+	import DynamicForm from '@lib/DynamicForm/index.svelte';
 	import { t, getLocale } from '../../../lib/i18n/index';
+
+	let phoneStates = $state({});
+
+	function update(idx, v) {
+		const svc = { ...$store.service };
+		const list = [...svc.reservationBlocks];
+		list[idx] = { ...list[idx], value: Array.isArray(v) ? v : [v] };
+		svc.reservationBlocks = list;
+		store.setKey('service', svc);
+	}
+
+	async function handlePhoneSendCode(blockId, phone) {
+		phoneStates[blockId] = { ...phoneStates[blockId], isLoading: true, error: null };
+		store.setKey('phoneNumber', phone);
+		
+		const result = await actions.updateProfilePhone();
+		
+		if (result) {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isLoading: false, 
+				success: "Verification code sent successfully!",
+				error: null 
+			};
+		} else {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isLoading: false, 
+				error: $store.phoneError || "Failed to send verification code" 
+			};
+		}
+	}
+
+	async function handlePhoneVerifyCode(blockId, code) {
+		phoneStates[blockId] = { ...phoneStates[blockId], isVerifying: true, verifyError: null };
+		store.setKey('verificationCode', code);
+		
+		const result = await actions.verifyPhoneCode();
+		
+		if (result) {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isVerifying: false, 
+				isVerified: true,
+				verifyError: null 
+			};
+		} else {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isVerifying: false, 
+				verifyError: $store.verifyError || "Invalid verification code" 
+			};
+		}
+	}
 </script>
 
 {#if $store.selectedSlot}
@@ -79,7 +133,13 @@
 			</div>
 		</div>
 		
-		<DynamicForm />
+		<DynamicForm 
+			blocks={$store.service?.reservationBlocks || []} 
+			onUpdate={update}
+			onPhoneSendCode={handlePhoneSendCode}
+			onPhoneVerifyCode={handlePhoneVerifyCode}
+			phoneStates={phoneStates}
+		/>
 		
 		<button
 			class="bg-primary-600 hover:bg-primary-700 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg mt-4 transition"

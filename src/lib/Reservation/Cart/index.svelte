@@ -1,29 +1,84 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import PhoneInput from '../PhoneInput/index.svelte';
+	import DynamicForm from '@lib/DynamicForm/index.svelte';
 	import { store, actions, initReservationStore, cartParts } from '../reservationStore.js';
 	import { onMount } from 'svelte';
 	import { t } from '../../../lib/i18n/index';
+
+	let phoneStates = $state({});
 
 	onMount(() => {
 		initReservationStore();
 	});
 
-	const requiresPhoneVerification = $derived($store.parts?.some(part => {
-		// Check if any part has a phone_number block with min_length > 0 (required)
-		return part.blocks?.some(block => 
-			block.properties?.variant === 'phone_number' &&
-			block.properties?.min_length && 
-			block.properties.min_length > 0
-		);
-	}) ?? false);
+	function update(idx, v) {
+		const blocks = [...$store.reservationBlocks];
+		blocks[idx] = { ...blocks[idx], value: Array.isArray(v) ? v : [v] };
+		store.setKey('reservationBlocks', blocks);
+	}
+
+	async function handlePhoneSendCode(blockId, phone) {
+		phoneStates[blockId] = { ...phoneStates[blockId], isLoading: true, error: null };
+		store.setKey('phoneNumber', phone);
+		
+		const result = await actions.updateProfilePhone();
+		
+		if (result) {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isLoading: false, 
+				success: "Verification code sent successfully!",
+				error: null 
+			};
+		} else {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isLoading: false, 
+				error: $store.phoneError || "Failed to send verification code" 
+			};
+		}
+	}
+
+	async function handlePhoneVerifyCode(blockId, code) {
+		phoneStates[blockId] = { ...phoneStates[blockId], isVerifying: true, verifyError: null };
+		store.setKey('verificationCode', code);
+		
+		const result = await actions.verifyPhoneCode();
+		
+		if (result) {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isVerifying: false, 
+				isVerified: true,
+				verifyError: null 
+			};
+		} else {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isVerifying: false, 
+				verifyError: $store.verifyError || "Invalid verification code" 
+			};
+		}
+	}
+
+	const requiresPhoneVerification = $derived($store.reservationBlocks?.some(block => 
+		block.properties?.variant === 'phone_number' &&
+		block.properties?.isRequired
+	) ?? false);
 </script>
 
 <div class="bg-tertiary mx-auto mt-20 max-w-xl space-y-4 rounded-xl p-4 shadow-lg">
 	<h2 class="text-2xl font-bold text-primary">{t('cart.title')}</h2>
 
-	{#if requiresPhoneVerification}
-		<PhoneInput />
+	<!-- Business-level reservation form (cart checkout) -->
+	{#if $store.reservationBlocks?.length > 0}
+		<DynamicForm 
+			blocks={$store.reservationBlocks} 
+			onUpdate={update}
+			onPhoneSendCode={handlePhoneSendCode}
+			onPhoneVerifyCode={handlePhoneVerifyCode}
+			phoneStates={phoneStates}
+		/>
 	{/if}
 
 	{#if !$store.parts?.length}
@@ -79,7 +134,7 @@
 
 		<button
 			class="bg-primary-600 hover:bg-primary-500 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-			disabled={$store?.loading || (requiresPhoneVerification && !$store?.isPhoneVerified)}
+			disabled={$store?.loading || (requiresPhoneVerification && !phoneStates[Object.keys(phoneStates).find(k => phoneStates[k]?.isVerified)]?.isVerified)}
 			onclick={()=> actions.checkout()}>
 			{#if !$store?.loading}
 				<Icon icon="mdi:check-circle" class="h-5 w-5" />
@@ -94,7 +149,7 @@
 			{/if}
 		</button>
 
-		{#if requiresPhoneVerification && !$store?.isPhoneVerified}
+		{#if requiresPhoneVerification && !phoneStates[Object.keys(phoneStates).find(k => phoneStates[k]?.isVerified)]?.isVerified}
 			<div class="bg-warning border-warning text-warning rounded-lg border p-3 text-sm">
 				<div class="flex items-start gap-2">
 					<Icon icon="mdi:alert" class="mt-0.5 h-5 w-5 flex-shrink-0" />
