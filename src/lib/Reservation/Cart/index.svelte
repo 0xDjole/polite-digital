@@ -5,8 +5,6 @@
 	import { onMount } from 'svelte';
 	import { t } from '../../../lib/i18n/index';
 
-	let phoneStates = $state({});
-
 	onMount(() => {
 		initReservationStore();
 	});
@@ -18,53 +16,14 @@
 	}
 
 	async function handlePhoneSendCode(blockId, phone) {
-		phoneStates[blockId] = { ...phoneStates[blockId], isLoading: true, error: null };
 		store.setKey('phoneNumber', phone);
-		
-		const result = await actions.updateProfilePhone();
-		
-		if (result) {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isLoading: false, 
-				success: "Verification code sent successfully!",
-				error: null 
-			};
-		} else {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isLoading: false, 
-				error: $store.phoneError || "Failed to send verification code" 
-			};
-		}
+		return await actions.updateProfilePhone();
 	}
 
 	async function handlePhoneVerifyCode(blockId, code) {
-		phoneStates[blockId] = { ...phoneStates[blockId], isVerifying: true, verifyError: null };
 		store.setKey('verificationCode', code);
-		
-		const result = await actions.verifyPhoneCode();
-		
-		if (result) {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isVerifying: false, 
-				isVerified: true,
-				verifyError: null 
-			};
-		} else {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isVerifying: false, 
-				verifyError: $store.verifyError || "Invalid verification code" 
-			};
-		}
+		return await actions.verifyPhoneCode();
 	}
-
-	const requiresPhoneVerification = $derived($store.reservationBlocks?.some(block => 
-		block.properties?.variant === 'phone_number' &&
-		block.properties?.isRequired
-	) ?? false);
 </script>
 
 <div class="bg-tertiary mx-auto mt-20 max-w-xl space-y-4 rounded-xl p-4 shadow-lg">
@@ -77,7 +36,6 @@
 			onUpdate={update}
 			onPhoneSendCode={handlePhoneSendCode}
 			onPhoneVerifyCode={handlePhoneVerifyCode}
-			phoneStates={phoneStates}
 		/>
 	{/if}
 
@@ -134,7 +92,7 @@
 
 		<button
 			class="bg-primary-600 hover:bg-primary-500 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-			disabled={$store?.loading || (requiresPhoneVerification && !phoneStates[Object.keys(phoneStates).find(k => phoneStates[k]?.isVerified)]?.isVerified)}
+			disabled={$store?.loading}
 			onclick={()=> actions.checkout()}>
 			{#if !$store?.loading}
 				<Icon icon="mdi:check-circle" class="h-5 w-5" />
@@ -149,13 +107,5 @@
 			{/if}
 		</button>
 
-		{#if requiresPhoneVerification && !phoneStates[Object.keys(phoneStates).find(k => phoneStates[k]?.isVerified)]?.isVerified}
-			<div class="bg-warning border-warning text-warning rounded-lg border p-3 text-sm">
-				<div class="flex items-start gap-2">
-					<Icon icon="mdi:alert" class="mt-0.5 h-5 w-5 flex-shrink-0" />
-					<p>{t('phone.verifyToast')}</p>
-				</div>
-			</div>
-		{/if}
 	{/if}
 </div>

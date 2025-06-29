@@ -22,7 +22,16 @@
 	let paymentError = $state(null);
 	let orderBlocks = $state([]);
 	let businessObject = $state(null);
-	let phoneStates = $state({});
+
+	async function handlePhoneSendCode(blockId, phone) {
+		store.setKey('phoneNumber', phone);
+		return await actions.updateProfilePhone();
+	}
+
+	async function handlePhoneVerifyCode(blockId, code) {
+		store.setKey('verificationCode', code);
+		return await actions.verifyPhoneCode();
+	}
 
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
@@ -284,50 +293,6 @@
 		}
 	});
 
-	async function handlePhoneSendCode(blockId, phone) {
-		phoneStates[blockId] = { ...phoneStates[blockId], isLoading: true, error: null };
-		store.setKey('phoneNumber', phone);
-		
-		const result = await actions.updateProfilePhone();
-		
-		if (result) {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isLoading: false, 
-				success: "Verification code sent successfully!",
-				error: null 
-			};
-		} else {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isLoading: false, 
-				error: $store.phoneError || "Failed to send verification code" 
-			};
-		}
-	}
-
-	async function handlePhoneVerifyCode(blockId, code) {
-		phoneStates[blockId] = { ...phoneStates[blockId], isVerifying: true, verifyError: null };
-		store.setKey('verificationCode', code);
-		
-		const result = await actions.verifyPhoneCode();
-		
-		if (result) {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isVerifying: false, 
-				isVerified: true,
-				verifyError: null 
-			};
-		} else {
-			phoneStates[blockId] = { 
-				...phoneStates[blockId], 
-				isVerifying: false, 
-				verifyError: $store.verifyError || "Invalid verification code" 
-			};
-		}
-	}
-
 	// Auto-select first available payment method and validate selection
 	$effect(() => {
 		const allowedMethods = $store.allowedPaymentMethods || ['CASH'];
@@ -465,7 +430,6 @@
 							}}
 							onPhoneSendCode={handlePhoneSendCode}
 							onPhoneVerifyCode={handlePhoneVerifyCode}
-							phoneStates={phoneStates}
 						/>
 
 						<!-- Payment Method -->

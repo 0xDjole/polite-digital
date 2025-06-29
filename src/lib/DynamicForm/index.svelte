@@ -2,15 +2,14 @@
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { getLocale, getLocaleFromUrl, t } from '@lib/i18n/index.js';
-	import PhoneInput from '@lib/PhoneInput/index.svelte';
+	import PhoneVerification from '@lib/PhoneVerification/index.svelte';
 
 	// Props
 	let { 
 		blocks = [], 
 		onUpdate = (idx: number, value: unknown) => {},
 		onPhoneSendCode = null,
-		onPhoneVerifyCode = null,
-		phoneStates = {}
+		onPhoneVerifyCode = null
 	} = $props();
 
 	// Get the current locale from the URL
@@ -62,20 +61,25 @@
 
 			{#if block.type === 'text'}
 				{#if block.properties?.variant === 'phone_number'}
-					<!-- Phone number input -->
-					<PhoneInput
-						value={block.value?.[0] ?? ''}
-						onChange={(value) => update(idx, value)}
-						onSendCode={onPhoneSendCode ? (phone) => onPhoneSendCode(block.id, phone) : () => {}}
-						onVerifyCode={onPhoneVerifyCode ? (code) => onPhoneVerifyCode(block.id, code) : () => {}}
-						isVerified={phoneStates[block.id]?.isVerified ?? false}
-						isLoading={phoneStates[block.id]?.isLoading ?? false}
-						error={phoneStates[block.id]?.error ?? null}
-						success={phoneStates[block.id]?.success ?? null}
-						verificationCode={phoneStates[block.id]?.verificationCode ?? ""}
-						isVerifying={phoneStates[block.id]?.isVerifying ?? false}
-						verifyError={phoneStates[block.id]?.verifyError ?? null}
-					/>
+					<!-- Phone number input with verification -->
+					{#if onPhoneSendCode && onPhoneVerifyCode}
+						<PhoneVerification
+							blockId={block.id}
+							value={block.value?.[0] ?? ''}
+							onChange={(value) => update(idx, value)}
+							onSendCode={onPhoneSendCode}
+							onVerifyCode={onPhoneVerifyCode}
+						/>
+					{:else}
+						<!-- Fallback for when no verification callbacks provided -->
+						<input
+							type="tel"
+							value={block.value?.[0] ?? ''}
+							placeholder="Phone number"
+							on:input={(e)=>update(idx, e.target.value)}
+							class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
+						/>
+					{/if}
 				{:else if block.properties?.variant === 'note'}
 					<!-- Textarea for notes -->
 					<textarea
