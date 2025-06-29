@@ -2,7 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { getLocale, getLocaleFromUrl, t } from '@lib/i18n/index.js';
-	import PhoneVerification from '@lib/PhoneVerification/index.svelte';
+	import PhoneInput from '@lib/PhoneInput/index.svelte';
 
 	// Props
 	let { 
@@ -63,7 +63,7 @@
 				{#if block.properties?.variant === 'phone_number'}
 					<!-- Phone number input with verification -->
 					{#if onPhoneSendCode && onPhoneVerifyCode}
-						<PhoneVerification
+						<PhoneInput
 							blockId={block.id}
 							value={block.value?.[0] ?? ''}
 							onChange={(value) => update(idx, value)}

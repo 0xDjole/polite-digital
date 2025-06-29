@@ -3,7 +3,18 @@
 	import { countries } from './countries.js';
 	import { onMount } from 'svelte';
 
-	let { value = '', onChange, onSendCode, onVerifyCode, isVerified = false, isLoading = false, error = null, success = null, verificationCode = '', isVerifying = false, verifyError = null } = $props();
+	let { value = '', onChange, onSendCode, onVerifyCode, blockId = null } = $props();
+	
+	// Internal verification state
+	let phoneState = $state({
+		isLoading: false,
+		error: null,
+		success: null,
+		isVerifying: false,
+		verifyError: null,
+		isVerified: false,
+		verificationCode: ''
+	});
 
 	let selectedCountry = $state(countries.find(c => c.iso === 'BA') || countries[0]);
 	let nationalNumber = $state('');
@@ -51,16 +62,48 @@
 	}
 
 	function handleSendCode() {
-		if (onSendCode) onSendCode(fullPhoneNumber.trim());
+		if (!onSendCode) return;
+		
+		phoneState.isLoading = true;
+		phoneState.error = null;
+		
+		onSendCode(blockId, fullPhoneNumber.trim()).then(result => {
+			phoneState.isLoading = false;
+			if (result) {
+				phoneState.success = "Verification code sent successfully!";
+				phoneState.error = null;
+			} else {
+				phoneState.error = "Failed to send verification code";
+			}
+		}).catch(error => {
+			phoneState.isLoading = false;
+			phoneState.error = error.message || "Failed to send verification code";
+		});
 	}
 
 	function handleVerifyCode() {
-		if (onVerifyCode) onVerifyCode(verificationCode);
+		if (!onVerifyCode) return;
+		
+		phoneState.isVerifying = true;
+		phoneState.verifyError = null;
+		
+		onVerifyCode(blockId, phoneState.verificationCode).then(result => {
+			phoneState.isVerifying = false;
+			if (result) {
+				phoneState.isVerified = true;
+				phoneState.verifyError = null;
+			} else {
+				phoneState.verifyError = "Invalid verification code";
+			}
+		}).catch(error => {
+			phoneState.isVerifying = false;
+			phoneState.verifyError = error.message || "Invalid verification code";
+		});
 	}
 
 	function handleCodeInput(e) {
 		const cleaned = e.target.value.replace(/\D/g, '');
-		verificationCode = cleaned;
+		phoneState.verificationCode = cleaned;
 		if (cleaned.length === 4) handleVerifyCode();
 	}
 </script>
@@ -81,7 +124,7 @@
 						type="button"
 						on:click={() => showDropdown = !showDropdown}
 						class="form__input w-36 flex items-center justify-between px-4 h-12"
-						disabled={isVerified}
+						disabled={phoneState.isVerified}
 					>
 						<span class="flex items-center gap-2">
 							<span class="text-lg">{selectedCountry.flag}</span>
@@ -129,7 +172,7 @@
 						value={nationalNumber}
 						on:input={handleInput}
 						class="form__input w-full pr-12 h-12"
-						disabled={isVerified}
+						disabled={phoneState.isVerified}
 					/>
 					<Icon icon="mdi:phone" class="text-muted pointer-events-none absolute inset-y-0 right-0 my-auto mr-4 h-5 w-5"/>
 				</div>
@@ -139,25 +182,22 @@
 				Full number: <span class="font-mono">{selectedCountry.code + ' ' + nationalNumber || selectedCountry.code + ' ...'}</span>
 			</p>
 
-			{#if error}
-				<p class="text-error text-sm">{error}</p>
+			{#if phoneState.error}
+				<p class="text-error text-sm">{phoneState.error}</p>
 			{/if}
 
-			{#if success}
-				<p class="text-success text-sm">{success}</p>
+			{#if phoneState.success}
+				<p class="text-success text-sm">{phoneState.success}</p>
 			{/if}
 
-			{#if !isVerified}
+			{#if !phoneState.isVerified}
 				<button
 					type="button"
 					on:click={handleSendCode}
-					disabled={isLoading || nationalNumber.trim() === ''}
+					disabled={phoneState.isLoading || nationalNumber.trim() === ''}
 					class="bg-primary-600 hover:bg-primary-700 mt-2 w-full rounded-xl px-4 py-3 font-medium text-white flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transition">
-					{#if isLoading}
-						<svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-						</svg>
+					{#if phoneState.isLoading}
+						<Icon icon="mdi:loading" class="h-5 w-5 animate-spin" />
 						Processing...
 					{:else}
 						Send Verification Code
@@ -166,32 +206,29 @@
 			{/if}
 		</div>
 
-		{#if success && !isVerified}
+		{#if phoneState.success && !phoneState.isVerified}
 			<div class="border-secondary space-y-3 border-t pt-6">
 				<label class="text-secondary mb-1 block font-medium">Verification Code</label>
 				<input
 					type="text"
 					maxlength="4"
 					placeholder="1234"
-					value={verificationCode}
+					value={phoneState.verificationCode}
 					on:input={handleCodeInput}
 					class="form__input text-center font-mono text-2xl tracking-wider w-full py-4"
 				/>
 
-				{#if verifyError}
-					<p class="text-error text-sm">{verifyError}</p>
+				{#if phoneState.verifyError}
+					<p class="text-error text-sm">{phoneState.verifyError}</p>
 				{/if}
 
 				<button
 					type="button"
 					on:click={handleVerifyCode}
-					disabled={isVerifying || verificationCode.length !== 4}
+					disabled={phoneState.isVerifying || phoneState.verificationCode.length !== 4}
 					class="mt-2 w-full rounded-xl bg-green-600 px-4 py-3 font-medium text-white flex items-center justify-center gap-2 hover:bg-green-700 disabled:opacity-70 disabled:cursor-not-allowed transition">
-					{#if isVerifying}
-						<svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-						</svg>
+					{#if phoneState.isVerifying}
+						<Icon icon="mdi:loading" class="h-5 w-5 animate-spin" />
 						Verifying...
 					{:else}
 						Verify Code
@@ -200,7 +237,7 @@
 			</div>
 		{/if}
 
-		{#if isVerified}
+		{#if phoneState.isVerified}
 			<div class="bg-success border-success mt-4 flex items-center gap-3 rounded-xl border p-4">
 				<Icon icon="mdi:check" class="h-5 w-5 text-white bg-green-500 rounded-full p-1"/>
 				<div>
