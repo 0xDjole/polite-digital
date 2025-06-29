@@ -1,7 +1,9 @@
-export { default as errors } from "./errors";
 import { z } from "zod";
 import { type Result, Ok, Err } from "ts-results-es";
-import errorCodes from "./errorCodes";
+import errorCodes, { ERROR_CONSTANTS } from "./errorCodes";
+
+// Export error constants for backward compatibility
+export const errors = ERROR_CONSTANTS;
 
 export type ServerError = {
 	error: string;

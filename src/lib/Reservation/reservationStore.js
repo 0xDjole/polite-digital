@@ -3,7 +3,7 @@ import { computed, deepMap } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
 import { getLocalizedString, getLocale, getLocaleFromUrl } from "../../lib/i18n/index";
 import { API_URL, BUSINESS_ID, STORAGE_URL } from "../env";
-import { getPrice, reservationApi } from "../index";
+import { getPrice, reservationApi, validatePhoneNumber } from "../index";
 import { tzGroups, findTimeZone } from "./timezone-utils";
 import { showToast } from "../toast.js";
 import * as authService from "../authService.js";
@@ -363,15 +363,10 @@ export const actions = {
 	async loadBusinessConfig() {
 		try {
 			const { businessId } = store.get();
-			const response = await fetch(`${API_URL}/v1/businesses/${businessId}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
+			const result = await authService.getBusinessConfig(businessId);
 			
-			if (response.ok) {
-				const business = await response.json();
+			if (result.success) {
+				const business = result.data;
 				store.setKey('business', business);
 				store.setKey('reservationBlocks', business.configs?.reservationBlocks || []);
 			}
@@ -683,11 +678,10 @@ export const actions = {
 		cartParts.set(filteredParts);
 	},
 
-	// Phone validation helper
+	// Phone validation helper (using shared utility)
 	validatePhoneNumber(phone) {
-		if (!phone) return false;
-		const cleaned = phone.replace(/\D/g, "");
-		return cleaned.length >= 8 && cleaned.length <= 15;
+		const result = validatePhoneNumber(phone);
+		return result.isValid;
 	},
 
 	// Phone verification

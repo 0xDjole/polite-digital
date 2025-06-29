@@ -1,6 +1,6 @@
 <script>
 	import { onMount, tick } from 'svelte';
-	import { eshopApi, getImageUrl, BUSINESS_ID } from '@lib/index';
+	import { eshopApi, getImageUrl, BUSINESS_ID, formatPrice as sharedFormatPrice } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
 	import { cartItems, cartTotal, cartItemCount, store, actions, initEshopStore } from '@lib/EShop/eshopStore.js';
 	import QuantitySelector from '@lib/EShop/QuantitySelector/index.svelte';
@@ -33,20 +33,9 @@
 		return await actions.verifyPhoneCode();
 	}
 
+	// Use shared formatPrice function
 	function formatPrice(priceOption) {
-		if (!priceOption) return '';
-		const roundedPrice = Number(priceOption.basePrice).toFixed(2);
-		
-		// Format based on currency
-		if (priceOption.currency === 'USD') {
-			return `$${roundedPrice}`;
-		} else if (priceOption.currency === 'EUR') {
-			return `€${roundedPrice}`;
-		} else if (priceOption.currency === 'GBP') {
-			return `£${roundedPrice}`;
-		} else {
-			return `${roundedPrice} ${priceOption.currency}`;
-		}
+		return sharedFormatPrice(priceOption);
 	}
 
 	function handleQuantityUpdate(itemId, newQuantity) {

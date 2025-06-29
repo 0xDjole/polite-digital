@@ -2,7 +2,7 @@
 import { computed, deepMap } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
 import { BUSINESS_ID, API_URL } from "../env";
-import { eshopApi, reservationApi } from "../index";
+import { eshopApi, reservationApi, formatPrice } from "../index";
 import { showToast } from "../toast.js";
 import * as authService from "../authService.js";
 
@@ -132,16 +132,10 @@ export const actions = {
 			store.setKey('loading', true);
 			store.setKey('error', null);
 			
-			// Get business details to fetch checkout blocks and Stripe config
-			const response = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
+			const result = await authService.getBusinessConfig(BUSINESS_ID);
 			
-			if (response.ok) {
-				const business = await response.json();
+			if (result.success) {
+				const business = result.data;
 				const orderBlocks = business.configs?.orderBlocks || [];
 				store.setKey('orderBlocks', orderBlocks);
 				// Set for DynamicForm compatibility
@@ -297,10 +291,9 @@ export const actions = {
 		}
 	},
 	
-	// Format price for display
+	// Format price for display (using shared utility)
 	formatPrice(priceOption) {
-		if (!priceOption) return '';
-		return `${priceOption.basePrice} ${priceOption.currency}`;
+		return formatPrice(priceOption);
 	},
 	
 };

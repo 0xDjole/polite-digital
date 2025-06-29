@@ -1,4 +1,5 @@
 import { reservationApi } from './index.js';
+import { API_URL } from './env.js';
 
 // Shared guest token management
 export async function getGuestToken(currentToken = null) {
@@ -37,5 +38,33 @@ export async function verifyPhoneCode(token, phoneNumber, code) {
 		return { success: true };
 	} else {
 		throw new Error(response.error || 'Invalid verification code');
+	}
+}
+
+// Shared business configuration fetching
+export async function getBusinessConfig(businessId) {
+	try {
+		const response = await fetch(`${API_URL}/v1/businesses/${businessId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		
+		if (!response.ok) {
+			throw new Error(`Failed to fetch business config: ${response.status}`);
+		}
+		
+		const business = await response.json();
+		return {
+			success: true,
+			data: business
+		};
+	} catch (error) {
+		console.error('Error loading business config:', error);
+		return {
+			success: false,
+			error: error.message
+		};
 	}
 }

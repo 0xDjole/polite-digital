@@ -2,6 +2,8 @@ import { API_URL, BUSINESS_ID } from "@lib/env";
 import { z } from "zod";
 import httpClient from "@lib/httpClient";
 
+// Block utilities are defined below in this file
+
 export { BUSINESS_ID };
 
 export const typeIcons = {
@@ -269,6 +271,7 @@ export function extractBlockValues(blocks: any[]): Record<string, any> {
 	return values;
 }
 
+// @deprecated Use getBlockValue from blockUtils instead
 export const getBlockValue = (entry, blockKey) => {
 	if (!entry || !entry.blocks) return null;
 
@@ -279,6 +282,7 @@ export const getBlockValue = (entry, blockKey) => {
 	return block.value[0];
 };
 
+// @deprecated Use getBlockValues from blockUtils instead
 export const getBlockValues = (entry, blockKey) => {
 	if (!entry || !entry.blocks) return null;
 
@@ -392,9 +396,16 @@ export function thumbnailUrl(service) {
 	return path ? `${storageUrl}/${path}` : null;
 }
 
-// format price
-export function getPrice(priceOption, locale) {
+// format price - handles both complex price options and simple price objects
+export function getPrice(priceOption, locale = 'en') {
 	if (!priceOption) return "";
+	
+	// Handle simple price objects (from eshop)
+	if (priceOption.basePrice && priceOption.currency && !priceOption.type) {
+		return `${priceOption.basePrice} ${priceOption.currency}`;
+	}
+	
+	// Handle complex price options (from services)
 	switch (priceOption.type) {
 		case "standard":
 			return `${priceOption.basePrice}${priceOption.currency}`;
@@ -405,6 +416,50 @@ export function getPrice(priceOption, locale) {
 			return `${priceOption.basePrice}${priceOption.currency} + ${val}`;
 		default:
 			return "";
+	}
+}
+
+// Enhanced price formatter with currency symbols and rounding
+export function formatPrice(priceOption, options = {}) {
+	if (!priceOption) return '';
+	
+	const { 
+		showSymbols = true, 
+		decimalPlaces = 2,
+		locale = 'en' 
+	} = options;
+	
+	let price, currency;
+	
+	// Handle simple price objects (from eshop)
+	if (priceOption.basePrice && priceOption.currency && !priceOption.type) {
+		price = Number(priceOption.basePrice);
+		currency = priceOption.currency;
+	}
+	// Handle complex price options (from services) - use getPrice for these
+	else if (priceOption.type) {
+		return getPrice(priceOption, locale);
+	}
+	else {
+		return '';
+	}
+	
+	const roundedPrice = price.toFixed(decimalPlaces);
+	
+	if (!showSymbols) {
+		return `${roundedPrice} ${currency}`;
+	}
+	
+	// Format with currency symbols
+	switch (currency) {
+		case 'USD':
+			return `$${roundedPrice}`;
+		case 'EUR':
+			return `€${roundedPrice}`;
+		case 'GBP':
+			return `£${roundedPrice}`;
+		default:
+			return `${roundedPrice} ${currency}`;
 	}
 }
 
@@ -784,3 +839,89 @@ export const reservationApi = {
 		}
 	},
 };
+
+// ===== ADDITIONAL BLOCK UTILITIES =====
+
+// Extract localized text value from a block, handling multilingual content
+export function getBlockTextValue(block: any, locale: string = 'en'): string {
+	if (!block || !block.value || block.value.length === 0) return '';
+	
+	const firstValue = block.value[0];
+	
+	// Handle multilingual object
+	if (typeof firstValue === 'object' && firstValue !== null) {
+		// Try specified locale first, then 'en', then first available language
+		if (firstValue[locale]) return firstValue[locale];
+		if (firstValue.en) return firstValue.en;
+		const values = Object.values(firstValue);
+		return String(values[0] || '');
+	}
+	
+	// Handle simple string
+	return String(firstValue);
+}
+
+// ===== VALIDATION UTILITIES =====
+
+export interface ValidationResult {
+	isValid: boolean;
+	error?: string;
+}
+
+// Phone number validation
+export function validatePhoneNumber(phone: string): ValidationResult {
+	if (!phone) {
+		return { isValid: false, error: 'Phone number is required' };
+	}
+	
+	const cleaned = phone.replace(/\D/g, '');
+	
+	if (cleaned.length < 8) {
+		return { isValid: false, error: 'Phone number is too short' };
+	}
+	
+	if (cleaned.length > 15) {
+		return { isValid: false, error: 'Phone number is too long' };
+	}
+	
+	return { isValid: true };
+}
+
+// Email validation
+export function validateEmail(email: string): ValidationResult {
+	if (!email) {
+		return { isValid: false, error: 'Email is required' };
+	}
+	
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	
+	if (!emailRegex.test(email)) {
+		return { isValid: false, error: 'Please enter a valid email address' };
+	}
+	
+	return { isValid: true };
+}
+
+// Verification code validation (4-digit codes)
+export function validateVerificationCode(code: string): ValidationResult {
+	if (!code) {
+		return { isValid: false, error: 'Verification code is required' };
+	}
+	
+	const cleaned = code.replace(/\D/g, '');
+	
+	if (cleaned.length !== 4) {
+		return { isValid: false, error: 'Please enter a 4-digit verification code' };
+	}
+	
+	return { isValid: true };
+}
+
+// Generic required field validation
+export function validateRequired(value: any, fieldName: string = 'This field'): ValidationResult {
+	if (value === null || value === undefined || value === '') {
+		return { isValid: false, error: `${fieldName} is required` };
+	}
+	
+	return { isValid: true };
+}

@@ -1,26 +1,13 @@
 <script>
-	import { getBlockLabel } from '@lib/index.ts';
+	import { getBlockLabel, getBlockTextValue } from '@lib/index.ts';
 	
 	export let blocks = [];
 	export let variant = 'badges'; // 'badges' | 'inline' | 'list'
 	export let label = '';
 
-	// Extract text value from block, preferring 'en' language
+	// Use shared block text value extraction
 	function getBlockValue(block) {
-		if (!block.value || block.value.length === 0) return '';
-		
-		const firstValue = block.value[0];
-		
-		// Handle multilingual object
-		if (typeof firstValue === 'object' && firstValue !== null) {
-			// Try 'en' first, then fallback to first available language
-			if (firstValue.en) return firstValue.en;
-			const values = Object.values(firstValue);
-			return values[0] || '';
-		}
-		
-		// Handle simple string
-		return String(firstValue);
+		return getBlockTextValue(block, 'en');
 	}
 
 </script>
