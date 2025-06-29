@@ -1,4 +1,6 @@
 <script>
+	import { getBlockLabel } from '@lib/index.ts';
+	
 	export let blocks = [];
 	export let variant = 'badges'; // 'badges' | 'inline' | 'list'
 	export let label = '';
@@ -21,15 +23,6 @@
 		return String(firstValue);
 	}
 
-	// Get display label for block
-	function getBlockLabel(block) {
-		if (block.properties?.label?.en) return block.properties.label.en;
-		if (block.properties?.label) {
-			const labels = Object.values(block.properties.label);
-			if (labels.length > 0) return labels[0];
-		}
-		return block.key || 'Attribute';
-	}
 </script>
 
 {#if blocks && blocks.length > 0}
@@ -42,7 +35,7 @@
 			<div class="attribute-badges">
 				{#each blocks as block}
 					{@const value = getBlockValue(block)}
-					{@const blockLabel = getBlockLabel(block)}
+					{@const blockLabel = getBlockLabel(block, 'en')}
 					{#if value}
 						<span class="attribute-badge">
 							{blockLabel}: {value}
@@ -54,7 +47,7 @@
 			<div class="attribute-inline">
 				{#each blocks as block}
 					{@const value = getBlockValue(block)}
-					{@const blockLabel = getBlockLabel(block)}
+					{@const blockLabel = getBlockLabel(block, 'en')}
 					{#if value}
 						<span class="attribute-item">
 							<strong>{blockLabel}:</strong> {value}
@@ -66,7 +59,7 @@
 			<div class="attribute-list">
 				{#each blocks as block}
 					{@const value = getBlockValue(block)}
-					{@const blockLabel = getBlockLabel(block)}
+					{@const blockLabel = getBlockLabel(block, 'en')}
 					{#if value}
 						<div class="attribute-list-item">
 							<dt class="attribute-list-label">{blockLabel}</dt>

@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
 	import { getLocale, getLocaleFromUrl, t } from '@lib/i18n/index.js';
+	import { getBlockLabel } from '@lib/index.ts';
 	import PhoneInput from '@lib/PhoneInput/index.svelte';
 
 	// Props
@@ -24,38 +25,14 @@
 	function update(idx: number, v: unknown) {
 		onUpdate(idx, v);
 	}
-	
-	function getBlockLabel(block) {
-		if (!block) return "";
-
-		// Skip labels for specific variants
-		if (block.properties?.variant === 'phone_number') return "";
-
-		if (block.properties?.label) {
-			if (typeof block.properties.label === "object") {
-				return (
-					block.properties.label[currLocale] ||
-					block.properties.label.en ||
-					Object.values(block.properties.label)[0] ||
-					""
-				);
-			}
-			if (typeof block.properties.label === "string") {
-				return block.properties.label;
-			}
-		}
-		
-		// Convert key to readable format
-		return block.key?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "";
-	}
 </script>
 
 {#if blocks?.length > 0}
 	{#each blocks as block, idx (block.id)}
 		<div class="space-y-2 mb-4">
-			{#if getBlockLabel(block)}
+			{#if getBlockLabel(block, currLocale)}
 				<label class="mb-1 block font-medium text-foreground">
-					{getBlockLabel(block)}
+					{getBlockLabel(block, currLocale)}
 				</label>
 			{/if}
 
@@ -127,7 +104,7 @@
 						<div class="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform
 		            {block.value?.[0] ? 'translate-x-5' : ''}"></div>
 					</div>
-					<span class="text-foreground">{getBlockLabel(block)}</span>
+					<span class="text-foreground">{getBlockLabel(block, currLocale)}</span>
 				</label>
 
 			{:else if block.type === 'number'}

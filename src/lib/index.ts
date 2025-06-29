@@ -176,14 +176,28 @@ const getCollectionEntry = async ({ collectionId, id }) => {
 	return response;
 };
 
-export function getBlockLabel(block: any): string {
+export function getBlockLabel(block: any, locale: string = 'en'): string {
 	if (!block) return "";
 
-	if (block.properties?.label) {
-		return block.properties.label;
-	}
+	// Skip labels for specific variants
+	if (block.properties?.variant === 'phone_number') return "";
 
-	return block.key || "";
+	if (block.properties?.label) {
+		if (typeof block.properties.label === "object") {
+			return (
+				block.properties.label[locale] ||
+				block.properties.label.en ||
+				Object.values(block.properties.label)[0] ||
+				""
+			);
+		}
+		if (typeof block.properties.label === "string") {
+			return block.properties.label;
+		}
+	}
+	
+	// Convert key to readable format
+	return block.key?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "";
 }
 
 export function createBlock(type: string, key: string, label?: string): any {

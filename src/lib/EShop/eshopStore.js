@@ -303,25 +303,6 @@ export const actions = {
 		return `${priceOption.basePrice} ${priceOption.currency}`;
 	},
 	
-	// Get block label (similar to reservation store)
-	getBlockLabel(block, locale = 'en') {
-		if (!block) return '';
-		
-		if (block.properties?.label) {
-			if (typeof block.properties.label === 'object') {
-				return (
-					block.properties.label[locale] ||
-					block.properties.label.en ||
-					Object.values(block.properties.label)[0] ||
-					''
-				);
-			}
-			if (typeof block.properties.label === 'string') {
-				return block.properties.label;
-			}
-		}
-		return block.key || '';
-	},
 };
 
 // Initialize the store
