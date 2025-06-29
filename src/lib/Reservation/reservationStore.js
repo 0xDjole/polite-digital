@@ -6,6 +6,7 @@ import { API_URL, BUSINESS_ID, STORAGE_URL } from "../env";
 import { getPrice, reservationApi } from "../index";
 import { tzGroups, findTimeZone } from "./timezone-utils";
 import { showToast } from "../toast.js";
+import * as authService from "../authService.js";
 
 export const cartParts = persistentAtom("reservationCart", [], {
 	encode: JSON.stringify,
@@ -220,14 +221,11 @@ export const actions = {
 
 	async getGuestToken() {
 		const state = store.get();
-		if (state.guestToken) return state.guestToken;
-
-		const res = await reservationApi.getGuestToken();
-		if (res.success) {
-			store.setKey("guestToken", res.token);
-			return res.token;
+		const token = await authService.getGuestToken(state.guestToken);
+		if (token !== state.guestToken) {
+			store.setKey("guestToken", token);
 		}
-		throw new Error("Failed to get guest token");
+		return token;
 	},
 
 	getStepNumberByName(name) {
@@ -708,19 +706,11 @@ export const actions = {
 			}
 
 			const token = await this.getGuestToken();
-			const res = await reservationApi.updateProfilePhone({
-				token,
-				phoneNumber,
-			});
-
-			if (res.success) {
-				store.setKey("phoneSuccess", "Verification code sent successfully!");
-				store.setKey("codeSentAt", Date.now());
-			} else {
-				store.setKey("phoneError", res.error || "Failed to send verification code");
-			}
-
-			return res.success;
+			await authService.updateProfilePhone(token, phoneNumber);
+			
+			store.setKey("phoneSuccess", "Verification code sent successfully!");
+			store.setKey("codeSentAt", Date.now());
+			return true;
 		} catch (e) {
 			store.setKey("phoneError", e.message);
 			return false;
@@ -743,30 +733,21 @@ export const actions = {
 			}
 
 			const token = await this.getGuestToken();
-			const res = await reservationApi.verifyPhoneCode({
-				token,
-				phoneNumber,
-				code: verificationCode,
-			});
-
-			if (res.success) {
-				store.setKey("isPhoneVerified", true);
-				store.setKey("phoneSuccess", null); // Clear success message
-				store.setKey("verificationCode", ""); // Clear the code
-			} else {
-				// Provide user-friendly error messages
-				let errorMessage = "Invalid verification code";
-				if (res.error?.includes("expired")) {
-					errorMessage = "Verification code has expired. Please request a new one.";
-				} else if (res.error?.includes("incorrect") || res.error?.includes("invalid")) {
-					errorMessage = "Incorrect verification code. Please try again.";
-				}
-				store.setKey("verifyError", errorMessage);
-			}
-
-			return res.success;
+			await authService.verifyPhoneCode(token, phoneNumber, verificationCode);
+			
+			store.setKey("isPhoneVerified", true);
+			store.setKey("phoneSuccess", null);
+			store.setKey("verificationCode", "");
+			return true;
 		} catch (e) {
-			store.setKey("verifyError", "Failed to verify code. Please try again.");
+			// Provide user-friendly error messages
+			let errorMessage = "Invalid verification code";
+			if (e.message?.includes("expired")) {
+				errorMessage = "Verification code has expired. Please request a new one.";
+			} else if (e.message?.includes("incorrect") || e.message?.includes("invalid")) {
+				errorMessage = "Incorrect verification code. Please try again.";
+			}
+			store.setKey("verifyError", errorMessage);
 			return false;
 		} finally {
 			store.setKey("isVerifying", false);

@@ -4,6 +4,7 @@ import { persistentAtom } from "@nanostores/persistent";
 import { BUSINESS_ID, API_URL } from "../env";
 import { eshopApi, reservationApi } from "../index";
 import { showToast } from "../toast.js";
+import * as authService from "../authService.js";
 
 // Frontend cart items
 export const cartItems = persistentAtom("eshopCart", [], {
@@ -118,14 +119,11 @@ export const actions = {
 	// Get guest token
 	async getGuestToken() {
 		const state = store.get();
-		if (state.userToken) return state.userToken;
-		
-		const response = await reservationApi.getGuestToken();
-		if (response.success) {
-			store.setKey('userToken', response.token);
-			return response.token;
+		const token = await authService.getGuestToken(state.userToken);
+		if (token !== state.userToken) {
+			store.setKey('userToken', token);
 		}
-		throw new Error('Failed to get guest token');
+		return token;
 	},
 	
 	// Load business order blocks and configuration
@@ -273,23 +271,12 @@ export const actions = {
 			const token = await this.getGuestToken();
 			const phoneNumber = store.get().phoneNumber;
 			
-			if (!phoneNumber) {
-				store.setKey('phoneError', 'Phone number is required');
-				return false;
-			}
-			
-			const response = await reservationApi.updateProfilePhone({ token, phoneNumber });
-			
-			if (response.success) {
-				store.setKey('phoneError', null);
-				return true;
-			} else {
-				store.setKey('phoneError', response.error || 'Failed to send verification code');
-				return false;
-			}
+			await authService.updateProfilePhone(token, phoneNumber);
+			store.setKey('phoneError', null);
+			return true;
 		} catch (error) {
 			console.error('Phone update error:', error);
-			store.setKey('phoneError', error.message || 'Failed to send verification code');
+			store.setKey('phoneError', error.message);
 			return false;
 		}
 	},
@@ -300,23 +287,12 @@ export const actions = {
 			const phoneNumber = store.get().phoneNumber;
 			const verificationCode = store.get().verificationCode;
 			
-			if (!verificationCode) {
-				store.setKey('verifyError', 'Verification code is required');
-				return false;
-			}
-			
-			const response = await reservationApi.verifyPhoneCode({ token, phoneNumber, code: verificationCode });
-			
-			if (response.success) {
-				store.setKey('verifyError', null);
-				return true;
-			} else {
-				store.setKey('verifyError', response.error || 'Invalid verification code');
-				return false;
-			}
+			await authService.verifyPhoneCode(token, phoneNumber, verificationCode);
+			store.setKey('verifyError', null);
+			return true;
 		} catch (error) {
 			console.error('Phone verification error:', error);
-			store.setKey('verifyError', error.message || 'Invalid verification code');
+			store.setKey('verifyError', error.message);
 			return false;
 		}
 	},
