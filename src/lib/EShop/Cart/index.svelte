@@ -5,6 +5,7 @@
 	import { cartItems, cartTotal, cartItemCount, store, actions, initEshopStore } from '@lib/EShop/eshopStore.js';
 	import QuantitySelector from '@lib/EShop/QuantitySelector/index.svelte';
 	import AttributeBlocks from '@lib/EShop/AttributeBlocks/index.svelte';
+	import DynamicForm from '@lib/DynamicForm/index.svelte';
 	import Icon from '@iconify/svelte';
 	import { loadStripe } from '@stripe/stripe-js';
 
@@ -21,13 +22,7 @@
 	let paymentError = $state(null);
 	let orderBlocks = $state([]);
 	let businessObject = $state(null);
-	
-	// Form data variables
-	let email = $state('');
-	let fullName = $state('');
-	let phoneNumber = $state('');
-	let shippingAddress = $state('');
-	let specialInstructions = $state('');
+	let phoneStates = $state({});
 
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
@@ -81,16 +76,8 @@
 
 		try {
 			// 1. First, create order (for both cash and credit card)
-			const checkoutData = {
-				email,
-				fullName,
-				phoneNumber,
-				shippingAddress,
-				specialInstructions
-			};
-
 			console.log('Creating order...');
-			const checkoutResponse = await actions.checkout(checkoutData, selectedPaymentMethod);
+			const checkoutResponse = await actions.checkout(selectedPaymentMethod);
 			
 			if (!checkoutResponse.success) {
 				throw new Error(checkoutResponse.error || 'Failed to create order');
@@ -123,7 +110,7 @@
 						payment_method: {
 							card: cardNumberElement,
 							billing_details: {
-								name: fullName || ''
+								name: ''
 							}
 						}
 					}
@@ -165,6 +152,9 @@
 	}
 
 	onMount(async () => {
+		// Initialize the eshop store to load order blocks
+		initEshopStore();
+		
 		// Wait for store to load business configuration
 		const unsubscribe = store.subscribe(async (storeValue) => {
 			if (storeValue.loading) return; // Still loading
@@ -180,8 +170,8 @@
 			}
 			
 			// Initialize order blocks and business object
-			if (storeValue.checkoutBlocks) {
-				orderBlocks = storeValue.checkoutBlocks.map(block => ({
+			if (storeValue.orderBlocks) {
+				orderBlocks = storeValue.orderBlocks.map(block => ({
 					...block,
 					value: block.value && block.value.length > 0 ? block.value : 
 						(block.type === 'text' ? [{ en: '' }] : 
@@ -194,7 +184,7 @@
 			businessObject = {
 				id: BUSINESS_ID,
 				configs: {
-					checkoutBlocks: storeValue.checkoutBlocks || []
+					orderBlocks: storeValue.orderBlocks || []
 				}
 			};
 		});
@@ -204,10 +194,10 @@
 		};
 	});
 
-	// Update order blocks when checkout blocks change
+	// Update order blocks when order blocks change
 	$effect(() => {
-		if ($store.checkoutBlocks) {
-			orderBlocks = $store.checkoutBlocks.map(block => ({
+		if ($store.orderBlocks) {
+			orderBlocks = $store.orderBlocks.map(block => ({
 				...block,
 				value: block.value && block.value.length > 0 ? block.value : 
 					(block.type === 'text' ? [{ en: '' }] : 
@@ -215,7 +205,7 @@
 					 block.type === 'number' ? [0] : [''])
 			}));
 			if (businessObject) {
-				businessObject.configs.checkoutBlocks = $store.checkoutBlocks;
+				businessObject.configs.orderBlocks = $store.orderBlocks;
 			}
 		}
 	});
@@ -293,6 +283,50 @@
 			setupCardElement();
 		}
 	});
+
+	async function handlePhoneSendCode(blockId, phone) {
+		phoneStates[blockId] = { ...phoneStates[blockId], isLoading: true, error: null };
+		store.setKey('phoneNumber', phone);
+		
+		const result = await actions.updateProfilePhone();
+		
+		if (result) {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isLoading: false, 
+				success: "Verification code sent successfully!",
+				error: null 
+			};
+		} else {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isLoading: false, 
+				error: $store.phoneError || "Failed to send verification code" 
+			};
+		}
+	}
+
+	async function handlePhoneVerifyCode(blockId, code) {
+		phoneStates[blockId] = { ...phoneStates[blockId], isVerifying: true, verifyError: null };
+		store.setKey('verificationCode', code);
+		
+		const result = await actions.verifyPhoneCode();
+		
+		if (result) {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isVerifying: false, 
+				isVerified: true,
+				verifyError: null 
+			};
+		} else {
+			phoneStates[blockId] = { 
+				...phoneStates[blockId], 
+				isVerifying: false, 
+				verifyError: $store.verifyError || "Invalid verification code" 
+			};
+		}
+	}
 
 	// Auto-select first available payment method and validate selection
 	$effect(() => {
@@ -421,70 +455,18 @@
 						handleCheckoutComplete();
 					}} class="space-y-6">
 						
-						<!-- Customer Information -->
-						<div>
-							<label class="block text-sm font-medium text-card-foreground mb-2">
-								Email Address <span class="text-destructive">*</span>
-							</label>
-							<input 
-								type="email" 
-								bind:value={email}
-								placeholder="your@email.com"
-								required
-								class="w-full p-3 bg-muted border-0 rounded-lg focus:bg-background transition-colors text-foreground placeholder-gray-500"
-							/>
-						</div>
-						
-						<div>
-							<label class="block text-sm font-medium text-card-foreground mb-2">
-								Full Name <span class="text-destructive">*</span>
-							</label>
-							<input 
-								type="text" 
-								bind:value={fullName}
-								placeholder="John Doe"
-								required
-								class="w-full p-3 bg-muted border-0 rounded-lg focus:bg-background transition-colors text-foreground placeholder-gray-500"
-							/>
-						</div>
-						
-						<div>
-							<label class="block text-sm font-medium text-card-foreground mb-2">
-								Phone Number <span class="text-destructive">*</span>
-							</label>
-							<input 
-								type="text" 
-								bind:value={phoneNumber}
-								placeholder="+387 XX XXX XXX"
-								required
-								class="w-full p-3 bg-muted border-0 rounded-lg focus:bg-background transition-colors text-foreground placeholder-gray-500"
-							/>
-						</div>
-						
-						<div>
-							<label class="block text-sm font-medium text-card-foreground mb-2">
-								Shipping Address <span class="text-destructive">*</span>
-							</label>
-							<input 
-								type="text" 
-								bind:value={shippingAddress}
-								placeholder="Street, City, Postal Code"
-								required
-								class="w-full p-3 bg-muted border-0 rounded-lg focus:bg-background transition-colors text-foreground placeholder-gray-500"
-							/>
-						</div>
-						
-						<div>
-							<label class="block text-sm font-medium text-card-foreground mb-2">
-								Special Instructions
-							</label>
-							<input 
-								type="text" 
-								bind:value={specialInstructions}
-								placeholder="Any special delivery instructions..."
-								class="w-full p-3 bg-muted border-0 rounded-lg focus:bg-background transition-colors text-foreground placeholder-gray-500"
-							/>
-						</div>
+						<!-- Dynamic Customer Information Form -->
+						<DynamicForm 
+							blocks={$store.orderBlocks} 
+							onUpdate={(idx, value) => {
+								const updatedBlocks = [...$store.orderBlocks];
+								updatedBlocks[idx] = { ...updatedBlocks[idx], value: Array.isArray(value) ? value : [value] };
+								store.setKey('orderBlocks', updatedBlocks);
+							}}
+							onPhoneSendCode={handlePhoneSendCode}
+							onPhoneVerifyCode={handlePhoneVerifyCode}
+							phoneStates={phoneStates}
+						/>
 
 						<!-- Payment Method -->
 						<div>

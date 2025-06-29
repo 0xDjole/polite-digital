@@ -502,13 +502,13 @@ export const eshopApi = {
 	},
 
 	// Checkout (direct from cart items, no backend cart)
-	checkout: async ({ token, businessId, items, paymentMethod, orderInfoBlocks, paymentIntentId = null }) => {
+	checkout: async ({ token, businessId, items, paymentMethod, blocks, paymentIntentId = null }) => {
 		try {
 			const payload = {
 				businessId,
 				items,
 				paymentMethod,
-				orderInfoBlocks,
+				blocks,
 				...(paymentIntentId && { paymentIntentId }),
 			};
 
@@ -734,7 +734,7 @@ export const reservationApi = {
 		try {
 			const payload = {
 				businessId,
-				info: [],
+				blocks: [],
 				parts: parts.map((p) => ({
 					serviceId: p.serviceId,
 					from: p.from,

@@ -643,7 +643,6 @@ export const actions = {
 			reservationMethod: state.selectedMethod,
 			providerId: state.selectedProvider?.id,
 			blocks,
-			isPhoneRequired: state.service.reservationConfigs.isPhoneRequired,
 		};
 
 		const newParts = [...state.parts, newPart];

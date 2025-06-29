@@ -14,7 +14,7 @@ export const cartItems = persistentAtom("eshopCart", [], {
 // Store for business config and checkout state
 export const store = deepMap({
 	businessId: BUSINESS_ID,
-	checkoutBlocks: [], // Business checkout form blocks
+	orderBlocks: [], // Business order form blocks
 	service: { // Mock service object for DynamicForm compatibility
 		reservationBlocks: []
 	},
@@ -22,6 +22,11 @@ export const store = deepMap({
 	processingCheckout: false,
 	loading: false,
 	error: null,
+	// Phone verification
+	phoneNumber: '',
+	phoneError: null,
+	verificationCode: '',
+	verifyError: null,
 	// Stripe configuration
 	stripeConfig: {
 		publicKey: null,
@@ -123,8 +128,8 @@ export const actions = {
 		throw new Error('Failed to get guest token');
 	},
 	
-	// Load business checkout blocks and configuration
-	async loadCheckoutBlocks() {
+	// Load business order blocks and configuration
+	async loadOrderBlocks() {
 		try {
 			store.setKey('loading', true);
 			store.setKey('error', null);
@@ -139,10 +144,10 @@ export const actions = {
 			
 			if (response.ok) {
 				const business = await response.json();
-				const checkoutBlocks = business.configs?.checkoutBlocks || [];
-				store.setKey('checkoutBlocks', checkoutBlocks);
-				// Also set for DynamicForm compatibility
-				store.setKey('service', { reservationBlocks: checkoutBlocks });
+				const orderBlocks = business.configs?.orderBlocks || [];
+				store.setKey('orderBlocks', orderBlocks);
+				// Set for DynamicForm compatibility
+				store.setKey('service', { reservationBlocks: orderBlocks });
 				
 				// Load allowed payment methods
 				const allowedPaymentMethods = business.configs?.allowedPaymentMethods || ['Cash'];
@@ -180,13 +185,13 @@ export const actions = {
 						value: null
 					}
 				];
-				store.setKey('checkoutBlocks', defaultBlocks);
-				// Also set for DynamicForm compatibility
+				store.setKey('orderBlocks', defaultBlocks);
+				// Set for DynamicForm compatibility
 				store.setKey('service', { reservationBlocks: defaultBlocks });
 			}
 		} catch (err) {
-			console.error('Error loading checkout blocks:', err);
-			store.setKey('error', 'Failed to load checkout configuration');
+			console.error('Error loading order blocks:', err);
+			store.setKey('error', 'Failed to load order configuration');
 		} finally {
 			store.setKey('loading', false);
 		}
@@ -202,30 +207,13 @@ export const actions = {
 		}));
 	},
 	
-	// Prepare order info blocks from form data
-	prepareOrderInfoBlocks(formData) {
-		const blocks = store.get().checkoutBlocks;
-		
-		return blocks.map(block => {
-			let value = formData[block.key] || '';
-			
-			// For text blocks, ensure value is localized object with "en" key
-			if (block.type === 'text' && typeof value === 'string') {
-				value = { en: value };
-			}
-			
-			return {
-				id: block.id,
-				key: block.key,
-				type: block.type,
-				value: [value],
-				properties: block.properties
-			};
-		});
+	// Get order info blocks (they already have values from DynamicForm)
+	getOrderInfoBlocks() {
+		return store.get().orderBlocks || [];
 	},
 	
 	// Process checkout
-	async checkout(formData, paymentMethod = 'Cash') {
+	async checkout(paymentMethod = 'Cash') {
 		const items = cartItems.get();
 		if (!items.length) {
 			showToast('Cart is empty', 'error', 3000);
@@ -238,14 +226,22 @@ export const actions = {
 			
 			const token = await this.getGuestToken();
 			const orderItems = this.prepareOrderItems();
-			const orderInfoBlocks = this.prepareOrderInfoBlocks(formData);
+			const blocks = this.getOrderInfoBlocks();
+			
+			console.log('Checkout payload:', {
+				token,
+				businessId: BUSINESS_ID,
+				items: orderItems,
+				paymentMethod,
+				blocks,
+			});
 			
 			const response = await eshopApi.checkout({
 				token,
 				businessId: BUSINESS_ID,
 				items: orderItems,
 				paymentMethod,
-				orderInfoBlocks,
+				blocks,
 			});
 			
 			if (response.success) {
@@ -268,6 +264,60 @@ export const actions = {
 			return { success: false, error: errorMessage };
 		} finally {
 			store.setKey('processingCheckout', false);
+		}
+	},
+	
+	// Phone verification for eshop
+	async updateProfilePhone() {
+		try {
+			const token = await this.getGuestToken();
+			const phoneNumber = store.get().phoneNumber;
+			
+			if (!phoneNumber) {
+				store.setKey('phoneError', 'Phone number is required');
+				return false;
+			}
+			
+			const response = await reservationApi.updateProfilePhone({ token, phoneNumber });
+			
+			if (response.success) {
+				store.setKey('phoneError', null);
+				return true;
+			} else {
+				store.setKey('phoneError', response.error || 'Failed to send verification code');
+				return false;
+			}
+		} catch (error) {
+			console.error('Phone update error:', error);
+			store.setKey('phoneError', error.message || 'Failed to send verification code');
+			return false;
+		}
+	},
+	
+	async verifyPhoneCode() {
+		try {
+			const token = await this.getGuestToken();
+			const phoneNumber = store.get().phoneNumber;
+			const verificationCode = store.get().verificationCode;
+			
+			if (!verificationCode) {
+				store.setKey('verifyError', 'Verification code is required');
+				return false;
+			}
+			
+			const response = await reservationApi.verifyPhoneCode({ token, phoneNumber, code: verificationCode });
+			
+			if (response.success) {
+				store.setKey('verifyError', null);
+				return true;
+			} else {
+				store.setKey('verifyError', response.error || 'Invalid verification code');
+				return false;
+			}
+		} catch (error) {
+			console.error('Phone verification error:', error);
+			store.setKey('verifyError', error.message || 'Invalid verification code');
+			return false;
 		}
 	},
 	
@@ -300,8 +350,8 @@ export const actions = {
 
 // Initialize the store
 export function initEshopStore() {
-	// Load checkout blocks on initialization
-	actions.loadCheckoutBlocks();
+	// Load order blocks on initialization
+	actions.loadOrderBlocks();
 }
 
 export default { store, actions, cartItems, cartTotal, cartItemCount, initEshopStore };

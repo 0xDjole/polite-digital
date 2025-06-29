@@ -10,7 +10,12 @@
 	});
 
 	const requiresPhoneVerification = $derived($store.parts?.some(part => {
-		return part.isPhoneRequired === true;
+		// Check if any part has a phone_number block with min_length > 0 (required)
+		return part.blocks?.some(block => 
+			block.properties?.variant === 'phone_number' &&
+			block.properties?.min_length && 
+			block.properties.min_length > 0
+		);
 	}) ?? false);
 </script>
 
