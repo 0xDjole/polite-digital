@@ -11,7 +11,7 @@
 
 	let showCheckoutSection = $state(false);
 	let checkoutFormData = $state({});
-	let selectedPaymentMethod = $state('Cash');
+	let selectedPaymentMethod = $state('CASH');
 	let stripe = $state(null);
 	let elements = $state(null);
 	let cardNumberElement = $state(null);
@@ -64,7 +64,7 @@
 	function handleCheckoutCancel() {
 		showCheckoutSection = false;
 		checkoutFormData = {};
-		selectedPaymentMethod = 'Cash';
+		selectedPaymentMethod = 'CASH';
 		paymentError = null;
 	}
 
@@ -84,7 +84,7 @@
 			const { orderId, clientSecret } = checkoutResponse.data;
 
 			// 2. For cash payments, we're done
-			if (selectedPaymentMethod === 'Cash') {
+			if (selectedPaymentMethod === 'CASH') {
 				showToast('Order placed successfully! Pay on delivery.', 'success', 6000);
 				showCheckoutSection = false;
 				actions.clearCart();
@@ -92,7 +92,7 @@
 			}
 
 			// 3. For credit card, confirm payment
-			if (selectedPaymentMethod === 'CreditCard') {
+			if (selectedPaymentMethod === 'CREDIT_CARD') {
 				if (!stripe || !cardNumberElement) {
 					throw new Error('Payment system not initialized');
 				}
@@ -128,7 +128,7 @@
 			// Success - clean up and reset
 			showCheckoutSection = false;
 			checkoutFormData = {};
-			selectedPaymentMethod = 'Cash';
+			selectedPaymentMethod = 'CASH';
 			actions.clearCart();
 			
 			if (individualElementsMounted) {
@@ -265,7 +265,7 @@
 	}
 
 	$effect(() => {
-		if (selectedPaymentMethod !== 'CreditCard' && individualElementsMounted) {
+		if (selectedPaymentMethod !== 'CREDIT_CARD' && individualElementsMounted) {
 			if (cardNumberElement) cardNumberElement.destroy();
 			if (cardExpiryElement) cardExpiryElement.destroy();
 			if (cardCvcElement) cardCvcElement.destroy();
@@ -277,7 +277,7 @@
 	});
 
 	$effect(() => {
-		if (showCheckoutSection && selectedPaymentMethod === 'CreditCard' && stripe && !individualElementsMounted) {
+		if (showCheckoutSection && selectedPaymentMethod === 'CREDIT_CARD' && stripe && !individualElementsMounted) {
 			setupCardElement();
 		}
 	});
@@ -287,24 +287,24 @@
 		const allowedMethods = $store.allowedPaymentMethods || ['CASH'];
 		
 		// If current selection is not allowed, pick the first allowed method
-		if (selectedPaymentMethod === 'Cash' && !allowedMethods.includes('CASH')) {
+		if (selectedPaymentMethod === 'CASH' && !allowedMethods.includes('CASH')) {
 			if (allowedMethods.includes('CREDIT_CARD') && $store.stripeConfig.enabled) {
-				selectedPaymentMethod = 'CreditCard';
+				selectedPaymentMethod = 'CREDIT_CARD';
 			}
-		} else if (selectedPaymentMethod === 'CreditCard' && (!allowedMethods.includes('CREDIT_CARD') || !$store.stripeConfig.enabled)) {
+		} else if (selectedPaymentMethod === 'CREDIT_CARD' && (!allowedMethods.includes('CREDIT_CARD') || !$store.stripeConfig.enabled)) {
 			if (allowedMethods.includes('CASH')) {
-				selectedPaymentMethod = 'Cash';
+				selectedPaymentMethod = 'CASH';
 			}
 		}
 		
 		// If no selection or invalid selection, default to first available
 		if (!selectedPaymentMethod || 
-			(selectedPaymentMethod === 'Cash' && !allowedMethods.includes('CASH')) ||
-			(selectedPaymentMethod === 'CreditCard' && (!allowedMethods.includes('CREDIT_CARD') || !$store.stripeConfig.enabled))) {
+			(selectedPaymentMethod === 'CASH' && !allowedMethods.includes('CASH')) ||
+			(selectedPaymentMethod === 'CREDIT_CARD' && (!allowedMethods.includes('CREDIT_CARD') || !$store.stripeConfig.enabled))) {
 			if (allowedMethods.includes('CASH')) {
-				selectedPaymentMethod = 'Cash';
+				selectedPaymentMethod = 'CASH';
 			} else if (allowedMethods.includes('CREDIT_CARD') && $store.stripeConfig.enabled) {
-				selectedPaymentMethod = 'CreditCard';
+				selectedPaymentMethod = 'CREDIT_CARD';
 			}
 		}
 	});
@@ -431,15 +431,15 @@
 									<button 
 										type="button"
 										class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
-										class:border-primary={selectedPaymentMethod === 'Cash'}
-										class:bg-primary={selectedPaymentMethod === 'Cash'}
-										class:shadow-sm={selectedPaymentMethod === 'Cash'}
-										class:border-transparent={selectedPaymentMethod !== 'Cash'}
-										class:bg-muted={selectedPaymentMethod !== 'Cash'}
-										class:hover:bg-muted={selectedPaymentMethod !== 'Cash'}
-										on:click={() => selectedPaymentMethod = 'Cash'}
+										class:border-primary={selectedPaymentMethod === 'CASH'}
+										class:bg-primary={selectedPaymentMethod === 'CASH'}
+										class:shadow-sm={selectedPaymentMethod === 'CASH'}
+										class:border-transparent={selectedPaymentMethod !== 'CASH'}
+										class:bg-muted={selectedPaymentMethod !== 'CASH'}
+										class:hover:bg-muted={selectedPaymentMethod !== 'CASH'}
+										on:click={() => selectedPaymentMethod = 'CASH'}
 									>
-										{#if selectedPaymentMethod === 'Cash'}
+										{#if selectedPaymentMethod === 'CASH'}
 											<div class="absolute top-2 right-2">
 												<Icon icon="mdi:check-circle" class="w-5 h-5 text-primary" />
 											</div>
@@ -449,8 +449,8 @@
 												<Icon icon="mdi:cash" class="w-6 h-6 text-primary" />
 											</div>
 											<div class="text-left">
-												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'Cash'} class:text-card-foreground={selectedPaymentMethod !== 'Cash'}>Cash Payment</div>
-												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'Cash'} class:text-muted-foreground={selectedPaymentMethod !== 'Cash'}>Pay when you receive</div>
+												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'CASH'} class:text-card-foreground={selectedPaymentMethod !== 'CASH'}>Cash Payment</div>
+												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'CASH'} class:text-muted-foreground={selectedPaymentMethod !== 'CASH'}>Pay when you receive</div>
 											</div>
 										</div>
 									</button>
@@ -460,15 +460,15 @@
 									<button 
 										type="button"
 										class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
-										class:border-primary={selectedPaymentMethod === 'CreditCard'}
-										class:bg-primary={selectedPaymentMethod === 'CreditCard'}
-										class:shadow-sm={selectedPaymentMethod === 'CreditCard'}
-										class:border-transparent={selectedPaymentMethod !== 'CreditCard'}
-										class:bg-muted={selectedPaymentMethod !== 'CreditCard'}
-										class:hover:bg-muted={selectedPaymentMethod !== 'CreditCard'}
-										on:click={() => selectedPaymentMethod = 'CreditCard'}
+										class:border-primary={selectedPaymentMethod === 'CREDIT_CARD'}
+										class:bg-primary={selectedPaymentMethod === 'CREDIT_CARD'}
+										class:shadow-sm={selectedPaymentMethod === 'CREDIT_CARD'}
+										class:border-transparent={selectedPaymentMethod !== 'CREDIT_CARD'}
+										class:bg-muted={selectedPaymentMethod !== 'CREDIT_CARD'}
+										class:hover:bg-muted={selectedPaymentMethod !== 'CREDIT_CARD'}
+										on:click={() => selectedPaymentMethod = 'CREDIT_CARD'}
 									>
-										{#if selectedPaymentMethod === 'CreditCard'}
+										{#if selectedPaymentMethod === 'CREDIT_CARD'}
 											<div class="absolute top-2 right-2">
 												<Icon icon="mdi:check-circle" class="w-5 h-5 text-primary" />
 											</div>
@@ -478,8 +478,8 @@
 												<Icon icon="mdi:credit-card" class="w-6 h-6 text-primary" />
 											</div>
 											<div class="text-left">
-												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'CreditCard'} class:text-card-foreground={selectedPaymentMethod !== 'CreditCard'}>Card Payment</div>
-												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'CreditCard'} class:text-muted-foreground={selectedPaymentMethod !== 'CreditCard'}>Secure online payment</div>
+												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'CREDIT_CARD'} class:text-card-foreground={selectedPaymentMethod !== 'CREDIT_CARD'}>Card Payment</div>
+												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'CREDIT_CARD'} class:text-muted-foreground={selectedPaymentMethod !== 'CREDIT_CARD'}>Secure online payment</div>
 											</div>
 										</div>
 									</button>
@@ -488,7 +488,7 @@
 						</div>
 
 						<!-- Credit Card Details -->
-						{#if selectedPaymentMethod === 'CreditCard'}
+						{#if selectedPaymentMethod === 'CREDIT_CARD'}
 							<div class="bg-muted rounded-lg border p-6">
 								<div class="flex items-center gap-2 mb-4">
 									<Icon icon="mdi:credit-card" class="w-5 h-5 text-primary" />
@@ -568,7 +568,7 @@
 									<Icon icon="mdi:loading" class="h-4 w-4 animate-spin" />
 									Processing...
 								{:else}
-									<Icon icon={selectedPaymentMethod === 'CreditCard' ? 'mdi:credit-card' : 'mdi:cash'} class="h-4 w-4" />
+									<Icon icon={selectedPaymentMethod === 'CREDIT_CARD' ? 'mdi:credit-card' : 'mdi:cash'} class="h-4 w-4" />
 									Place Order • {formatPrice($cartTotal)}
 								{/if}
 							</button>
