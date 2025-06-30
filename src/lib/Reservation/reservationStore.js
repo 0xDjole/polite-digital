@@ -59,6 +59,7 @@ export const store = deepMap({
 	guestToken: null,
 	service: null,
 	business: null,
+	currency: 'USD', // Business currency
 	reservationBlocks: [], // Business-level reservation blocks for cart
 	apiUrl: API_URL,
 	businessId: BUSINESS_ID,
@@ -368,6 +369,7 @@ export const actions = {
 			if (result.success) {
 				const business = result.data;
 				store.setKey('business', business);
+				store.setKey('currency', business.configs?.currency || 'USD');
 				store.setKey('reservationBlocks', business.configs?.reservationBlocks || []);
 			}
 		} catch (err) {

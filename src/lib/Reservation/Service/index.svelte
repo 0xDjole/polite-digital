@@ -16,8 +16,6 @@
 
 	export let service;
 
-	let businessCurrency = 'USD';
-
 	function getPrice(priceOption, currency = 'USD') {
 		if (!priceOption) return "";
 		const locale = getLocale();
@@ -35,26 +33,13 @@
 		}
 	}
 
-	async function loadBusinessCurrency() {
-		try {
-			const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
-			const API_URL = import.meta.env.PUBLIC_API_URL;
-			const businessRes = await fetch(
-				`${API_URL}/v1/businesses/${BUSINESS_ID}`
-			);
-			if (businessRes.ok) {
-				const business = await businessRes.json();
-				businessCurrency = business.configs?.currency || 'USD';
-			}
-		} catch (e) {
-			console.error('Error loading business currency:', e);
-		}
-	}
+	// Get currency from reservation store
+	$: businessCurrency = $store.currency;
 
 	onMount(() => {
 		initReservationStore();
 		actions.setService(service);
-		loadBusinessCurrency();
+		actions.loadBusinessConfig();
 	});
 
 	const locale = getLocale();

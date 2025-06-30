@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getLocale, getRelativeLocaleUrl } from "@lib/i18n";
+	import { store as reservationStore, actions as reservationActions, initReservationStore } from '../reservationStore.js';
 
 	const API_URL = import.meta.env.PUBLIC_API_URL;
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
@@ -10,7 +11,9 @@
 	let services = [];
 	let loading = true;
 	let error = null;
-	let businessCurrency = 'USD';
+
+	// Get currency from reservation store
+	$: businessCurrency = $reservationStore.currency;
 
 	function getGalleryThumbnail(gallery) {
 		if (!gallery?.length) return null;
@@ -49,15 +52,6 @@
 			
 			const { items } = await res.json();
 			services = items;
-			
-			// Load business configuration to get currency
-			const businessRes = await fetch(
-				`${API_URL}/v1/businesses/${BUSINESS_ID}`
-			);
-			if (businessRes.ok) {
-				const business = await businessRes.json();
-				businessCurrency = business.configs?.currency || 'USD';
-			}
 		} catch (e) {
 			error = e.message;
 			console.error('Error loading services:', e);
@@ -67,6 +61,9 @@
 	}
 
 	onMount(() => {
+		// Initialize reservation store to load business config
+		initReservationStore();
+		reservationActions.loadBusinessConfig();
 		loadServices();
 	});
 </script>
