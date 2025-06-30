@@ -397,30 +397,30 @@ export function thumbnailUrl(service) {
 }
 
 // format price - handles both complex price options and simple price objects
-export function getPrice(priceOption, locale = 'en') {
+export function getPrice(priceOption, currency, locale = 'en') {
 	if (!priceOption) return "";
 	
-	// Handle simple price objects (from eshop)
-	if (priceOption.basePrice && priceOption.currency && !priceOption.type) {
-		return `${priceOption.basePrice} ${priceOption.currency}`;
+	// Handle simple price objects (from eshop) - now currency comes from business
+	if (priceOption.basePrice && !priceOption.type) {
+		return `${priceOption.basePrice} ${currency}`;
 	}
 	
-	// Handle complex price options (from services)
+	// Handle complex price options (from services) - now currency comes from business
 	switch (priceOption.type) {
 		case "standard":
-			return `${priceOption.basePrice}${priceOption.currency}`;
+			return `${priceOption.basePrice} ${currency}`;
 		case "custom":
 			return priceOption.customValue[locale] || priceOption.customValue.en;
 		case "complex":
 			const val = priceOption.customValue[locale] || priceOption.customValue.en;
-			return `${priceOption.basePrice}${priceOption.currency} + ${val}`;
+			return `${priceOption.basePrice} ${currency} + ${val}`;
 		default:
 			return "";
 	}
 }
 
 // Enhanced price formatter with currency symbols and rounding
-export function formatPrice(priceOption, options = {}) {
+export function formatPrice(priceOption, currency, options = {}) {
 	if (!priceOption) return '';
 	
 	const { 
@@ -429,16 +429,15 @@ export function formatPrice(priceOption, options = {}) {
 		locale = 'en' 
 	} = options;
 	
-	let price, currency;
+	let price;
 	
 	// Handle simple price objects (from eshop)
-	if (priceOption.basePrice && priceOption.currency && !priceOption.type) {
+	if (priceOption.basePrice && !priceOption.type) {
 		price = Number(priceOption.basePrice);
-		currency = priceOption.currency;
 	}
 	// Handle complex price options (from services) - use getPrice for these
 	else if (priceOption.type) {
-		return getPrice(priceOption, locale);
+		return getPrice(priceOption, currency, locale);
 	}
 	else {
 		return '';

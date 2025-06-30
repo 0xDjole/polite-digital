@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { getPrice, getGalleryThumbnail } from '../../index';
+	import { getGalleryThumbnail } from '../../index';
 	import { store, actions, initReservationStore, canProceed, currentStepName } from '../reservationStore.js';
  	import { t, getLocale, getRelativeLocaleUrl } from '@lib/i18n/index';
 
@@ -16,9 +16,45 @@
 
 	export let service;
 
+	let businessCurrency = 'USD';
+
+	function getPrice(priceOption, currency = 'USD') {
+		if (!priceOption) return "";
+		const locale = getLocale();
+		switch (priceOption.type) {
+			case "standard":
+				return `${priceOption.basePrice} ${currency}`;
+			case "custom":
+				return priceOption.customValue[locale] || priceOption.customValue.en;
+			case "complex": {
+				const val = priceOption.customValue[locale] || priceOption.customValue.en;
+				return `${priceOption.basePrice} ${currency} + ${val}`;
+			}
+			default:
+				return "";
+		}
+	}
+
+	async function loadBusinessCurrency() {
+		try {
+			const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
+			const API_URL = import.meta.env.PUBLIC_API_URL;
+			const businessRes = await fetch(
+				`${API_URL}/v1/businesses/${BUSINESS_ID}`
+			);
+			if (businessRes.ok) {
+				const business = await businessRes.json();
+				businessCurrency = business.configs?.currency || 'USD';
+			}
+		} catch (e) {
+			console.error('Error loading business currency:', e);
+		}
+	}
+
 	onMount(() => {
 		initReservationStore();
 		actions.setService(service);
+		loadBusinessCurrency();
 	});
 
 	const locale = getLocale();
@@ -52,7 +88,7 @@
 			</div>
 
 			<div class="bg-base-100/10 rounded-xl px-6 py-3 backdrop-blur-md">
-				<p class="font-mono text-3xl font-bold">{getPrice(service.priceOption)}</p>
+				<p class="font-mono text-3xl font-bold">{getPrice(service.priceOption, businessCurrency)}</p>
 			</div>
 		</div>
 	</div>

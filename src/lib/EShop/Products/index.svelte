@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { eshopApi, getPrice, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
+	import { store } from '../eshopStore.js';
 
 
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
@@ -47,7 +48,9 @@
 
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
-		return `${priceOption.basePrice} ${priceOption.currency}`;
+		// Get currency from business store
+		const currency = $store.currency || 'USD';
+		return `${priceOption.basePrice} ${currency}`;
 	}
 
 	onMount(() => {

@@ -15,6 +15,7 @@ export const cartItems = persistentAtom("eshopCart", [], {
 // Store for business config and checkout state
 export const store = deepMap({
 	businessId: BUSINESS_ID,
+	currency: "USD", // Business currency
 	orderBlocks: [], // Business order form blocks
 	service: {
 		// Mock service object for DynamicForm compatibility
@@ -39,18 +40,15 @@ export const store = deepMap({
 });
 
 // Computed values
-export const cartTotal = computed(cartItems, (items) => {
-	if (!items || items.length === 0) return { basePrice: 0, currency: "USD" };
+export const cartTotal = computed([cartItems, store], (items, storeData) => {
+	if (!items || items.length === 0) return { basePrice: 0, currency: storeData.currency };
 
 	const total = items.reduce((sum, item) => {
 		const itemTotal = item.price.basePrice * item.quantity;
 		return sum + itemTotal;
 	}, 0);
 
-	// Use currency from first item (assuming all items use same currency)
-	const currency = items[0]?.price?.currency || "USD";
-
-	return { basePrice: total, currency };
+	return { basePrice: total, currency: storeData.currency };
 });
 
 export const cartItemCount = computed(cartItems, (items) => {
@@ -143,6 +141,10 @@ export const actions = {
 				// Load allowed payment methods
 				const allowedPaymentMethods = business.configs?.allowedPaymentMethods || ["CASH"];
 				store.setKey("allowedPaymentMethods", allowedPaymentMethods);
+
+				// Load business currency
+				const currency = business.configs?.currency || "USD";
+				store.setKey("currency", currency);
 
 				// Load Stripe configuration
 				const stripeConfig = {
@@ -292,7 +294,8 @@ export const actions = {
 
 	// Format price for display (using shared utility)
 	formatPrice(priceOption) {
-		return formatPrice(priceOption);
+		const currency = store.get().currency;
+		return formatPrice(priceOption, currency);
 	},
 };
 

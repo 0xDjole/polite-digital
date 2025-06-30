@@ -10,6 +10,7 @@
 	let services = [];
 	let loading = true;
 	let error = null;
+	let businessCurrency = 'USD';
 
 	function getGalleryThumbnail(gallery) {
 		if (!gallery?.length) return null;
@@ -18,16 +19,16 @@
 		return res?.url || null;
 	}
 
-	function getPrice(priceOption) {
+	function getPrice(priceOption, currency = 'USD') {
 		if (!priceOption) return "";
 		switch (priceOption.type) {
 			case "standard":
-				return `${priceOption.basePrice}${priceOption.currency}`;
+				return `${priceOption.basePrice} ${currency}`;
 			case "custom":
 				return priceOption.customValue[locale] || priceOption.customValue.en;
 			case "complex": {
 				const val = priceOption.customValue[locale] || priceOption.customValue.en;
-				return `${priceOption.basePrice}${priceOption.currency} + ${val}`;
+				return `${priceOption.basePrice} ${currency} + ${val}`;
 			}
 			default:
 				return "";
@@ -48,6 +49,15 @@
 			
 			const { items } = await res.json();
 			services = items;
+			
+			// Load business configuration to get currency
+			const businessRes = await fetch(
+				`${API_URL}/v1/businesses/${BUSINESS_ID}`
+			);
+			if (businessRes.ok) {
+				const business = await businessRes.json();
+				businessCurrency = business.configs?.currency || 'USD';
+			}
 		} catch (e) {
 			error = e.message;
 			console.error('Error loading services:', e);
@@ -142,7 +152,7 @@
 						{service.description?.[locale] || service.description?.en || ""}
 					</p>
 					<p class="text-primary-600 font-medium">
-						{getPrice(service.priceOption)}
+						{getPrice(service.priceOption, businessCurrency)}
 					</p>
 				</div>
 			</a>

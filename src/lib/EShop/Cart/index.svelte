@@ -35,7 +35,7 @@
 
 	// Use shared formatPrice function
 	function formatPrice(priceOption) {
-		return sharedFormatPrice(priceOption);
+		return sharedFormatPrice(priceOption, $store.currency);
 	}
 
 	function handleQuantityUpdate(itemId, newQuantity) {
