@@ -67,6 +67,13 @@ export const store = deepMap({
 	timezone: findTimeZone(tzGroups),
 	tzGroups,
 	parts: [],
+
+	// Payment configuration
+	allowedPaymentMethods: ["CASH"], // Default to cash only
+	stripeConfig: {
+		publicKey: null,
+		enabled: false,
+	},
 });
 
 export const currentStepName = computed(store, (state) => {
@@ -371,6 +378,17 @@ export const actions = {
 				store.setKey('business', business);
 				store.setKey('currency', business.configs?.currency || 'USD');
 				store.setKey('reservationBlocks', business.configs?.reservationBlocks || []);
+
+				// Load allowed payment methods
+				const allowedPaymentMethods = business.configs?.allowedPaymentMethods || ["CASH"];
+				store.setKey('allowedPaymentMethods', allowedPaymentMethods);
+
+				// Load Stripe configuration
+				const stripeConfig = {
+					publicKey: business.configs?.stripePublicKey || null,
+					enabled: allowedPaymentMethods.includes("CREDIT_CARD") && !!business.configs?.stripePublicKey,
+				};
+				store.setKey('stripeConfig', stripeConfig);
 			}
 		} catch (err) {
 			console.error('Error loading business config:', err);
@@ -751,9 +769,9 @@ export const actions = {
 	},
 
 	// Checkout
-	async checkout() {
+	async checkout(paymentMethod = "CASH") {
 		const state = store.get();
-		if (state.loading || !state.parts.length) return;
+		if (state.loading || !state.parts.length) return { success: false, error: "No parts in cart" };
 
 		store.setKey("loading", true);
 
@@ -764,19 +782,24 @@ export const actions = {
 				businessId: state.businessId,
 				blocks: state.reservationBlocks || [], // Business-level blocks for cart
 				parts: state.parts,
+				paymentMethod, // Add payment method support
 			});
 
 			if (result.success) {
-				showToast("Reservation created successfully!", "success", 6000);
-				const emptyCart = [];
-				store.setKey("parts", emptyCart);
-				cartParts.set(emptyCart);
+				// Don't clear cart or show toast here - let calling code handle it
+				return {
+					success: true,
+					data: {
+						reservationId: result.data?.reservationId,
+						clientSecret: result.data?.clientSecret, // For Stripe payments
+					},
+				};
 			} else {
 				throw new Error(result.error);
 			}
 		} catch (e) {
-			console.error(e);
-			showToast("Booking failed: " + e.message, "error", 8000);
+			console.error("Reservation checkout error:", e);
+			return { success: false, error: e.message };
 		} finally {
 			store.setKey("loading", false);
 		}
