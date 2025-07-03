@@ -8,20 +8,16 @@
 	import DynamicForm from '@lib/DynamicForm/index.svelte';
 	import Icon from '@iconify/svelte';
 	import { loadStripe } from '@stripe/stripe-js';
+	import PaymentForm from '@lib/payment/PaymentForm.svelte';
 
 	let showCheckoutSection = $state(false);
 	let checkoutFormData = $state({});
 	let selectedPaymentMethod = $state('CASH');
-	let stripe = $state(null);
-	let elements = $state(null);
-	let cardNumberElement = $state(null);
-	let cardExpiryElement = $state(null);
-	let cardCvcElement = $state(null);
-	let individualElementsMounted = $state(false);
 	let paymentProcessing = $state(false);
 	let paymentError = $state(null);
 	let orderBlocks = $state([]);
 	let businessObject = $state(null);
+	let confirmPayment = null;
 
 	async function handlePhoneSendCode(blockId, phone) {
 		store.setKey('phoneNumber', phone);
@@ -93,8 +89,8 @@
 
 			// 3. For credit card, confirm payment
 			if (selectedPaymentMethod === 'CREDIT_CARD') {
-				if (!stripe || !cardNumberElement) {
-					throw new Error('Payment system not initialized');
+				if (!confirmPayment) {
+					throw new Error('Payment system not ready');
 				}
 
 				if (!clientSecret) {
@@ -102,17 +98,7 @@
 				}
 
 				console.log('Confirming payment...');
-				const { error, paymentIntent } = await stripe.confirmCardPayment(
-					clientSecret,
-					{
-						payment_method: {
-							card: cardNumberElement,
-							billing_details: {
-								name: ''
-							}
-						}
-					}
-				);
+				const { error, paymentIntent } = await confirmPayment(clientSecret);
 
 				if (error) {
 					throw new Error(`Payment failed: ${error.message}`);
@@ -130,16 +116,6 @@
 			checkoutFormData = {};
 			selectedPaymentMethod = 'CASH';
 			actions.clearCart();
-			
-			if (individualElementsMounted) {
-				if (cardNumberElement) cardNumberElement.destroy();
-				if (cardExpiryElement) cardExpiryElement.destroy();
-				if (cardCvcElement) cardCvcElement.destroy();
-				cardNumberElement = null;
-				cardExpiryElement = null;
-				cardCvcElement = null;
-				individualElementsMounted = false;
-			}
 
 		} catch (error) {
 			console.error('Checkout error:', error);
@@ -157,15 +133,6 @@
 		const unsubscribe = store.subscribe(async (storeValue) => {
 			if (storeValue.loading) return; // Still loading
 			
-			// Load Stripe if business has it configured
-			if (storeValue.stripeConfig.enabled && storeValue.stripeConfig.publicKey && !stripe) {
-				try {
-					stripe = await loadStripe(storeValue.stripeConfig.publicKey);
-					console.log('Stripe loaded with business public key');
-				} catch (error) {
-					console.error('Failed to load Stripe:', error);
-				}
-			}
 			
 			// Initialize order blocks and business object
 			if (storeValue.orderBlocks) {
@@ -208,106 +175,6 @@
 		}
 	});
 
-	async function setupCardElement() {
-		if (!stripe || individualElementsMounted) return;
-
-		await tick();
-		
-		const cardNumberContainer = document.getElementById('card-number-element');
-		const cardExpiryContainer = document.getElementById('card-expiry-element');
-		const cardCvcContainer = document.getElementById('card-cvc-element');
-		
-		if (!cardNumberContainer || !cardExpiryContainer || !cardCvcContainer) {
-			console.error('Card element containers not found');
-			return;
-		}
-
-		// Clear any existing content
-		cardNumberContainer.innerHTML = '';
-		cardExpiryContainer.innerHTML = '';
-		cardCvcContainer.innerHTML = '';
-
-		elements = stripe.elements();
-		
-		// Get theme-aware colors
-		const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-		
-		const style = {
-			base: {
-				color: isDark ? '#ffffff' : '#000000',
-				fontFamily: 'Inter, system-ui, sans-serif',
-				fontSmoothing: 'antialiased',
-				fontSize: '16px',
-				'::placeholder': {
-					color: isDark ? '#6b7280' : '#9ca3af'
-				}
-			},
-			invalid: {
-				color: '#ef4444',
-				iconColor: '#ef4444'
-			}
-		};
-
-		cardNumberElement = elements.create('cardNumber', { style });
-		cardExpiryElement = elements.create('cardExpiry', { style });
-		cardCvcElement = elements.create('cardCvc', { style });
-		
-		try {
-			cardNumberElement.mount('#card-number-element');
-			cardExpiryElement.mount('#card-expiry-element');
-			cardCvcElement.mount('#card-cvc-element');
-			
-			individualElementsMounted = true;
-			console.log('Stripe card elements mounted successfully');
-		} catch (error) {
-			console.error('Failed to mount Stripe card elements:', error);
-		}
-	}
-
-	$effect(() => {
-		if (selectedPaymentMethod !== 'CREDIT_CARD' && individualElementsMounted) {
-			if (cardNumberElement) cardNumberElement.destroy();
-			if (cardExpiryElement) cardExpiryElement.destroy();
-			if (cardCvcElement) cardCvcElement.destroy();
-			cardNumberElement = null;
-			cardExpiryElement = null;
-			cardCvcElement = null;
-			individualElementsMounted = false;
-		}
-	});
-
-	$effect(() => {
-		if (showCheckoutSection && selectedPaymentMethod === 'CREDIT_CARD' && stripe && !individualElementsMounted) {
-			setupCardElement();
-		}
-	});
-
-	// Auto-select first available payment method and validate selection
-	$effect(() => {
-		const allowedMethods = $store.allowedPaymentMethods || ['CASH'];
-		
-		// If current selection is not allowed, pick the first allowed method
-		if (selectedPaymentMethod === 'CASH' && !allowedMethods.includes('CASH')) {
-			if (allowedMethods.includes('CREDIT_CARD') && $store.stripeConfig.enabled) {
-				selectedPaymentMethod = 'CREDIT_CARD';
-			}
-		} else if (selectedPaymentMethod === 'CREDIT_CARD' && (!allowedMethods.includes('CREDIT_CARD') || !$store.stripeConfig.enabled)) {
-			if (allowedMethods.includes('CASH')) {
-				selectedPaymentMethod = 'CASH';
-			}
-		}
-		
-		// If no selection or invalid selection, default to first available
-		if (!selectedPaymentMethod || 
-			(selectedPaymentMethod === 'CASH' && !allowedMethods.includes('CASH')) ||
-			(selectedPaymentMethod === 'CREDIT_CARD' && (!allowedMethods.includes('CREDIT_CARD') || !$store.stripeConfig.enabled))) {
-			if (allowedMethods.includes('CASH')) {
-				selectedPaymentMethod = 'CASH';
-			} else if (allowedMethods.includes('CREDIT_CARD') && $store.stripeConfig.enabled) {
-				selectedPaymentMethod = 'CREDIT_CARD';
-			}
-		}
-	});
 </script>
 
 {#if $store.loading}
@@ -421,134 +288,16 @@
 							onPhoneVerifyCode={handlePhoneVerifyCode}
 						/>
 
-						<!-- Payment Method -->
-						<div>
-							<label class="block text-sm font-medium text-card-foreground mb-3">
-								Payment Method <span class="text-destructive">*</span>
-							</label>
-							<div class="grid gap-3" class:grid-cols-2={$store.allowedPaymentMethods.length > 1} class:grid-cols-1={$store.allowedPaymentMethods.length === 1}>
-								{#if $store.allowedPaymentMethods.includes('CASH')}
-									<button 
-										type="button"
-										class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
-										class:border-primary={selectedPaymentMethod === 'CASH'}
-										class:bg-primary={selectedPaymentMethod === 'CASH'}
-										class:shadow-sm={selectedPaymentMethod === 'CASH'}
-										class:border-transparent={selectedPaymentMethod !== 'CASH'}
-										class:bg-muted={selectedPaymentMethod !== 'CASH'}
-										class:hover:bg-muted={selectedPaymentMethod !== 'CASH'}
-										on:click={() => selectedPaymentMethod = 'CASH'}
-									>
-										{#if selectedPaymentMethod === 'CASH'}
-											<div class="absolute top-2 right-2">
-												<Icon icon="mdi:check-circle" class="w-5 h-5 text-primary" />
-											</div>
-										{/if}
-										<div class="flex items-center gap-3">
-											<div class="flex items-center justify-center w-12 h-12 rounded-full bg-background">
-												<Icon icon="mdi:cash" class="w-6 h-6 text-primary" />
-											</div>
-											<div class="text-left">
-												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'CASH'} class:text-card-foreground={selectedPaymentMethod !== 'CASH'}>Cash Payment</div>
-												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'CASH'} class:text-muted-foreground={selectedPaymentMethod !== 'CASH'}>Pay when you receive</div>
-											</div>
-										</div>
-									</button>
-								{/if}
-								
-								{#if $store.allowedPaymentMethods.includes('CREDIT_CARD') && $store.stripeConfig.enabled}
-									<button 
-										type="button"
-										class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
-										class:border-primary={selectedPaymentMethod === 'CREDIT_CARD'}
-										class:bg-primary={selectedPaymentMethod === 'CREDIT_CARD'}
-										class:shadow-sm={selectedPaymentMethod === 'CREDIT_CARD'}
-										class:border-transparent={selectedPaymentMethod !== 'CREDIT_CARD'}
-										class:bg-muted={selectedPaymentMethod !== 'CREDIT_CARD'}
-										class:hover:bg-muted={selectedPaymentMethod !== 'CREDIT_CARD'}
-										on:click={() => selectedPaymentMethod = 'CREDIT_CARD'}
-									>
-										{#if selectedPaymentMethod === 'CREDIT_CARD'}
-											<div class="absolute top-2 right-2">
-												<Icon icon="mdi:check-circle" class="w-5 h-5 text-primary" />
-											</div>
-										{/if}
-										<div class="flex items-center gap-3">
-											<div class="flex items-center justify-center w-12 h-12 rounded-full bg-background">
-												<Icon icon="mdi:credit-card" class="w-6 h-6 text-primary" />
-											</div>
-											<div class="text-left">
-												<div class="font-semibold" class:text-primary-foreground={selectedPaymentMethod === 'CREDIT_CARD'} class:text-card-foreground={selectedPaymentMethod !== 'CREDIT_CARD'}>Card Payment</div>
-												<div class="text-sm" class:text-primary-foreground={selectedPaymentMethod === 'CREDIT_CARD'} class:text-muted-foreground={selectedPaymentMethod !== 'CREDIT_CARD'}>Secure online payment</div>
-											</div>
-										</div>
-									</button>
-								{/if}
-							</div>
-						</div>
-
-						<!-- Credit Card Details -->
-						{#if selectedPaymentMethod === 'CREDIT_CARD'}
-							<div class="bg-muted rounded-lg border p-6">
-								<div class="flex items-center gap-2 mb-4">
-									<Icon icon="mdi:credit-card" class="w-5 h-5 text-primary" />
-									<h4 class="font-medium text-card-foreground">Card Details</h4>
-								</div>
-								
-								<div class="space-y-4">
-									<div>
-										<label class="block text-sm font-medium text-card-foreground mb-2">
-											Card Number
-										</label>
-										<div 
-											id="card-number-element" 
-											class="card-input"
-										>
-										</div>
-									</div>
-
-									<div class="grid grid-cols-2 gap-4">
-										<div>
-											<label class="block text-sm font-medium text-card-foreground mb-2">
-												Expiry Date
-											</label>
-											<div 
-												id="card-expiry-element" 
-												class="card-input"
-											>
-											</div>
-										</div>
-
-										<div>
-											<label class="block text-sm font-medium text-card-foreground mb-2">
-												CVC
-											</label>
-											<div 
-												id="card-cvc-element" 
-												class="card-input"
-											>
-											</div>
-										</div>
-									</div>
-									
-									<div class="flex items-center gap-2 text-sm text-muted-foreground">
-										<Icon icon="mdi:shield-check" class="w-4 h-4 text-green-600" />
-										<span>Your payment information is encrypted and secure</span>
-									</div>
-								</div>
-							</div>
-						{/if}
-
-						<!-- Error Message -->
-						{#if paymentError}
-							<div class="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-								<div class="flex items-center gap-2 text-destructive">
-									<Icon icon="mdi:alert-circle" class="w-5 h-5" />
-									<span class="font-medium">Payment Error</span>
-								</div>
-								<p class="text-destructive/80 mt-1">{paymentError}</p>
-							</div>
-						{/if}
+						<!-- Payment -->
+						<PaymentForm
+							allowedMethods={$store.allowedPaymentMethods}
+							stripePublicKey={$store.stripeConfig?.publicKey}
+							{selectedPaymentMethod}
+							onPaymentMethodChange={(method) => selectedPaymentMethod = method}
+							onStripeReady={(confirmFn) => confirmPayment = confirmFn}
+							error={paymentError}
+							variant="eshop"
+						/>
 
 						<!-- Action Buttons -->
 						<div class="flex gap-3 pt-4">
