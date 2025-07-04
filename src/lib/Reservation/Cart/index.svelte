@@ -14,7 +14,6 @@
 
 	onMount(() => {
 		initReservationStore();
-		
 	});
 
 	function update(idx, v) {

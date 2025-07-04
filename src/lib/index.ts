@@ -798,11 +798,11 @@ export const reservationApi = {
 	},
 
 	// Complete reservation checkout
-	checkout: async ({ token, businessId, parts, paymentMethod = "CASH" }) => {
+	checkout: async ({ token, businessId, parts, paymentMethod = "CASH", blocks = [] }) => {
 		try {
 			const payload = {
 				businessId,
-				blocks: [],
+				blocks: blocks,
 				paymentMethod, // Add payment method support
 				parts: parts.map((p) => ({
 					serviceId: p.serviceId,
