@@ -42,8 +42,8 @@
 					{#if onPhoneSendCode && onPhoneVerifyCode}
 						<PhoneInput
 							blockId={block.id}
-							value={block.value?.[0] ?? ''}
-							onChange={(value) => update(idx, value)}
+							value={block.value?.[0]?.en || block.value?.[0] || ''}
+							onChange={(value) => update(idx, { en: value })}
 							onSendCode={onPhoneSendCode}
 							onVerifyCode={onPhoneVerifyCode}
 						/>
@@ -51,18 +51,18 @@
 						<!-- Fallback for when no verification callbacks provided -->
 						<input
 							type="tel"
-							value={block.value?.[0] ?? ''}
+							value={block.value?.[0]?.en || block.value?.[0] || ''}
 							placeholder="Phone number"
-							on:input={(e)=>update(idx, e.target.value)}
+							on:input={(e)=>update(idx, { en: e.target.value })}
 							class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
 						/>
 					{/if}
 				{:else if block.properties?.variant === 'note'}
 					<!-- Textarea for notes -->
 					<textarea
-						value={block.value?.[0] ?? ''}
+						value={block.value?.[0]?.en || block.value?.[0] || ''}
 						placeholder={block.properties?.placeholder || ''}
-						on:input={(e)=>update(idx, e.target.value)}
+						on:input={(e)=>update(idx, { en: e.target.value })}
 						rows="3"
 						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 resize-none {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
 					></textarea>
@@ -71,8 +71,8 @@
 					<div class="relative">
 						<select
 							class="w-full appearance-none rounded-lg border-0 bg-muted px-3 py-2 pr-10 text-foreground focus:bg-background {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
-							value={block.value?.[0] ?? ''}
-							on:change={(e)=>update(idx, e.target.value)}>
+							value={block.value?.[0]?.en || block.value?.[0] || ''}
+							on:change={(e)=>update(idx, { en: e.target.value })}>
 							<option value="" disabled>{t('form.select', 'Select…')}</option>
 							{#each block.properties.options as opt}
 								<option value={opt}>{typeof opt === 'object' ? opt[currLocale] || opt.en : opt}</option>
@@ -84,9 +84,9 @@
 					<!-- Regular text input -->
 					<input
 						type="text"
-						value={block.value?.[0] ?? ''}
+						value={block.value?.[0]?.en || block.value?.[0] || ''}
 						placeholder={block.properties?.placeholder || ''}
-						on:input={(e)=>update(idx, e.target.value)}
+						on:input={(e)=>update(idx, { en: e.target.value })}
 						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
 					/>
 				{/if}
