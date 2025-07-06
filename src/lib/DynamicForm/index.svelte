@@ -31,19 +31,13 @@
 		if (!block.value || !block.value[0]) return '';
 		const val = block.value[0];
 		if (typeof val === 'string') return val;
-		if (typeof val === 'object' && val.en !== undefined) return val.en;
+		if (typeof val === 'object' && val.en !== undefined) return val.en || '';
 		return '';
 	}
 
-	// Helper function to update block value properly
+	// Helper function to update block value properly - always use { en: value } format
 	function updateBlockValue(idx: number, value: string) {
-		const block = blocks[idx];
-		// Check if the current value is an object structure
-		if (block.value?.[0] && typeof block.value[0] === 'object') {
-			update(idx, { en: value });
-		} else {
-			update(idx, value);
-		}
+		update(idx, { en: value });
 	}
 </script>
 
