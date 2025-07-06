@@ -11,6 +11,8 @@
 	let paymentProcessing = $state(false);
 	let paymentError = $state(null);
 	let confirmPayment = null;
+	let formValid = $state(true);
+	let formErrors = $state([]);
 
 	onMount(() => {
 		initReservationStore();
@@ -20,6 +22,12 @@
 		const blocks = [...$store.reservationBlocks];
 		blocks[idx] = { ...blocks[idx], value: Array.isArray(v) ? v : [v] };
 		store.setKey('reservationBlocks', blocks);
+	}
+
+	function handleValidationChange(isValid, errors) {
+		formValid = isValid;
+		formErrors = errors;
+		console.log('Cart validation updated:', { isValid, errors });
 	}
 
 	async function handlePhoneSendCode(blockId, phone) {
@@ -34,6 +42,12 @@
 
 
 	async function handleCheckout() {
+		// Block submission if form is invalid
+		if (!formValid) {
+			showToast('Please fix the form errors before submitting', 'error', 4000);
+			return;
+		}
+
 		paymentProcessing = true;
 		paymentError = null;
 
@@ -112,6 +126,7 @@
 			onUpdate={update}
 			onPhoneSendCode={handlePhoneSendCode}
 			onPhoneVerifyCode={handlePhoneVerifyCode}
+			onValidationChange={handleValidationChange}
 		/>
 	{/if}
 
@@ -278,9 +293,27 @@
 			</div>
 		{/if}
 
+		<!-- Form validation errors summary -->
+		{#if !formValid && formErrors.length > 0}
+			<div class="p-4 rounded-lg">
+				<div class="flex items-center gap-2 text-error mb-3">
+					<Icon icon="mdi:alert-circle" class="w-5 h-5 flex-shrink-0" />
+					<span class="font-semibold">Please complete all required fields:</span>
+				</div>
+				<ul class="text-error text-sm space-y-2">
+					{#each formErrors as error}
+						<li class="flex items-start gap-2">
+							<Icon icon="mdi:close-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" />
+							<span><strong>{error.blockKey}:</strong> {error.message}</span>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
+
 		<button
 			class="bg-primary-600 hover:bg-primary-500 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-			disabled={$store?.loading || paymentProcessing}
+			disabled={$store?.loading || paymentProcessing || !formValid}
 			onclick={handleCheckout}>
 			{#if !$store?.loading && !paymentProcessing}
 				{@const isInquiryOnly = ($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'))}

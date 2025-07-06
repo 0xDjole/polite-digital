@@ -181,9 +181,6 @@ const getCollectionEntry = async ({ collectionId, id }) => {
 export function getBlockLabel(block: any, locale: string = 'en'): string {
 	if (!block) return "";
 
-	// Skip labels for specific variants
-	if (block.properties?.variant === 'phone_number') return "";
-
 	if (block.properties?.label) {
 		if (typeof block.properties.label === "object") {
 			return (

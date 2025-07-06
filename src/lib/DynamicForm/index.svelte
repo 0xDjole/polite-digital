@@ -10,7 +10,8 @@
 		blocks = [], 
 		onUpdate = (idx: number, value: unknown) => {},
 		onPhoneSendCode = null,
-		onPhoneVerifyCode = null
+		onPhoneVerifyCode = null,
+		onValidationChange = (isValid: boolean, errors: any[]) => {}
 	} = $props();
 
 	// Get the current locale from the URL
@@ -24,7 +25,52 @@
 
 	function update(idx: number, v: unknown) {
 		onUpdate(idx, v);
+		// Trigger validation check after any update
+		setTimeout(validateAllFields, 0);
 	}
+
+	// Validation state
+	let validationErrors = $state([]);
+	let isFormValid = $state(true);
+	let phoneVerificationStatus = $state({}); // Track phone verification status by blockId
+
+	// Validate all fields and notify parent
+	function validateAllFields() {
+		const errors = [];
+		
+		blocks.forEach((block, idx) => {
+			const value = getBlockValue(block);
+			const error = getValidationError(block, value);
+			
+			if (error) {
+				const fieldLabel = getBlockLabel(block, currLocale) || block.key;
+				errors.push({
+					index: idx,
+					blockKey: fieldLabel,
+					message: error,
+					value: value,
+					pattern: block.properties?.pattern
+				});
+			}
+		});
+		
+		validationErrors = errors;
+		isFormValid = errors.length === 0;
+		
+		// Notify parent component
+		onValidationChange(isFormValid, errors);
+		
+		// Note: Removed automatic focus to prevent interference with PhoneInput component
+		
+		console.log('Form validation:', { isValid: isFormValid, errors: errors.length, errorDetails: errors });
+	}
+
+	// Run validation on mount and when blocks change
+	$effect(() => {
+		if (blocks.length > 0) {
+			validateAllFields();
+		}
+	});
 
 	// Helper function to get the string value from a block value
 	function getBlockValue(block: any): string {
@@ -39,6 +85,97 @@
 	function updateBlockValue(idx: number, value: string) {
 		update(idx, { en: value });
 	}
+
+	// Helper function to check if field is required based on pattern
+	function isFieldRequired(block: any): boolean {
+		const pattern = block.properties?.pattern;
+		// All patterns make fields required except empty pattern
+		return !!pattern || block.properties?.isRequired;
+	}
+
+	// Helper function to validate pattern
+	function validatePattern(block: any, value: string): boolean {
+		if (!block.properties?.pattern) return true;
+		
+		const trimmedValue = value?.trim() || '';
+		if (!trimmedValue) return false; // Empty value fails validation if pattern exists
+		
+		try {
+			const regex = new RegExp(block.properties.pattern);
+			return regex.test(trimmedValue);
+		} catch (e) {
+			console.warn('Invalid regex pattern:', block.properties.pattern);
+			return true;
+		}
+	}
+
+	// Helper function to get validation error message
+	function getValidationError(block: any, value: string): string {
+		const trimmedValue = value?.trim() || '';
+		
+		if (isFieldRequired(block) && !trimmedValue) {
+			return 'This field is required';
+		}
+		
+		// Special handling for phone verification
+		if (block.properties?.variant === 'phone_number' && onPhoneSendCode && onPhoneVerifyCode) {
+			const verificationStatus = phoneVerificationStatus[block.id];
+			if (trimmedValue && !verificationStatus?.verified) {
+				return 'Please verify your phone number';
+			}
+		}
+		
+		if (trimmedValue && !validatePattern(block, trimmedValue)) {
+			// Return specific error messages based on pattern
+			const pattern = block.properties?.pattern;
+			if (pattern === '^.+@.+\\..+$') {
+				return 'Please enter a valid email address';
+			} else if (pattern === '^.{6,20}$') {
+				return 'Phone number must be 6-20 characters';
+			} else if (pattern === '^https?:\\/\\/.+$') {
+				return 'Please enter a valid URL';
+			} else {
+				return 'Invalid format';
+			}
+		}
+		
+		return '';
+	}
+
+	// Helper function to check if field has validation error
+	function hasValidationError(block: any, value: string): boolean {
+		return getValidationError(block, value) !== '';
+	}
+
+	// Wrapper for phone send code to track verification status
+	async function handlePhoneSendCode(blockId: string, phoneNumber: string) {
+		if (onPhoneSendCode) {
+			// Reset verification status when sending new code
+			phoneVerificationStatus[blockId] = { verified: false, codeSent: false };
+			const result = await onPhoneSendCode(blockId, phoneNumber);
+			if (result) {
+				phoneVerificationStatus[blockId].codeSent = true;
+			}
+			// Trigger validation update
+			setTimeout(validateAllFields, 0);
+			return result;
+		}
+		return false;
+	}
+
+	// Wrapper for phone verify code to track verification status
+	async function handlePhoneVerifyCode(blockId: string, verificationCode: string) {
+		if (onPhoneVerifyCode) {
+			const result = await onPhoneVerifyCode(blockId, verificationCode);
+			if (result) {
+				phoneVerificationStatus[blockId] = { verified: true, codeSent: true };
+			}
+			// Trigger validation update
+			setTimeout(validateAllFields, 0);
+			return result;
+		}
+		return false;
+	}
 </script>
 
 {#if blocks?.length > 0}
@@ -47,6 +184,9 @@
 			{#if getBlockLabel(block, currLocale)}
 				<label class="mb-1 block font-medium text-foreground">
 					{getBlockLabel(block, currLocale)}
+					{#if isFieldRequired(block)}
+						<span class="text-error ml-1">*</span>
+					{/if}
 				</label>
 			{/if}
 
@@ -58,8 +198,8 @@
 							blockId={block.id}
 							value={getBlockValue(block)}
 							onChange={(value) => updateBlockValue(idx, value)}
-							onSendCode={onPhoneSendCode}
-							onVerifyCode={onPhoneVerifyCode}
+							onSendCode={handlePhoneSendCode}
+							onVerifyCode={handlePhoneVerifyCode}
 						/>
 					{:else}
 						<!-- Fallback for when no verification callbacks provided -->
@@ -68,7 +208,9 @@
 							value={getBlockValue(block)}
 							placeholder="Phone number"
 							on:input={(e)=>updateBlockValue(idx, e.target.value)}
-							class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
+							on:blur={() => validateAllFields()}
+							class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500"
+							required={isFieldRequired(block)}
 						/>
 					{/if}
 				{:else if block.properties?.variant === 'note'}
@@ -77,16 +219,20 @@
 						value={getBlockValue(block)}
 						placeholder={block.properties?.placeholder || ''}
 						on:input={(e)=>updateBlockValue(idx, e.target.value)}
+						on:blur={() => validateAllFields()}
 						rows="3"
-						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 resize-none {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
+						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 resize-none"
+						required={isFieldRequired(block)}
 					></textarea>
 				{:else if block.properties?.options && block.properties.options.length > 0}
 					<!-- Dropdown for fields with options -->
 					<div class="relative">
 						<select
-							class="w-full appearance-none rounded-lg border-0 bg-muted px-3 py-2 pr-10 text-foreground focus:bg-background {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
+							class="w-full appearance-none rounded-lg border-0 bg-muted px-3 py-2 pr-10 text-foreground focus:bg-background"
 							value={getBlockValue(block)}
-							on:change={(e)=>updateBlockValue(idx, e.target.value)}>
+							on:change={(e)=>updateBlockValue(idx, e.target.value)}
+							on:blur={() => validateAllFields()}
+							required={isFieldRequired(block)}>
 							<option value="" disabled>{t('form.select', 'Select…')}</option>
 							{#each block.properties.options as opt}
 								<option value={opt}>{typeof opt === 'object' ? opt[currLocale] || opt.en : opt}</option>
@@ -101,11 +247,16 @@
 						value={getBlockValue(block)}
 						placeholder={block.properties?.placeholder || (block.type === 'email' ? 'Enter email address' : '')}
 						on:input={(e)=>updateBlockValue(idx, e.target.value)}
-						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
+						on:blur={() => validateAllFields()}
+						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500"
+						required={isFieldRequired(block)}
 					/>
 				{/if}
-				{#if block.properties?.isRequired && !getBlockValue(block)}
-					<div class="mt-1 text-xs text-destructive">{t('form.fieldRequired', 'This field is required')}</div>
+				{#if getValidationError(block, getBlockValue(block))}
+					<div class="mt-1 text-xs text-error font-medium">
+						<Icon icon="mdi:alert-circle" class="w-3 h-3 inline mr-1" />
+						{getValidationError(block, getBlockValue(block))}
+					</div>
 				{/if}
 
 			{:else if block.type === 'boolean'}
