@@ -114,7 +114,7 @@
 		const trimmedValue = value?.trim() || '';
 		
 		if (isFieldRequired(block) && !trimmedValue) {
-			return 'This field is required';
+			return ''; // Remove "This field is required" message
 		}
 		
 		// Special handling for phone verification

@@ -293,23 +293,7 @@
 			</div>
 		{/if}
 
-		<!-- Form validation errors summary -->
-		{#if !formValid && formErrors.length > 0}
-			<div class="p-4 rounded-lg">
-				<div class="flex items-center gap-2 text-error mb-3">
-					<Icon icon="mdi:alert-circle" class="w-5 h-5 flex-shrink-0" />
-					<span class="font-semibold">Please complete all required fields:</span>
-				</div>
-				<ul class="text-error text-sm space-y-2">
-					{#each formErrors as error}
-						<li class="flex items-start gap-2">
-							<Icon icon="mdi:close-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" />
-							<span><strong>{error.blockKey}:</strong> {error.message}</span>
-						</li>
-					{/each}
-				</ul>
-			</div>
-		{/if}
+		<!-- Form validation errors summary removed -->
 
 		<button
 			class="bg-primary-600 hover:bg-primary-500 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
