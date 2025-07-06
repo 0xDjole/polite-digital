@@ -18,6 +18,14 @@
 		initReservationStore();
 	});
 
+	// Auto-select first available payment method
+	$effect(() => {
+		const allowedMethods = $store.allowedPaymentMethods || ['CASH'];
+		if (allowedMethods.length > 0 && !allowedMethods.includes(selectedPaymentMethod)) {
+			selectedPaymentMethod = allowedMethods[0];
+		}
+	});
+
 	function update(idx, v) {
 		const blocks = [...$store.reservationBlocks];
 		blocks[idx] = { ...blocks[idx], value: Array.isArray(v) ? v : [v] };
@@ -182,6 +190,9 @@
 		</div>
 
 		<!-- Payment - only show if credit card selected AND there are non-inquiry parts -->
+		{@const debugParts = ($store.parts || []).map(p => ({ id: p.id, reservationMethod: p.reservationMethod }))}
+		{@const hasNonInquiryParts = ($store.parts || []).some(part => !part.reservationMethod?.includes('INQUIRY'))}
+		{console.log('RESERVATION PAYMENT DEBUG:', { selectedPaymentMethod, parts: debugParts, hasNonInquiryParts, allowedPaymentMethods: $store.allowedPaymentMethods })}
 		{#if selectedPaymentMethod === 'CREDIT_CARD' && ($store.parts || []).some(part => !part.reservationMethod?.includes('INQUIRY'))}
 			<PaymentForm
 				allowedMethods={$store.allowedPaymentMethods || ['CASH']}
@@ -297,7 +308,7 @@
 
 		<button
 			class="bg-primary-600 hover:bg-primary-500 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-			disabled={$store?.loading || paymentProcessing || !formValid}
+			disabled={$store?.loading || paymentProcessing || !formValid || (selectedPaymentMethod === 'CREDIT_CARD' && !confirmPayment)}
 			onclick={handleCheckout}>
 			{#if !$store?.loading && !paymentProcessing}
 				{@const isInquiryOnly = ($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'))}
