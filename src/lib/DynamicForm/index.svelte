@@ -25,6 +25,26 @@
 	function update(idx: number, v: unknown) {
 		onUpdate(idx, v);
 	}
+
+	// Helper function to get the string value from a block value
+	function getBlockValue(block: any): string {
+		if (!block.value || !block.value[0]) return '';
+		const val = block.value[0];
+		if (typeof val === 'string') return val;
+		if (typeof val === 'object' && val.en !== undefined) return val.en;
+		return '';
+	}
+
+	// Helper function to update block value properly
+	function updateBlockValue(idx: number, value: string) {
+		const block = blocks[idx];
+		// Check if the current value is an object structure
+		if (block.value?.[0] && typeof block.value[0] === 'object') {
+			update(idx, { en: value });
+		} else {
+			update(idx, value);
+		}
+	}
 </script>
 
 {#if blocks?.length > 0}
@@ -36,14 +56,14 @@
 				</label>
 			{/if}
 
-			{#if block.type === 'text'}
+			{#if block.type === 'text' || block.type === 'email'}
 				{#if block.properties?.variant === 'phone_number'}
 					<!-- Phone number input with verification -->
 					{#if onPhoneSendCode && onPhoneVerifyCode}
 						<PhoneInput
 							blockId={block.id}
-							value={block.value?.[0]?.en || block.value?.[0] || ''}
-							onChange={(value) => update(idx, { en: value })}
+							value={getBlockValue(block)}
+							onChange={(value) => updateBlockValue(idx, value)}
 							onSendCode={onPhoneSendCode}
 							onVerifyCode={onPhoneVerifyCode}
 						/>
@@ -51,28 +71,28 @@
 						<!-- Fallback for when no verification callbacks provided -->
 						<input
 							type="tel"
-							value={block.value?.[0]?.en || block.value?.[0] || ''}
+							value={getBlockValue(block)}
 							placeholder="Phone number"
-							on:input={(e)=>update(idx, { en: e.target.value })}
-							class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
+							on:input={(e)=>updateBlockValue(idx, e.target.value)}
+							class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
 						/>
 					{/if}
 				{:else if block.properties?.variant === 'note'}
 					<!-- Textarea for notes -->
 					<textarea
-						value={block.value?.[0]?.en || block.value?.[0] || ''}
+						value={getBlockValue(block)}
 						placeholder={block.properties?.placeholder || ''}
-						on:input={(e)=>update(idx, { en: e.target.value })}
+						on:input={(e)=>updateBlockValue(idx, e.target.value)}
 						rows="3"
-						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 resize-none {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
+						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 resize-none {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
 					></textarea>
 				{:else if block.properties?.options && block.properties.options.length > 0}
 					<!-- Dropdown for fields with options -->
 					<div class="relative">
 						<select
-							class="w-full appearance-none rounded-lg border-0 bg-muted px-3 py-2 pr-10 text-foreground focus:bg-background {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
-							value={block.value?.[0]?.en || block.value?.[0] || ''}
-							on:change={(e)=>update(idx, { en: e.target.value })}>
+							class="w-full appearance-none rounded-lg border-0 bg-muted px-3 py-2 pr-10 text-foreground focus:bg-background {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
+							value={getBlockValue(block)}
+							on:change={(e)=>updateBlockValue(idx, e.target.value)}>
 							<option value="" disabled>{t('form.select', 'Select…')}</option>
 							{#each block.properties.options as opt}
 								<option value={opt}>{typeof opt === 'object' ? opt[currLocale] || opt.en : opt}</option>
@@ -81,16 +101,16 @@
 						<Icon icon="mdi:chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none text-muted-foreground" />
 					</div>
 				{:else}
-					<!-- Regular text input -->
+					<!-- Text or Email input -->
 					<input
-						type="text"
-						value={block.value?.[0]?.en || block.value?.[0] || ''}
-						placeholder={block.properties?.placeholder || ''}
-						on:input={(e)=>update(idx, { en: e.target.value })}
-						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !block.value?.[0] ? 'bg-red-100' : ''}"
+						type={block.type === 'email' ? 'email' : 'text'}
+						value={getBlockValue(block)}
+						placeholder={block.properties?.placeholder || (block.type === 'email' ? 'Enter email address' : '')}
+						on:input={(e)=>updateBlockValue(idx, e.target.value)}
+						class="w-full rounded-lg border-0 bg-muted px-3 py-2 text-foreground focus:bg-background placeholder-gray-500 {block.properties?.isRequired && !getBlockValue(block) ? 'bg-red-100' : ''}"
 					/>
 				{/if}
-				{#if block.properties?.isRequired && !block.value?.[0]}
+				{#if block.properties?.isRequired && !getBlockValue(block)}
 					<div class="mt-1 text-xs text-destructive">{t('form.fieldRequired', 'This field is required')}</div>
 				{/if}
 

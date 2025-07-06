@@ -803,7 +803,6 @@ export const reservationApi = {
 			const payload = {
 				businessId,
 				blocks: blocks,
-				paymentMethod, // Add payment method support
 				parts: parts.map((p) => ({
 					serviceId: p.serviceId,
 					from: p.from,
@@ -813,6 +812,11 @@ export const reservationApi = {
 					providerId: p.providerId,
 				})),
 			};
+
+			// Only add payment method if it's defined (not for inquiry-only reservations)
+			if (paymentMethod !== undefined) {
+				payload.paymentMethod = paymentMethod;
+			}
 
 			const res = await fetch(`${API_URL}/v1/reservations`, {
 				method: "POST",
