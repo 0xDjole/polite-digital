@@ -18,6 +18,14 @@
 	let orderBlocks = $state([]);
 	let businessObject = $state(null);
 	let confirmPayment = null;
+	let formValid = $state(false);
+	let formErrors = $state([]);
+
+	function handleValidationChange(isValid, errors) {
+		formValid = isValid;
+		formErrors = errors;
+		console.log('EShop Cart validation updated:', { isValid, errors });
+	}
 
 	async function handlePhoneSendCode(blockId, phone) {
 		store.setKey('phoneNumber', phone);
@@ -65,6 +73,12 @@
 	}
 
 	async function handleCheckoutComplete() {
+		// Block submission if form is invalid
+		if (!formValid) {
+			showToast('Please fix the form errors before placing order', 'error', 4000);
+			return;
+		}
+
 		paymentProcessing = true;
 		paymentError = null;
 
@@ -286,6 +300,7 @@
 							}}
 							onPhoneSendCode={handlePhoneSendCode}
 							onPhoneVerifyCode={handlePhoneVerifyCode}
+							onValidationChange={handleValidationChange}
 						/>
 
 						<!-- Payment -->
@@ -310,7 +325,7 @@
 							</button>
 							<button 
 								type="submit"
-								disabled={$store.processingCheckout || paymentProcessing}
+								disabled={$store.processingCheckout || paymentProcessing || !formValid || (selectedPaymentMethod === 'CREDIT_CARD' && !confirmPayment)}
 								class="flex-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
 							>
 								{#if $store.processingCheckout || paymentProcessing}
