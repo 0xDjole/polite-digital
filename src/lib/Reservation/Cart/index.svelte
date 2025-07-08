@@ -14,15 +14,26 @@
 	let formValid = $state(true);
 	let formErrors = $state([]);
 
+
+	$inspect('sss ',selectedPaymentMethod);
+
 	onMount(() => {
 		initReservationStore();
 	});
 
-	// Auto-select first available payment method
+	// Auto-select appropriate payment method
 	$effect(() => {
-		const allowedMethods = $store.allowedPaymentMethods || ['CASH'];
-		if (allowedMethods.length > 0 && !allowedMethods.includes(selectedPaymentMethod)) {
-			selectedPaymentMethod = allowedMethods[0];
+		const isInquiryOnly = ($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'));
+		
+		if (isInquiryOnly) {
+			// For inquiry-only, always use FREE
+			selectedPaymentMethod = 'FREE';
+		} else {
+			// For non-inquiry, use business's allowed payment methods
+			const allowedMethods = $store.allowedPaymentMethods || ['CASH'];
+			if (allowedMethods.length > 0 && !allowedMethods.includes(selectedPaymentMethod)) {
+				selectedPaymentMethod = allowedMethods[0];
+			}
 		}
 	});
 
@@ -33,6 +44,7 @@
 	}
 
 	function handleValidationChange(isValid, errors) {
+		console.log('is valid ',isValid,errors);
 		formValid = isValid;
 		formErrors = errors;
 		console.log('Cart validation updated:', { isValid, errors });
@@ -60,12 +72,8 @@
 		paymentError = null;
 
 		try {
-			// For inquiry-only reservations, don't send payment method
-			const isInquiryOnly = ($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'));
-			const paymentMethod = isInquiryOnly ? undefined : selectedPaymentMethod;
-			
-			// Create reservation first (for both cash and credit card)
-			const checkoutResponse = await actions.checkout(paymentMethod);
+			// Always send payment method (including FREE for inquiry-only)
+			const checkoutResponse = await actions.checkout(selectedPaymentMethod);
 			
 			if (!checkoutResponse.success) {
 				throw new Error(checkoutResponse.error || 'Failed to create reservation');
@@ -73,9 +81,9 @@
 
 			const { reservationId, clientSecret } = checkoutResponse.data;
 
-			// For cash payments or inquiry-only reservations, we're done
-			if (paymentMethod === 'CASH' || paymentMethod === undefined) {
-				const message = isInquiryOnly ? 'Inquiry submitted successfully!' : 'Reservation created successfully!';
+			// For cash payments or free inquiries, we're done
+			if (selectedPaymentMethod === 'CASH' || selectedPaymentMethod === 'FREE') {
+				const message = selectedPaymentMethod === 'FREE' ? 'Inquiry submitted successfully!' : 'Reservation created successfully!';
 				showToast(message, 'success', 6000);
 				
 				// Clear cart
@@ -86,7 +94,7 @@
 			}
 
 			// For credit card, confirm payment
-			if (paymentMethod === 'CREDIT_CARD') {
+			if (selectedPaymentMethod === 'CREDIT_CARD') {
 				if (!confirmPayment) {
 					throw new Error('Payment system not ready');
 				}
@@ -203,15 +211,52 @@
 				error={paymentError}
 				variant="reservation"
 			/>
-		{:else if ($store.allowedPaymentMethods || ['CASH']).length > 1}
+		{:else}
 			<!-- Payment method selection only -->
 			<div class="space-y-4">
 				<div>
 					<label class="block text-sm font-medium mb-3 text-primary">
 						Payment Method <span class="text-red-500">*</span>
 					</label>
-					<div class="grid gap-3" class:grid-cols-2={($store.allowedPaymentMethods || ['CASH']).length > 1} class:grid-cols-1={($store.allowedPaymentMethods || ['CASH']).length === 1}>
-						{#if ($store.allowedPaymentMethods || ['CASH']).includes('CASH')}
+					{#each [($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'))] as isInquiryOnly}
+						{@const availableMethods = isInquiryOnly ? ['FREE'] : ($store.allowedPaymentMethods || ['CASH'])}
+						<div class="grid gap-3" class:grid-cols-2={availableMethods.length > 1} class:grid-cols-1={availableMethods.length === 1}>
+						{#if availableMethods.includes('FREE')}
+							<button 
+								type="button"
+								class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
+								class:border-primary={selectedPaymentMethod === 'FREE'}
+								class:bg-primary={selectedPaymentMethod === 'FREE'}
+								class:shadow-sm={selectedPaymentMethod === 'FREE'}
+								class:border-transparent={selectedPaymentMethod !== 'FREE'}
+								class:bg-secondary={selectedPaymentMethod !== 'FREE'}
+								class:hover:bg-tertiary={selectedPaymentMethod !== 'FREE'}
+								onclick={() => selectedPaymentMethod = 'FREE'}
+							>
+								{#if selectedPaymentMethod === 'FREE'}
+									<div class="absolute top-2 right-2">
+										<Icon icon="mdi:check-circle" class="w-5 h-5 text-primary" />
+									</div>
+								{/if}
+								<div class="flex items-center gap-3">
+									<div class="flex items-center justify-center w-12 h-12 rounded-full bg-background">
+										<Icon icon="mdi:gift" class="w-6 h-6 text-primary" />
+									</div>
+									<div class="text-left">
+										<div class="font-semibold" 
+											class:text-primary-foreground={selectedPaymentMethod === 'FREE'}
+											class:text-primary={selectedPaymentMethod !== 'FREE'}
+										>Free Inquiry</div>
+										<div class="text-sm" 
+											class:text-primary-foreground={selectedPaymentMethod === 'FREE'}
+											class:text-secondary={selectedPaymentMethod !== 'FREE'}
+										>No payment required</div>
+									</div>
+								</div>
+							</button>
+						{/if}
+						
+						{#if availableMethods.includes('CASH')}
 							<button 
 								type="button"
 								class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
@@ -246,7 +291,7 @@
 							</button>
 						{/if}
 						
-						{#if ($store.allowedPaymentMethods || ['CASH']).includes('CREDIT_CARD') && $store.stripeConfig?.publicKey}
+						{#if availableMethods.includes('CREDIT_CARD') && $store.stripeConfig?.publicKey}
 							<button 
 								type="button"
 								class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"
@@ -289,18 +334,9 @@
 								</div>
 							</button>
 						{/if}
-					</div>
-				</div>
-				
-				{#if ($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'))}
-					<div class="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-						<div class="flex items-center gap-2 text-yellow-800">
-							<Icon icon="mdi:information" class="w-5 h-5" />
-							<span class="font-medium">Inquiry Only</span>
 						</div>
-						<p class="mt-1 text-yellow-700 text-sm">Credit card payment is not required for inquiry reservations. Prices shown are for reference only.</p>
-					</div>
-				{/if}
+					{/each}
+				</div>
 			</div>
 		{/if}
 
@@ -311,22 +347,16 @@
 			disabled={$store?.loading || paymentProcessing || !formValid || (selectedPaymentMethod === 'CREDIT_CARD' && !confirmPayment)}
 			onclick={handleCheckout}>
 			{#if !$store?.loading && !paymentProcessing}
-				{@const isInquiryOnly = ($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'))}
-				{@const effectivePaymentMethod = isInquiryOnly ? 'CASH' : selectedPaymentMethod}
-				<Icon icon={effectivePaymentMethod === 'CREDIT_CARD' ? 'mdi:credit-card' : (isInquiryOnly ? 'mdi:send' : 'mdi:check-circle')} class="h-5 w-5" />
-				{#if isInquiryOnly}
+				<Icon icon={selectedPaymentMethod === 'CREDIT_CARD' ? 'mdi:credit-card' : (selectedPaymentMethod === 'FREE' ? 'mdi:send' : 'mdi:check-circle')} class="h-5 w-5" />
+				{#if selectedPaymentMethod === 'FREE'}
 					Submit Inquiry
-				{:else if effectivePaymentMethod === 'CREDIT_CARD'}
+				{:else if selectedPaymentMethod === 'CREDIT_CARD'}
 					Pay & Confirm
 				{:else}
 					{t('reservation.confirm')}
 				{/if}
 			{:else}
-				<svg class="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-					<path class="opacity-75" fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-				</svg>
+				<Icon icon="mdi:loading" class="h-5 w-5 animate-spin" />
 				{paymentProcessing ? 'Processing...' : t('cart.processing')}
 			{/if}
 		</button>
