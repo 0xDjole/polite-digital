@@ -5,7 +5,6 @@
 	import { getBlockLabel } from '@lib/index.ts';
 	import PhoneInput from '@lib/PhoneInput/index.svelte';
 	import TextInput from './TextInput.svelte';
-	import EmailInput from './EmailInput.svelte';
 	import TextAreaInput from './TextAreaInput.svelte';
 	import SelectInput from './SelectInput.svelte';
 	import CheckboxInput from './CheckboxInput.svelte';
@@ -237,24 +236,13 @@
 						onBlur={() => validateAllFields()}
 					/>
 				{:else}
-					<!-- Text or Email input -->
-					{#if block.type === 'email'}
-						<EmailInput
-							value={getBlockValue(block)}
-							placeholder={block.properties?.placeholder || 'Enter email address'}
-							required={isFieldRequired(block)}
-							onChange={(value) => updateBlockValue(idx, value)}
-							onBlur={() => validateAllFields()}
-						/>
-					{:else}
-						<TextInput
-							value={getBlockValue(block)}
-							placeholder={block.properties?.placeholder || ''}
-							required={isFieldRequired(block)}
-							onChange={(value) => updateBlockValue(idx, value)}
-							onBlur={() => validateAllFields()}
-						/>
-					{/if}
+					<TextInput
+						value={getBlockValue(block)}
+						placeholder={block.properties?.placeholder || ''}
+						required={isFieldRequired(block)}
+						onChange={(value) => updateBlockValue(idx, value)}
+						onBlur={() => validateAllFields()}
+					/>
 				{/if}
 				{#if getValidationError(block, getBlockValue(block))}
 					<div class="mt-1 text-xs text-error font-medium">
