@@ -37,7 +37,7 @@
 
 	// Validation state
 	let validationErrors = $state([]);
-	let isFormValid = $state(true);
+	let isFormValid = $state(false);
 	let phoneVerificationStatus = $state({}); // Track phone verification status by blockId
 
 	// Validate all fields and notify parent
@@ -120,7 +120,7 @@
 		const trimmedValue = value?.trim() || '';
 		
 		if (isFieldRequired(block) && !trimmedValue) {
-			return ''; // Remove "This field is required" message
+			return 'This field is required';
 		}
 		
 		// Special handling for phone verification

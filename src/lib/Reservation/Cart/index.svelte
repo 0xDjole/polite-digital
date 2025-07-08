@@ -11,7 +11,7 @@
 	let paymentProcessing = $state(false);
 	let paymentError = $state(null);
 	let confirmPayment = null;
-	let formValid = $state(true);
+	let formValid = $state(false);
 	let formErrors = $state([]);
 
 
@@ -215,9 +215,6 @@
 			<!-- Payment method selection only -->
 			<div class="space-y-4">
 				<div>
-					<label class="block text-sm font-medium mb-3 text-primary">
-						Payment Method <span class="text-red-500">*</span>
-					</label>
 					{#each [($store.parts || []).every(part => part.reservationMethod?.includes('INQUIRY'))] as isInquiryOnly}
 						{@const availableMethods = isInquiryOnly ? ['FREE'] : ($store.allowedPaymentMethods || ['CASH'])}
 						<div class="grid gap-3" class:grid-cols-2={availableMethods.length > 1} class:grid-cols-1={availableMethods.length === 1}>
