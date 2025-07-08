@@ -37,7 +37,7 @@
 	// Validation state
 	let validationErrors = $state([]);
 	let isFormValid = $state(false);
-	let phoneVerificationStatus = $state({}); // Track phone verification status by blockId
+	let phoneVerified = $state({}); // Track if phone is verified by blockId
 
 	// Validate all fields and notify parent
 	function validateAllFields() {
@@ -122,10 +122,9 @@
 			return 'This field is required';
 		}
 		
-		// Special handling for phone verification
-		if (block.properties?.variant === 'phone_number' && onPhoneSendCode && onPhoneVerifyCode) {
-			const verificationStatus = phoneVerificationStatus[block.id];
-			if (trimmedValue && !verificationStatus?.verified) {
+		// Phone validation - must be verified
+		if (block.properties?.variant === 'phone_number' && trimmedValue) {
+			if (!phoneVerified[block.id]) {
 				return 'Please verify your phone number';
 			}
 		}
@@ -152,35 +151,12 @@
 		return getValidationError(block, value) !== '';
 	}
 
-	// Wrapper for phone send code to track verification status
-	async function handlePhoneSendCode(blockId: string, phoneNumber: string) {
-		if (onPhoneSendCode) {
-			// Reset verification status when sending new code
-			phoneVerificationStatus[blockId] = { verified: false, codeSent: false };
-			const result = await onPhoneSendCode(blockId, phoneNumber);
-			if (result) {
-				phoneVerificationStatus[blockId].codeSent = true;
-			}
-			// Trigger validation update
-			setTimeout(validateAllFields, 0);
-			return result;
-		}
-		return false;
+	// Handle phone verification status update
+	function handlePhoneValidation(blockId: string, isVerified: boolean) {
+		phoneVerified[blockId] = isVerified;
+		validateAllFields();
 	}
 
-	// Wrapper for phone verify code to track verification status
-	async function handlePhoneVerifyCode(blockId: string, verificationCode: string) {
-		if (onPhoneVerifyCode) {
-			const result = await onPhoneVerifyCode(blockId, verificationCode);
-			if (result) {
-				phoneVerificationStatus[blockId] = { verified: true, codeSent: true };
-			}
-			// Trigger validation update
-			setTimeout(validateAllFields, 0);
-			return result;
-		}
-		return false;
-	}
 </script>
 
 {#if blocks?.length > 0}
@@ -195,27 +171,16 @@
 				</label>
 			{/if}
 
-			{#if block.type === 'text' || block.type === 'email'}
+			{#if block.type === 'text'}
 				{#if block.properties?.variant === 'phone_number'}
-					<!-- Phone number input with verification -->
-					{#if onPhoneSendCode && onPhoneVerifyCode}
-						<PhoneInput
-							blockId={block.id}
-							value={getBlockValue(block)}
-							onChange={(value) => updateBlockValue(idx, value)}
-							onSendCode={handlePhoneSendCode}
-							onVerifyCode={handlePhoneVerifyCode}
-						/>
-					{:else}
-						<!-- Fallback for when no verification callbacks provided -->
-						<TextInput
-							value={getBlockValue(block)}
-							placeholder="Phone number"
-							required={isFieldRequired(block)}
-							onChange={(value) => updateBlockValue(idx, value)}
-							onBlur={() => validateAllFields()}
-						/>
-					{/if}
+					<PhoneInput
+						blockId={block.id}
+						value={getBlockValue(block)}
+						onChange={(value) => updateBlockValue(idx, value)}
+						onSendCode={onPhoneSendCode}
+						onVerifyCode={onPhoneVerifyCode}
+						onValidationChange={(isVerified) => handlePhoneValidation(block.id, isVerified)}
+					/>
 				{:else if block.properties?.variant === 'note'}
 					<!-- Textarea for notes -->
 					<TextAreaInput

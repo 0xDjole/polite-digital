@@ -1,9 +1,30 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import { countries } from './countries.js';
 	import { onMount } from 'svelte';
 
-	let { value = '', onChange, onSendCode, onVerifyCode, blockId = null } = $props();
+	const countries = [
+		{ iso: 'BA', name: 'Bosnia and Herzegovina', code: '+387', flag: '🇧🇦' },
+		{ iso: 'RS', name: 'Serbia', code: '+381', flag: '🇷🇸' },
+		{ iso: 'HR', name: 'Croatia', code: '+385', flag: '🇭🇷' },
+		{ iso: 'US', name: 'United States', code: '+1', flag: '🇺🇸' },
+		{ iso: 'DE', name: 'Germany', code: '+49', flag: '🇩🇪' },
+		{ iso: 'GB', name: 'United Kingdom', code: '+44', flag: '🇬🇧' },
+		{ iso: 'FR', name: 'France', code: '+33', flag: '🇫🇷' },
+		{ iso: 'IT', name: 'Italy', code: '+39', flag: '🇮🇹' },
+		{ iso: 'ES', name: 'Spain', code: '+34', flag: '🇪🇸' },
+		{ iso: 'NL', name: 'Netherlands', code: '+31', flag: '🇳🇱' },
+		{ iso: 'CH', name: 'Switzerland', code: '+41', flag: '🇨🇭' },
+		{ iso: 'AT', name: 'Austria', code: '+43', flag: '🇦🇹' }
+	];
+
+	let { 
+		value = '', 
+		onChange, 
+		onSendCode, 
+		onVerifyCode, 
+		blockId = null,
+		onValidationChange = () => {}
+	} = $props();
 	
 	// Internal verification state
 	let phoneState = $state({
@@ -81,6 +102,11 @@
 		});
 	}
 
+	// Notify parent when verification status changes
+	$effect(() => {
+		onValidationChange(phoneState.isVerified);
+	});
+
 	function handleVerifyCode() {
 		if (!onVerifyCode) return;
 		
@@ -106,6 +132,7 @@
 		phoneState.verificationCode = cleaned;
 		if (cleaned.length === 4) handleVerifyCode();
 	}
+
 </script>
 
 <div class="bg-secondary border-secondary mt-4 overflow-visible rounded-2xl border shadow-lg">
