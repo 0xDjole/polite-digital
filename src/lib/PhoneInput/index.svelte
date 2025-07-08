@@ -108,7 +108,7 @@
 	}
 </script>
 
-<div class="bg-secondary border-secondary mt-4 overflow-hidden rounded-2xl border shadow-lg">
+<div class="bg-secondary border-secondary mt-4 overflow-visible rounded-2xl border shadow-lg">
 	<div class="border-secondary bg-card border-b px-6 py-4">
 		<h2 class="text-primary text-xl font-bold">Phone Verification</h2>
 		<p class="text-muted mt-1 text-sm">Enter your phone number to verify</p>
@@ -134,7 +134,7 @@
 					</button>
 
 					{#if showDropdown}
-						<div class="absolute top-full left-0 w-96 z-50 bg-popover border-secondary border rounded-xl shadow-lg mt-2 overflow-hidden">
+						<div class="absolute top-full left-0 w-96 z-[9999] bg-popover border-secondary border rounded-xl shadow-lg mt-2 overflow-visible">
 							<div class="p-4 border-secondary border-b bg-muted">
 								<input
 									type="text"
@@ -143,7 +143,7 @@
 									class="form__input w-full text-sm"
 								/>
 							</div>
-							<div class="overflow-y-auto bg-popover" style="max-height: 400px;">
+							<div class="overflow-y-auto bg-popover max-h-80">
 								{#each filteredCountries as country}
 									<button
 										type="button"
