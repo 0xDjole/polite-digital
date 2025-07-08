@@ -33,8 +33,8 @@
 		console.log('Payment form validation updated:', { isValid });
 	}
 
-	// Combined validation - both form and payment must be valid
-	const isCompletelyValid = $derived(formValid && paymentFormValid);
+	// Combined validation - form must be valid, payment form only for credit card
+	const isCompletelyValid = $derived(formValid && (selectedPaymentMethod === 'CASH' || paymentFormValid));
 
 	async function handlePhoneSendCode(blockId, phone) {
 		store.setKey('phoneNumber', phone);
@@ -86,7 +86,7 @@
 		if (!isCompletelyValid) {
 			if (!formValid) {
 				showToast('Please fix the form errors before placing order', 'error', 4000);
-			} else if (!paymentFormValid) {
+			} else if (selectedPaymentMethod === 'CREDIT_CARD' && !paymentFormValid) {
 				showToast('Please complete payment information before placing order', 'error', 4000);
 			}
 			return;

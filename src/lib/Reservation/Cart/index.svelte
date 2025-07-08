@@ -13,6 +13,7 @@
 	let confirmPayment = null;
 	let formValid = $state(false);
 	let formErrors = $state([]);
+	let paymentFormValid = $state(false);
 
 
 	$inspect('sss ',selectedPaymentMethod);
@@ -50,6 +51,11 @@
 		console.log('Cart validation updated:', { isValid, errors });
 	}
 
+	function handlePaymentValidationChange(isValid) {
+		paymentFormValid = isValid;
+		console.log('Payment form validation updated:', { isValid });
+	}
+
 	async function handlePhoneSendCode(blockId, phone) {
 		store.setKey('phoneNumber', phone);
 		return await actions.updateProfilePhone();
@@ -65,6 +71,12 @@
 		// Block submission if form is invalid
 		if (!formValid) {
 			showToast('Please fix the form errors before submitting', 'error', 4000);
+			return;
+		}
+
+		// Block submission if payment form is invalid (only for credit card)
+		if (selectedPaymentMethod === 'CREDIT_CARD' && !paymentFormValid) {
+			showToast('Please complete payment information before submitting', 'error', 4000);
 			return;
 		}
 
@@ -208,6 +220,7 @@
 				{selectedPaymentMethod}
 				onPaymentMethodChange={(method) => selectedPaymentMethod = method}
 				onStripeReady={(confirmFn) => confirmPayment = confirmFn}
+				onValidationChange={handlePaymentValidationChange}
 				error={paymentError}
 				variant="reservation"
 			/>
@@ -341,7 +354,7 @@
 
 		<button
 			class="bg-primary-600 hover:bg-primary-500 mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-			disabled={$store?.loading || paymentProcessing || !formValid || (selectedPaymentMethod === 'CREDIT_CARD' && !confirmPayment)}
+			disabled={$store?.loading || paymentProcessing || !formValid || (selectedPaymentMethod === 'CREDIT_CARD' && (!paymentFormValid || !confirmPayment))}
 			onclick={handleCheckout}>
 			{#if !$store?.loading && !paymentProcessing}
 				<Icon icon={selectedPaymentMethod === 'CREDIT_CARD' ? 'mdi:credit-card' : (selectedPaymentMethod === 'FREE' ? 'mdi:send' : 'mdi:check-circle')} class="h-5 w-5" />
