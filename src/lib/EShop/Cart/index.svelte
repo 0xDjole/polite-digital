@@ -20,12 +20,21 @@
 	let confirmPayment = null;
 	let formValid = $state(false);
 	let formErrors = $state([]);
+	let paymentFormValid = $state(false);
 
 	function handleValidationChange(isValid, errors) {
 		formValid = isValid;
 		formErrors = errors;
 		console.log('EShop Cart validation updated:', { isValid, errors });
 	}
+
+	function handlePaymentValidationChange(isValid) {
+		paymentFormValid = isValid;
+		console.log('Payment form validation updated:', { isValid });
+	}
+
+	// Combined validation - both form and payment must be valid
+	const isCompletelyValid = $derived(formValid && paymentFormValid);
 
 	async function handlePhoneSendCode(blockId, phone) {
 		store.setKey('phoneNumber', phone);
@@ -74,8 +83,12 @@
 
 	async function handleCheckoutComplete() {
 		// Block submission if form is invalid
-		if (!formValid) {
-			showToast('Please fix the form errors before placing order', 'error', 4000);
+		if (!isCompletelyValid) {
+			if (!formValid) {
+				showToast('Please fix the form errors before placing order', 'error', 4000);
+			} else if (!paymentFormValid) {
+				showToast('Please complete payment information before placing order', 'error', 4000);
+			}
 			return;
 		}
 
@@ -310,6 +323,7 @@
 							{selectedPaymentMethod}
 							onPaymentMethodChange={(method) => selectedPaymentMethod = method}
 							onStripeReady={(confirmFn) => confirmPayment = confirmFn}
+							onValidationChange={handlePaymentValidationChange}
 							error={paymentError}
 							variant="eshop"
 						/>
@@ -325,7 +339,7 @@
 							</button>
 							<button 
 								type="submit"
-								disabled={$store.processingCheckout || paymentProcessing || !formValid || (selectedPaymentMethod === 'CREDIT_CARD' && !confirmPayment)}
+								disabled={$store.processingCheckout || paymentProcessing || !isCompletelyValid || (selectedPaymentMethod === 'CREDIT_CARD' && !confirmPayment)}
 								class="flex-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
 							>
 								{#if $store.processingCheckout || paymentProcessing}

@@ -10,6 +10,7 @@
 		selectedPaymentMethod = 'CASH',
 		onPaymentMethodChange = null,
 		onStripeReady = null,
+		onValidationChange = null,
 		error = null,
 		variant = 'default' // 'default', 'eshop', 'reservation'
 	} = $props();
@@ -20,6 +21,9 @@
 	let cardExpiryElement = $state(null);
 	let cardCvcElement = $state(null);
 	let elementsReady = $state(false);
+	let cardNumberValid = $state(false);
+	let cardExpiryValid = $state(false);
+	let cardCvcValid = $state(false);
 
 	// Initialize Stripe
 	$effect(() => {
@@ -92,6 +96,22 @@
 			cardExpiryElement.mount(`#${prefix}card-expiry-element`);
 			cardCvcElement.mount(`#${prefix}card-cvc-element`);
 			
+			// Add validation listeners
+			cardNumberElement.on('change', (event) => {
+				cardNumberValid = event.complete;
+				updateValidationState();
+			});
+			
+			cardExpiryElement.on('change', (event) => {
+				cardExpiryValid = event.complete;
+				updateValidationState();
+			});
+			
+			cardCvcElement.on('change', (event) => {
+				cardCvcValid = event.complete;
+				updateValidationState();
+			});
+			
 			elementsReady = true;
 			console.log(`Stripe card elements mounted for ${variant}`);
 
@@ -111,6 +131,14 @@
 		}
 	}
 
+	function updateValidationState() {
+		const isValid = cardNumberValid && cardExpiryValid && cardCvcValid;
+		console.log('Card validation state:', { cardNumberValid, cardExpiryValid, cardCvcValid, isValid });
+		if (onValidationChange) {
+			onValidationChange(isValid);
+		}
+	}
+
 	function destroyStripeElements() {
 		if (cardNumberElement) cardNumberElement.destroy();
 		if (cardExpiryElement) cardExpiryElement.destroy();
@@ -119,6 +147,10 @@
 		cardExpiryElement = null;
 		cardCvcElement = null;
 		elementsReady = false;
+		cardNumberValid = false;
+		cardExpiryValid = false;
+		cardCvcValid = false;
+		updateValidationState();
 	}
 
 	onDestroy(() => {
@@ -142,6 +174,15 @@
 
 	let variantClasses = $derived(getVariantClasses());
 	let prefix = $derived(variant === 'reservation' ? 'reservation-' : '');
+
+	// Update validation when payment method changes
+	$effect(() => {
+		if (selectedPaymentMethod === 'CASH' && onValidationChange) {
+			onValidationChange(true); // Cash payments are always valid
+		} else if (selectedPaymentMethod === 'CREDIT_CARD' && onValidationChange) {
+			onValidationChange(false); // Credit card starts invalid until filled
+		}
+	});
 
 	// Auto-select payment method if only one is available
 	$effect(() => {
