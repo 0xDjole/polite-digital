@@ -1,6 +1,6 @@
 import lottie from 'lottie-web';
 import gearAnimationData from '@assets/videos/gear.json';
-import { animations } from '../../lib/animation';
+import { animations } from '@lib/animation';
 
 // Store gear animation instance globally
 let gearAnimation = null;
