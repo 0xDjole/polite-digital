@@ -1,6 +1,6 @@
 <script>
 	import Icon from '@iconify/svelte';
-	import { totalCartItems } from './cartStore.js';
+	import { totalCartItems } from '@lib/core/stores/cart';
 	import { getLocale, getRelativeLocaleUrl, t } from '@lib/i18n/index';
 </script>
 
