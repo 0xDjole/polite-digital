@@ -2,7 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { eshopApi, getImageUrl, BUSINESS_ID, formatPrice as sharedFormatPrice } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
-	import { cartItems, cartTotal, cartItemCount, store, actions, initEshopStore } from '@lib/EShop/eshopStore.js';
+	import { cartItems, cartTotal, cartItemCount, store, actions, initEshopStore } from '@lib/core/stores/eshop';
 	import QuantitySelector from '@lib/EShop/QuantitySelector/index.svelte';
 	import AttributeBlocks from '@lib/EShop/AttributeBlocks/index.svelte';
 	import DynamicForm from '@lib/DynamicForm/index.svelte';

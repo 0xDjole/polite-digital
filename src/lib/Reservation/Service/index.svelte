@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { getGalleryThumbnail } from '../../index';
-	import { store, actions, initReservationStore, canProceed, currentStepName } from '../reservationStore.js';
+	import { store, actions, initReservationStore, canProceed, currentStepName } from '@lib/core/stores/reservation';
  	import { t, getLocale, getRelativeLocaleUrl } from '@lib/i18n/index';
 
 	import StepIndicator from '../StepIndicator/index.svelte';

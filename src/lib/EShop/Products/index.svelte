@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { eshopApi, getPrice, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
-	import { store } from '../eshopStore.js';
+	import { store } from '@lib/core/stores/eshop';
 
 
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;

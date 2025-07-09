@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getLocale, getRelativeLocaleUrl } from "@lib/i18n";
-	import { store as reservationStore, actions as reservationActions, initReservationStore } from '../reservationStore.js';
+	import { store as reservationStore, actions as reservationActions, initReservationStore } from '@lib/core/stores/reservation';
 
 	const API_URL = import.meta.env.PUBLIC_API_URL;
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;

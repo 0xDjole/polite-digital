@@ -1,6 +1,6 @@
 <script>
 	import Icon from '@iconify/svelte';
-	import { store, actions } from '../reservationStore.js';
+	import { store, actions } from '@lib/core/stores/reservation';
 	import DynamicForm from '@lib/DynamicForm/index.svelte';
 	import { t, getLocale } from '../../../lib/i18n/index';
 

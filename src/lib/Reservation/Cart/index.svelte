@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import DynamicForm from '@lib/DynamicForm/index.svelte';
-	import { store, actions, initReservationStore, cartParts } from '../reservationStore.js';
+	import { store, actions, initReservationStore, cartParts } from '@lib/core/stores/reservation';
 	import { onMount } from 'svelte';
 	import { t } from '../../../lib/i18n/index';
 	import { showToast } from '@lib/toast.js';

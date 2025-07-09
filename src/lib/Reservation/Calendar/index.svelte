@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import { store, actions } from '../reservationStore.js';
+	import { store, actions } from '@lib/core/stores/reservation';
 
 	function discClass(cell) {
 		if (cell.blank) return '';

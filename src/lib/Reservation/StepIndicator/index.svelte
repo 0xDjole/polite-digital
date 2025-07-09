@@ -1,7 +1,7 @@
 <script>
   import Icon from '@iconify/svelte';
   import check from '@iconify-icons/mdi/check';
-  import { store } from '../reservationStore.js';
+  import { store } from '@lib/core/stores/reservation';
   import { t } from '../../../lib/i18n/index';
 </script>
 
