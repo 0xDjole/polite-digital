@@ -1,6 +1,6 @@
-import { API_URL, BUSINESS_ID } from "@lib/env";
+import { API_URL, BUSINESS_ID } from "@lib/core/config";
 import { z } from "zod";
-import httpClient from "@lib/httpClient";
+import httpClient from "@lib/core/services/http";
 
 // Block utilities are defined below in this file
 
