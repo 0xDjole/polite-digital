@@ -33,6 +33,8 @@ export * from './stores/reservation';
 export * from './utils/blocks';
 export * from './utils/errors';
 export * from './utils/price';
+export * from './utils/svg';
+export * from './utils/text';
 export * from './utils/timezone';
 export * from './utils/validation';
 
@@ -68,6 +70,21 @@ export {
     verifyPhoneCode,
     getBusinessConfig
 } from './services/auth';
+
+export { 
+    // SVG utilities
+    fetchSvgContent,
+    getSvgContentForAstro,
+    injectSvgIntoElement
+} from './utils/svg';
+
+export { 
+    // Text utilities
+    slugify,
+    humanize,
+    categorify,
+    formatDate
+} from './utils/text';
 
 export { 
     // Timezone utilities
