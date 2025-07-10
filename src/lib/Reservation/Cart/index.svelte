@@ -216,7 +216,7 @@
 		{#if selectedPaymentMethod === 'CREDIT_CARD' && ($store.parts || []).some(part => !part.reservationMethod?.includes('INQUIRY'))}
 			<PaymentForm
 				allowedMethods={$store.allowedPaymentMethods || ['CASH']}
-				stripePublicKey={$store.stripeConfig?.publicKey}
+				paymentProvider={$store.paymentConfig?.provider}
 				{selectedPaymentMethod}
 				onPaymentMethodChange={(method) => selectedPaymentMethod = method}
 				onStripeReady={(confirmFn) => confirmPayment = confirmFn}
@@ -301,7 +301,7 @@
 							</button>
 						{/if}
 						
-						{#if availableMethods.includes('CREDIT_CARD') && $store.stripeConfig?.publicKey}
+						{#if availableMethods.includes('CREDIT_CARD') && $store.paymentConfig?.provider}
 							<button 
 								type="button"
 								class="relative flex items-center p-4 rounded-lg cursor-pointer transition-all border-2"

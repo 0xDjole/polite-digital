@@ -39,13 +39,21 @@ export interface ReservationCartPart {
     blocks: any[];
 }
 
+// Payment provider types
+export interface PaymentProviderConfig {
+    type: 'stripe';
+    publicKey: string;
+    secretKey: string;
+    webhookSecret: string;
+}
+
 // Business types
 export interface BusinessConfig {
     orderBlocks?: any[];
     reservationBlocks?: any[];
     allowedPaymentMethods?: string[];
     currency?: string;
-    stripePublicKey?: string;
+    paymentProvider?: PaymentProviderConfig;
 }
 
 export interface Business {
@@ -88,8 +96,8 @@ export interface EshopStoreState {
     phoneError: string | null;
     verificationCode: string;
     verifyError: string | null;
-    stripeConfig: {
-        publicKey: string | null;
+    paymentConfig: {
+        provider: PaymentProviderConfig | null;
         enabled: boolean;
     };
     allowedPaymentMethods: string[];
@@ -147,8 +155,8 @@ export interface ReservationStoreState {
     
     // Payment configuration
     allowedPaymentMethods: string[];
-    stripeConfig: {
-        publicKey: string | null;
+    paymentConfig: {
+        provider: PaymentProviderConfig | null;
         enabled: boolean;
     };
 }

@@ -319,7 +319,7 @@
 						<!-- Payment -->
 						<PaymentForm
 							allowedMethods={$store.allowedPaymentMethods}
-							stripePublicKey={$store.stripeConfig?.publicKey}
+							paymentProvider={$store.paymentConfig?.provider}
 							{selectedPaymentMethod}
 							onPaymentMethodChange={(method) => selectedPaymentMethod = method}
 							onStripeReady={(confirmFn) => confirmPayment = confirmFn}

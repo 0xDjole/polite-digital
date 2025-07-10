@@ -73,8 +73,8 @@ export const store = deepMap<ReservationStoreState>({
 
     // Payment configuration
     allowedPaymentMethods: ["CASH"], // Default to cash only
-    stripeConfig: {
-        publicKey: null,
+    paymentConfig: {
+        provider: null,
         enabled: false,
     },
 });
@@ -386,12 +386,12 @@ export const actions = {
                 const allowedPaymentMethods = business.configs?.allowedPaymentMethods || ["CASH"];
                 store.setKey('allowedPaymentMethods', allowedPaymentMethods);
 
-                // Load Stripe configuration
-                const stripeConfig = {
-                    publicKey: business.configs?.stripePublicKey || null,
-                    enabled: allowedPaymentMethods.includes("CREDIT_CARD") && !!business.configs?.stripePublicKey,
+                // Load payment provider configuration
+                const paymentConfig = {
+                    provider: business.configs?.paymentProvider || null,
+                    enabled: allowedPaymentMethods.includes("CREDIT_CARD") && !!business.configs?.paymentProvider,
                 };
-                store.setKey('stripeConfig', stripeConfig);
+                store.setKey('paymentConfig', paymentConfig);
             }
         } catch (err) {
             console.error('Error loading business config:', err);

@@ -32,9 +32,9 @@ export const store = deepMap<EshopStoreState>({
     phoneError: null,
     verificationCode: "",
     verifyError: null,
-    // Stripe configuration
-    stripeConfig: {
-        publicKey: null,
+    // Payment configuration
+    paymentConfig: {
+        provider: null,
         enabled: false,
     },
     // Allowed payment methods from business config
@@ -150,12 +150,12 @@ export const actions = {
                 const currency = business.configs?.currency || "USD";
                 store.setKey("currency", currency);
 
-                // Load Stripe configuration
-                const stripeConfig = {
-                    publicKey: business.configs?.stripePublicKey || null,
-                    enabled: allowedPaymentMethods.includes("CREDIT_CARD") || false,
+                // Load payment provider configuration
+                const paymentConfig = {
+                    provider: business.configs?.paymentProvider || null,
+                    enabled: allowedPaymentMethods.includes("CREDIT_CARD") && !!business.configs?.paymentProvider,
                 };
-                store.setKey("stripeConfig", stripeConfig);
+                store.setKey("paymentConfig", paymentConfig);
             } else {
                 // Fallback to default checkout blocks if API fails
                 const defaultBlocks: Block[] = [

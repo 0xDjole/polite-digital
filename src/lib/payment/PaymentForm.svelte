@@ -6,7 +6,7 @@
 
 	let { 
 		allowedMethods = ['CASH'],
-		stripePublicKey = null,
+		paymentProvider = null,
 		selectedPaymentMethod = 'CASH',
 		onPaymentMethodChange = null,
 		onStripeReady = null,
@@ -14,6 +14,20 @@
 		error = null,
 		variant = 'default' // 'default', 'eshop', 'reservation'
 	} = $props();
+	
+	// Extract Stripe public key from payment provider
+	let stripePublicKey = $derived(paymentProvider?.type === 'stripe' ? paymentProvider.publicKey : null);
+	
+	// Debug log
+	$effect(() => {
+		console.log('PaymentForm props:', { 
+			paymentProvider, 
+			stripePublicKey,
+			selectedPaymentMethod,
+			allowedMethods,
+			variant 
+		});
+	});
 
 	let stripe = $state(null);
 	let elements = $state(null);
@@ -27,10 +41,12 @@
 
 	// Initialize Stripe
 	$effect(() => {
+		console.log('Stripe init effect:', { stripePublicKey, hasStripe: !!stripe });
 		if (stripePublicKey && !stripe) {
+			console.log(`Loading Stripe with public key: ${stripePublicKey}`);
 			loadStripe(stripePublicKey).then(s => {
 				stripe = s;
-				console.log(`Stripe loaded for ${variant}`);
+				console.log(`Stripe loaded successfully for ${variant}`, s);
 			}).catch(err => {
 				console.error(`Failed to load Stripe for ${variant}:`, err);
 			});
@@ -47,6 +63,7 @@
 	});
 
 	async function setupStripeElements() {
+		console.log('setupStripeElements called:', { stripe: !!stripe, elementsReady });
 		if (!stripe || elementsReady) return;
 
 		await tick();
@@ -56,8 +73,19 @@
 		const cardExpiryContainer = document.getElementById(`${prefix}card-expiry-element`);
 		const cardCvcContainer = document.getElementById(`${prefix}card-cvc-element`);
 		
+		console.log('Container elements:', { 
+			cardNumber: !!cardNumberContainer, 
+			cardExpiry: !!cardExpiryContainer, 
+			cardCvc: !!cardCvcContainer 
+		});
+		
 		if (!cardNumberContainer || !cardExpiryContainer || !cardCvcContainer) {
-			console.error(`Card element containers not found for ${variant}`);
+			console.error(`Card element containers not found for ${variant}`, {
+				prefix,
+				cardNumberId: `${prefix}card-number-element`,
+				cardExpiryId: `${prefix}card-expiry-element`,
+				cardCvcId: `${prefix}card-cvc-element`
+			});
 			return;
 		}
 
