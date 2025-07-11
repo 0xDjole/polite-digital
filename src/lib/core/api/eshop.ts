@@ -1,6 +1,7 @@
 import { API_URL } from '../config';
 import type { ApiResponse } from '../types';
 import { reservationApi } from './reservation';
+import httpClient from '../services/http';
 
 export const eshopApi = {
     // Get products
@@ -17,44 +18,30 @@ export const eshopApi = {
         limit?: number;
         cursor?: string | null;
     }) {
-        let url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
+        const url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
         
-        const params = [];
-        
-        if (categoryIds && categoryIds.length > 0) {
-            params.push(`categoryIds=${encodeURIComponent(JSON.stringify(categoryIds))}`);
-        }
-        
-        if (status) {
-            params.push(`status=${encodeURIComponent(status)}`);
-        }
-        
-        if (limit) {
-            params.push(`limit=${limit}`);
-        }
-        
-        if (cursor) {
-            params.push(`cursor=${encodeURIComponent(cursor)}`);
-        }
+        const response = await httpClient.get(url, {
+            params: {
+                categoryIds: categoryIds && categoryIds.length > 0 ? categoryIds : undefined,
+                status,
+                limit,
+                cursor
+            }
+        });
 
-        if (params.length > 0) {
-            url += `?${params.join('&')}`;
-        }
-
-        try {
-            const res = await fetch(url);
-            const json = await res.json();
+        if (response.success) {
+            const json = response.value;
             return {
                 success: true,
                 data: json.items || [],
                 cursor: json.cursor,
                 total: json.total || 0,
             };
-        } catch (e: any) {
-            console.error("Error fetching products:", e);
+        } else {
+            console.error("Error fetching products:", response.error);
             return {
                 success: false,
-                error: e.message,
+                error: response.error,
                 data: [],
             };
         }

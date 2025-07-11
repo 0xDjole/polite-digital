@@ -111,50 +111,20 @@ const getCollection = async (id) => {
 };
 
 const getCollections = async ({ name = null, ids = null }) => {
-	let url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
-
-	const queryParams = [];
-
-	if (name) {
-		queryParams.push(`name=${encodeURIComponent(name)}`);
-	}
-
-	if (ids) {
-		const idsJson = JSON.stringify(ids);
-		queryParams.push(`ids=${encodeURIComponent(idsJson)}`);
-	}
-
-	if (queryParams.length > 0) {
-		url += `?${queryParams.join("&")}`;
-	}
-
-	const response = await httpClient.get(url);
+	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
+	
+	const response = await httpClient.get(url, {
+		params: { name, ids }
+	});
 	return response.value;
 };
 
 const getCollectionEntries = async ({ collectionId, limit, cursor, ids = null }) => {
-	let url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
-
-	const queryParams = [];
-
-	if (limit) {
-		queryParams.push(`limit=${limit}`);
-	}
-
-	if (cursor) {
-		queryParams.push(`cursor=${cursor}`);
-	}
-
-	if (ids) {
-		const idsJson = JSON.stringify(ids);
-		queryParams.push(`ids=${encodeURIComponent(idsJson)}`);
-	}
-
-	if (queryParams.length > 0) {
-		url += `?${queryParams.join("&")}`;
-	}
-
-	const response = await httpClient.get(url);
+	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
+	
+	const response = await httpClient.get(url, {
+		params: { limit, cursor, ids }
+	});
 	return response.value;
 };
 
@@ -502,44 +472,30 @@ export const cmsApi = () => ({
 export const eshopApi = {
 	// Get products
 	getProducts: async ({ businessId, categoryIds = null, status = "Published", limit = 20, cursor = null }) => {
-		let url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
+		const url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
 		
-		const params = [];
-		
-		if (categoryIds && categoryIds.length > 0) {
-			params.push(`categoryIds=${encodeURIComponent(JSON.stringify(categoryIds))}`);
-		}
-		
-		if (status) {
-			params.push(`status=${encodeURIComponent(status)}`);
-		}
-		
-		if (limit) {
-			params.push(`limit=${limit}`);
-		}
-		
-		if (cursor) {
-			params.push(`cursor=${encodeURIComponent(cursor)}`);
-		}
+		const response = await httpClient.get(url, {
+			params: {
+				categoryIds: categoryIds && categoryIds.length > 0 ? categoryIds : undefined,
+				status,
+				limit,
+				cursor
+			}
+		});
 
-		if (params.length > 0) {
-			url += `?${params.join('&')}`;
-		}
-
-		try {
-			const res = await fetch(url);
-			const json = await res.json();
+		if (response.success) {
+			const json = response.value;
 			return {
 				success: true,
 				data: json.items || [],
 				cursor: json.cursor,
 				total: json.total || 0,
 			};
-		} catch (e) {
-			console.error("Error fetching products:", e);
+		} else {
+			console.error("Error fetching products:", response.error);
 			return {
 				success: false,
-				error: e.message,
+				error: response.error,
 				data: [],
 			};
 		}

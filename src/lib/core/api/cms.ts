@@ -9,24 +9,11 @@ const getCollection = async (id: string) => {
 };
 
 const getCollections = async ({ name = null, ids = null }: { name?: string | null; ids?: string[] | null }) => {
-    let url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
-
-    const queryParams = [];
-
-    if (name) {
-        queryParams.push(`name=${encodeURIComponent(name)}`);
-    }
-
-    if (ids) {
-        const idsJson = JSON.stringify(ids);
-        queryParams.push(`ids=${encodeURIComponent(idsJson)}`);
-    }
-
-    if (queryParams.length > 0) {
-        url += `?${queryParams.join("&")}`;
-    }
-
-    const response = await httpClient.get(url);
+    const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
+    
+    const response = await httpClient.get(url, {
+        params: { name, ids }
+    });
     return response.value;
 };
 
@@ -41,28 +28,11 @@ const getCollectionEntries = async ({
     cursor?: string; 
     ids?: string[] | null;
 }) => {
-    let url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
-
-    const queryParams = [];
-
-    if (limit) {
-        queryParams.push(`limit=${limit}`);
-    }
-
-    if (cursor) {
-        queryParams.push(`cursor=${cursor}`);
-    }
-
-    if (ids) {
-        const idsJson = JSON.stringify(ids);
-        queryParams.push(`ids=${encodeURIComponent(idsJson)}`);
-    }
-
-    if (queryParams.length > 0) {
-        url += `?${queryParams.join("&")}`;
-    }
-
-    const response = await httpClient.get(url);
+    const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
+    
+    const response = await httpClient.get(url, {
+        params: { limit, cursor, ids }
+    });
     return response.value;
 };
 

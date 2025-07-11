@@ -1,5 +1,6 @@
 import { API_URL } from '../config';
 import type { ApiResponse } from '../types';
+import httpClient from '../services/http';
 
 export const reservationApi = {
     // Get available slots for a service
@@ -18,24 +19,28 @@ export const reservationApi = {
         limit?: number;
         providerId?: string | null;
     }) {
-        let url = `${API_URL}/v1/businesses/${businessId}/services/${serviceId}/available-slots?from=${from}&to=${to}&limit=${limit}`;
+        const url = `${API_URL}/v1/businesses/${businessId}/services/${serviceId}/available-slots`;
+        
+        const response = await httpClient.get(url, {
+            params: {
+                from,
+                to,
+                limit,
+                providerId
+            }
+        });
 
-        if (providerId) {
-            url += `&providerId=${providerId}`;
-        }
-
-        try {
-            const res = await fetch(url);
-            const json = await res.json();
+        if (response.success) {
+            const json = response.value;
             return {
                 success: true,
                 data: json.data?.items || json.items || [],
             };
-        } catch (e: any) {
-            console.error("Error fetching available slots:", e);
+        } else {
+            console.error("Error fetching available slots:", response.error);
             return {
                 success: false,
-                error: e.message,
+                error: response.error,
                 data: [],
             };
         }
@@ -43,19 +48,26 @@ export const reservationApi = {
 
     // Get all providers for a service
     async getProviders({ businessId, serviceId, limit = 50 }: { businessId: string; serviceId: string; limit?: number }) {
-        try {
-            const url = `${API_URL}/v1/businesses/${businessId}/providers?serviceId=${serviceId}&limit=${limit}`;
-            const res = await fetch(url);
-            const json = await res.json();
+        const url = `${API_URL}/v1/businesses/${businessId}/providers`;
+        
+        const response = await httpClient.get(url, {
+            params: {
+                serviceId,
+                limit
+            }
+        });
+
+        if (response.success) {
+            const json = response.value;
             return {
                 success: true,
                 data: json.items || [],
             };
-        } catch (e: any) {
-            console.error("Error loading providers:", e);
+        } else {
+            console.error("Error loading providers:", response.error);
             return {
                 success: false,
-                error: e.message,
+                error: response.error,
                 data: [],
             };
         }
