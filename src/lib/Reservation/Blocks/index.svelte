@@ -91,7 +91,15 @@
 				</div>
 			{/if}
 		{:else if block.type === 'text'}
-			<p style={getStyleString(block)}>{getLocalizedContent(block.value?.[0])}</p>
+			{@const content = getLocalizedContent(block.value?.[0])}
+			{@const url = block.properties?.url}
+			{#if url}
+				<a href={url} target="_blank" rel="noopener noreferrer" style={getStyleString(block)}>
+					{content}
+				</a>
+			{:else}
+				<p style={getStyleString(block)}>{content}</p>
+			{/if}
 		{:else if block.type === 'media'}
 			{@const imageUrl = getImageUrl(block.value?.[0])}
 			{@const url = block.properties?.url}
@@ -99,22 +107,14 @@
 			{#if imageUrl}
 				<div style={getStyleString(block)}>
 					{#if url}
-						<div class="flex flex-col gap-2 items-center">
-							<a href={url} target="_blank" rel="noopener noreferrer" class="inline-block transition-opacity duration-300 hover:opacity-80">
-								<img
-									src={imageUrl}
-									alt={altText}
-									class="transition-transform duration-500 hover:scale-105"
-									referrerpolicy="no-referrer"
-								/>
-							</a>
-							<div class="flex items-center gap-2 flex-wrap justify-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">
-								<span class="text-gray-600 font-medium whitespace-nowrap">🔗 Link:</span>
-								<a href={url} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors break-all">
-									{url}
-								</a>
-							</div>
-						</div>
+						<a href={url} target="_blank" rel="noopener noreferrer" class="inline-block transition-opacity duration-300 hover:opacity-80">
+							<img
+								src={imageUrl}
+								alt={altText}
+								class="transition-transform duration-500 hover:scale-105"
+								referrerpolicy="no-referrer"
+							/>
+						</a>
 					{:else}
 						<img
 							src={imageUrl}
