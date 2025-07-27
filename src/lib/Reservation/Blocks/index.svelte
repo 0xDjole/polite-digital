@@ -77,11 +77,11 @@
 				{getLocalizedContent(block.value?.[0])}
 			</h3>
 		{:else if block.type === 'text' && block.properties?.variant === 'url'}
-			{@const linkText = getLocalizedContent(block.value?.[0]) || block.properties?.href || 'Link'}
-			{@const href = block.properties?.href}
-			{#if href}
+			{@const linkText = getLocalizedContent(block.value?.[0]) || block.properties?.url || 'Link'}
+			{@const url = block.properties?.url}
+			{#if url}
 				<div style={getStyleString(block)}>
-					<a href={href} target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 underline break-all">
+					<a href={url} target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 underline break-all">
 						{linkText}
 					</a>
 				</div>
@@ -94,19 +94,27 @@
 			<p style={getStyleString(block)}>{getLocalizedContent(block.value?.[0])}</p>
 		{:else if block.type === 'media'}
 			{@const imageUrl = getImageUrl(block.value?.[0])}
-			{@const href = block.properties?.href}
+			{@const url = block.properties?.url}
 			{@const altText = block.properties?.label?.en || block.properties?.label?.[Object.keys(block.properties?.label || {})[0]] || 'Image'}
 			{#if imageUrl}
 				<div style={getStyleString(block)}>
-					{#if href}
-						<a href={href} target="_blank" rel="noopener noreferrer" class="inline-block transition-opacity duration-300 hover:opacity-80">
-							<img
-								src={imageUrl}
-								alt={altText}
-								class="transition-transform duration-500 hover:scale-105"
-								referrerpolicy="no-referrer"
-							/>
-						</a>
+					{#if url}
+						<div class="flex flex-col gap-2 items-center">
+							<a href={url} target="_blank" rel="noopener noreferrer" class="inline-block transition-opacity duration-300 hover:opacity-80">
+								<img
+									src={imageUrl}
+									alt={altText}
+									class="transition-transform duration-500 hover:scale-105"
+									referrerpolicy="no-referrer"
+								/>
+							</a>
+							<div class="flex items-center gap-2 flex-wrap justify-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-sm">
+								<span class="text-gray-600 font-medium whitespace-nowrap">🔗 Link:</span>
+								<a href={url} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors break-all">
+									{url}
+								</a>
+							</div>
+						</div>
 					{:else}
 						<img
 							src={imageUrl}
