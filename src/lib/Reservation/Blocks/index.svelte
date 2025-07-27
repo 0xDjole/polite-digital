@@ -107,11 +107,10 @@
 			{#if imageUrl}
 				<div style={getStyleString(block)}>
 					{#if url}
-						<a href={url} target="_blank" rel="noopener noreferrer" class="inline-block transition-opacity duration-300 hover:opacity-80">
+						<a href={url} target="_blank" rel="noopener noreferrer">
 							<img
 								src={imageUrl}
 								alt={altText}
-								class="transition-transform duration-500 hover:scale-105"
 								referrerpolicy="no-referrer"
 							/>
 						</a>
@@ -119,7 +118,6 @@
 						<img
 							src={imageUrl}
 							alt={altText}
-							class="transition-transform duration-500 hover:scale-105"
 							referrerpolicy="no-referrer"
 						/>
 					{/if}
