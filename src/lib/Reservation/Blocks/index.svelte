@@ -76,18 +76,45 @@
 			<h3 class="text-xl font-medium my-2" style={getStyleString(block)}>
 				{getLocalizedContent(block.value?.[0])}
 			</h3>
+		{:else if block.type === 'text' && block.properties?.variant === 'url'}
+			{@const linkText = getLocalizedContent(block.value?.[0]) || block.properties?.href || 'Link'}
+			{@const href = block.properties?.href}
+			{#if href}
+				<div style={getStyleString(block)}>
+					<a href={href} target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 underline break-all">
+						{linkText}
+					</a>
+				</div>
+			{:else}
+				<div style={getStyleString(block)} class="text-gray-500 italic">
+					[URL: {linkText}]
+				</div>
+			{/if}
 		{:else if block.type === 'text'}
 			<p style={getStyleString(block)}>{getLocalizedContent(block.value?.[0])}</p>
 		{:else if block.type === 'media'}
 			{@const imageUrl = getImageUrl(block.value?.[0])}
+			{@const href = block.properties?.href}
+			{@const altText = block.properties?.label?.en || block.properties?.label?.[Object.keys(block.properties?.label || {})[0]] || 'Image'}
 			{#if imageUrl}
 				<div style={getStyleString(block)}>
-					<img
-						src={imageUrl}
-						alt=""
-						class="transition-transform duration-500 hover:scale-105"
-						referrerpolicy="no-referrer"
-					/>
+					{#if href}
+						<a href={href} target="_blank" rel="noopener noreferrer" class="inline-block transition-opacity duration-300 hover:opacity-80">
+							<img
+								src={imageUrl}
+								alt={altText}
+								class="transition-transform duration-500 hover:scale-105"
+								referrerpolicy="no-referrer"
+							/>
+						</a>
+					{:else}
+						<img
+							src={imageUrl}
+							alt={altText}
+							class="transition-transform duration-500 hover:scale-105"
+							referrerpolicy="no-referrer"
+						/>
+					{/if}
 				</div>
 			{/if}
 		{:else if block.type === 'block' && block.properties?.variant === 'badge'}

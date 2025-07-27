@@ -289,12 +289,25 @@ export const getImageUrl = (imageBlock: any, isBlock = true) => {
 
     const storageUrl = STORAGE_URL || "";
 
+    // Helper to check if URL is external
+    const isExternalUrl = (url: string) => {
+        return url.startsWith('http://') || url.startsWith('https://');
+    };
+
     if (isBlock) {
         if (typeof imageBlock === "string") {
+            // Check if it's already a full URL
+            if (isExternalUrl(imageBlock)) {
+                return imageBlock;
+            }
             return `${storageUrl}/${imageBlock}`;
         }
 
         if (imageBlock.url) {
+            // Check if it's already a full URL
+            if (isExternalUrl(imageBlock.url)) {
+                return imageBlock.url;
+            }
             return `${storageUrl}/${imageBlock.url}`;
         }
     }
@@ -304,7 +317,12 @@ export const getImageUrl = (imageBlock: any, isBlock = true) => {
         imageBlock.resolutions.original &&
         imageBlock.resolutions.original.url
     ) {
-        return `${storageUrl}/${imageBlock.resolutions.original.url}`;
+        const url = imageBlock.resolutions.original.url;
+        // Check if it's already a full URL
+        if (isExternalUrl(url)) {
+            return url;
+        }
+        return `${storageUrl}/${url}`;
     }
 
     return null;
