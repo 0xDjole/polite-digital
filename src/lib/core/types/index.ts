@@ -71,6 +71,31 @@ export interface ApiResponse<T> {
     total?: number;
 }
 
+export interface PaginatedResponse<T> {
+    data: T[];
+    meta?: {
+        total: number;
+        page: number;
+        per_page: number;
+    };
+}
+
+// Newsletter types
+export interface Newsletter {
+    id: string;
+    business_id: string;
+    name: string;
+    description: string;
+    newsletter_type: 'Free' | 'Paid';
+    status: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
+    stripe_product_id?: string;
+    stripe_price_id?: string;
+    price?: number;
+    currency?: string;
+    created_at: number;
+    updated_at: number;
+}
+
 // Block types
 export interface Block {
     id: string;
