@@ -15,6 +15,12 @@ export interface NewsletterResponse {
 	};
 }
 
+export interface NewsletterSubscribePayload {
+	newsletterId: string;
+	email: string;
+	providerCustomerId: string | null;
+}
+
 export const newsletterApi = {
 	async find(payload: NewsletterFindPayload): Promise<PaginatedResponse<Newsletter>> {
 		const params = new URLSearchParams({
@@ -62,12 +68,14 @@ export const newsletterApi = {
 		newsletterId,
 		businessId,
 		successUrl,
-		cancelUrl
+		cancelUrl,
+		email
 	}: {
 		newsletterId: string;
 		businessId: string;
 		successUrl: string;
 		cancelUrl: string;
+		email: string;
 	}) {
 		try {
 			// Get the backend API URL from environment
@@ -84,6 +92,7 @@ export const newsletterApi = {
 					businessId,
 					successUrl,
 					cancelUrl,
+					email,
 				}),
 			});
 
@@ -101,6 +110,43 @@ export const newsletterApi = {
 			return {
 				success: false,
 				error: error instanceof Error ? error.message : 'Failed to create checkout session',
+			};
+		}
+	},
+
+	async subscribe(payload: NewsletterSubscribePayload) {
+		try {
+			// Get the backend API URL from environment
+			const backendUrl = import.meta.env.PUBLIC_SERVER_URL || 'http://localhost:8000';
+			const url = `${backendUrl}/v1/newsletters/${payload.newsletterId}/subscribe`;
+
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					newsletterId: payload.newsletterId,
+					email: payload.email,
+					providerCustomerId: payload.providerCustomerId,
+				}),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+			}
+
+			const data = await response.json();
+			return {
+				success: true,
+				data,
+			};
+		} catch (error) {
+			console.error('Newsletter subscription error:', error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : 'Failed to subscribe to newsletter',
 			};
 		}
 	},

@@ -24,6 +24,7 @@
 
 	let subscribing = $state(false);
 	let error = $state<string | null>(null);
+	let email = $state('');
 
 	const formatPrice = (price: number, currency: string = 'USD') => {
 		return new Intl.NumberFormat('en-US', {
@@ -33,10 +34,35 @@
 	};
 
 	const handleSubscribe = async () => {
+		if (!email || !email.includes('@')) {
+			error = 'Please enter a valid email address';
+			return;
+		}
+
+		subscribing = true;
+		error = null;
+
 		if (newsletter.newsletter_type === 'Free') {
-			// For free newsletters, we could show a simple email subscription form
-			// For now, just show a message
-			alert('Free newsletter subscription would be implemented here');
+			try {
+				const { newsletterApi } = await import('../core/api/newsletter');
+				const response = await newsletterApi.subscribe({
+					newsletterId: newsletter.id,
+					email: email,
+					providerCustomerId: null,
+				});
+
+				if (response.success) {
+					alert('Successfully subscribed to the newsletter!');
+					email = ''; // Clear the email field
+				} else {
+					throw new Error(response.error || 'Failed to subscribe');
+				}
+			} catch (err) {
+				console.error('Subscription error:', err);
+				error = err instanceof Error ? err.message : 'Failed to subscribe';
+			} finally {
+				subscribing = false;
+			}
 			return;
 		}
 
@@ -45,9 +71,6 @@
 			error = 'This newsletter is not properly configured for subscriptions';
 			return;
 		}
-
-		subscribing = true;
-		error = null;
 
 		try {
 			// Initialize Stripe - use the key from dev.json
@@ -69,6 +92,7 @@
 				businessId: newsletter.businessId,
 				successUrl: `${window.location.origin}/newsletters?success=true`,
 				cancelUrl: `${window.location.origin}/newsletters?canceled=true`,
+				email: email,
 			});
 
 			if (!response.success) {
@@ -125,9 +149,17 @@
 		<!-- Subscription Button -->
 		{#if newsletter.status === 'ACTIVE'}
 			<div class="space-y-2">
+				<input
+					type="email"
+					bind:value={email}
+					placeholder="Enter your email"
+					class="w-full px-3 py-2 border border-border rounded-md text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+					required
+				/>
+				
 				<button
 					onclick={handleSubscribe}
-					disabled={subscribing}
+					disabled={subscribing || !email}
 					class="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-md font-medium transition-colors"
 				>
 					{#if subscribing}
