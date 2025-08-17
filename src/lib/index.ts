@@ -106,24 +106,27 @@ const collectionSchema = z.object({});
 
 const getCollection = async (id) => {
 	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${id}`;
+
+	console.log("url", url);
 	const { value } = await httpClient.get(url);
+
 	return value;
 };
 
 const getCollections = async ({ name = null, ids = null }) => {
 	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
-	
+
 	const response = await httpClient.get(url, {
-		params: { name, ids }
+		params: { name, ids },
 	});
 	return response.value;
 };
 
 const getCollectionEntries = async ({ collectionId, limit, cursor, ids = null }) => {
 	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
-	
+
 	const response = await httpClient.get(url, {
-		params: { limit, cursor, ids }
+		params: { limit, cursor, ids },
 	});
 	return response.value;
 };
@@ -148,7 +151,7 @@ const getCollectionEntry = async ({ collectionId, id }) => {
 	return response;
 };
 
-export function getBlockLabel(block: any, locale: string = 'en'): string {
+export function getBlockLabel(block: any, locale: string = "en"): string {
 	if (!block) return "";
 
 	if (block.properties?.label) {
@@ -164,9 +167,9 @@ export function getBlockLabel(block: any, locale: string = 'en'): string {
 			return block.properties.label;
 		}
 	}
-	
+
 	// Convert key to readable format
-	return block.key?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "";
+	return block.key?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 }
 
 export function createBlock(type: string, key: string, label?: string): any {
@@ -364,14 +367,14 @@ export function thumbnailUrl(service) {
 }
 
 // format price - handles both complex price options and simple price objects
-export function getPrice(priceOption, currency, locale = 'en') {
+export function getPrice(priceOption, currency, locale = "en") {
 	if (!priceOption) return "";
-	
+
 	// Handle simple price objects (from eshop) - now currency comes from business
 	if (priceOption.basePrice && !priceOption.type) {
 		return `${priceOption.basePrice} ${currency}`;
 	}
-	
+
 	// Handle complex price options (from services) - now currency comes from business
 	switch (priceOption.type) {
 		case "standard":
@@ -388,16 +391,12 @@ export function getPrice(priceOption, currency, locale = 'en') {
 
 // Enhanced price formatter with currency symbols and rounding
 export function formatPrice(priceOption, currency, options = {}) {
-	if (!priceOption) return '';
-	
-	const { 
-		showSymbols = true, 
-		decimalPlaces = 2,
-		locale = 'en' 
-	} = options;
-	
+	if (!priceOption) return "";
+
+	const { showSymbols = true, decimalPlaces = 2, locale = "en" } = options;
+
 	let price;
-	
+
 	// Handle simple price objects (from eshop)
 	if (priceOption.basePrice && !priceOption.type) {
 		price = Number(priceOption.basePrice);
@@ -405,24 +404,23 @@ export function formatPrice(priceOption, currency, options = {}) {
 	// Handle complex price options (from services) - use getPrice for these
 	else if (priceOption.type) {
 		return getPrice(priceOption, currency, locale);
+	} else {
+		return "";
 	}
-	else {
-		return '';
-	}
-	
+
 	const roundedPrice = price.toFixed(decimalPlaces);
-	
+
 	if (!showSymbols) {
 		return `${roundedPrice} ${currency}`;
 	}
-	
+
 	// Format with currency symbols
 	switch (currency) {
-		case 'USD':
+		case "USD":
 			return `$${roundedPrice}`;
-		case 'EUR':
+		case "EUR":
 			return `€${roundedPrice}`;
-		case 'GBP':
+		case "GBP":
 			return `£${roundedPrice}`;
 		default:
 			return `${roundedPrice} ${currency}`;
@@ -471,16 +469,22 @@ export const cmsApi = () => ({
 
 export const eshopApi = {
 	// Get products
-	getProducts: async ({ businessId, categoryIds = null, status = "Published", limit = 20, cursor = null }) => {
+	getProducts: async ({
+		businessId,
+		categoryIds = null,
+		status = "Published",
+		limit = 20,
+		cursor = null,
+	}) => {
 		const url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
-		
+
 		const response = await httpClient.get(url, {
 			params: {
 				categoryIds: categoryIds && categoryIds.length > 0 ? categoryIds : undefined,
 				status,
 				limit,
-				cursor
-			}
+				cursor,
+			},
 		});
 
 		if (response.success) {
@@ -533,14 +537,17 @@ export const eshopApi = {
 				...(paymentIntentId && { paymentIntentId }),
 			};
 
-			const res = await fetch(`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/orders/checkout`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+			const res = await fetch(
+				`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/orders/checkout`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(payload),
 				},
-				body: JSON.stringify(payload),
-			});
+			);
 
 			if (!res.ok) {
 				const error = (await res.text()) || res.statusText;
@@ -565,22 +572,25 @@ export const eshopApi = {
 		try {
 			const tokenResponse = await reservationApi.getGuestToken();
 			if (!tokenResponse.success) {
-				throw new Error('Failed to get guest token');
+				throw new Error("Failed to get guest token");
 			}
 			const token = tokenResponse.token;
-			
-			const res = await fetch(`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/payment/create-intent`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+
+			const res = await fetch(
+				`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/payment/create-intent`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						amount,
+						currency,
+						businessId,
+					}),
 				},
-				body: JSON.stringify({
-					amount,
-					currency,
-					businessId,
-				}),
-			});
+			);
 
 			if (!res.ok) {
 				const error = (await res.text()) || res.statusText;
@@ -593,7 +603,7 @@ export const eshopApi = {
 				data: json,
 			};
 		} catch (e) {
-			console.error('Payment intent creation failed:', e);
+			console.error("Payment intent creation failed:", e);
 			return {
 				success: false,
 				error: e.message,
@@ -802,20 +812,20 @@ export const reservationApi = {
 // ===== ADDITIONAL BLOCK UTILITIES =====
 
 // Extract localized text value from a block, handling multilingual content
-export function getBlockTextValue(block: any, locale: string = 'en'): string {
-	if (!block || !block.value || block.value.length === 0) return '';
-	
+export function getBlockTextValue(block: any, locale: string = "en"): string {
+	if (!block || !block.value || block.value.length === 0) return "";
+
 	const firstValue = block.value[0];
-	
+
 	// Handle multilingual object
-	if (typeof firstValue === 'object' && firstValue !== null) {
+	if (typeof firstValue === "object" && firstValue !== null) {
 		// Try specified locale first, then 'en', then first available language
 		if (firstValue[locale]) return firstValue[locale];
 		if (firstValue.en) return firstValue.en;
 		const values = Object.values(firstValue);
-		return String(values[0] || '');
+		return String(values[0] || "");
 	}
-	
+
 	// Handle simple string
 	return String(firstValue);
 }
@@ -830,57 +840,57 @@ export interface ValidationResult {
 // Phone number validation
 export function validatePhoneNumber(phone: string): ValidationResult {
 	if (!phone) {
-		return { isValid: false, error: 'Phone number is required' };
+		return { isValid: false, error: "Phone number is required" };
 	}
-	
-	const cleaned = phone.replace(/\D/g, '');
-	
+
+	const cleaned = phone.replace(/\D/g, "");
+
 	if (cleaned.length < 8) {
-		return { isValid: false, error: 'Phone number is too short' };
+		return { isValid: false, error: "Phone number is too short" };
 	}
-	
+
 	if (cleaned.length > 15) {
-		return { isValid: false, error: 'Phone number is too long' };
+		return { isValid: false, error: "Phone number is too long" };
 	}
-	
+
 	return { isValid: true };
 }
 
 // Email validation
 export function validateEmail(email: string): ValidationResult {
 	if (!email) {
-		return { isValid: false, error: 'Email is required' };
+		return { isValid: false, error: "Email is required" };
 	}
-	
+
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	
+
 	if (!emailRegex.test(email)) {
-		return { isValid: false, error: 'Please enter a valid email address' };
+		return { isValid: false, error: "Please enter a valid email address" };
 	}
-	
+
 	return { isValid: true };
 }
 
 // Verification code validation (4-digit codes)
 export function validateVerificationCode(code: string): ValidationResult {
 	if (!code) {
-		return { isValid: false, error: 'Verification code is required' };
+		return { isValid: false, error: "Verification code is required" };
 	}
-	
-	const cleaned = code.replace(/\D/g, '');
-	
+
+	const cleaned = code.replace(/\D/g, "");
+
 	if (cleaned.length !== 4) {
-		return { isValid: false, error: 'Please enter a 4-digit verification code' };
+		return { isValid: false, error: "Please enter a 4-digit verification code" };
 	}
-	
+
 	return { isValid: true };
 }
 
 // Generic required field validation
-export function validateRequired(value: any, fieldName: string = 'This field'): ValidationResult {
-	if (value === null || value === undefined || value === '') {
+export function validateRequired(value: any, fieldName: string = "This field"): ValidationResult {
+	if (value === null || value === undefined || value === "") {
 		return { isValid: false, error: `${fieldName} is required` };
 	}
-	
+
 	return { isValid: true };
 }
