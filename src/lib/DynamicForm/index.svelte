@@ -66,8 +66,6 @@
 		onValidationChange(isFormValid, errors);
 		
 		// Note: Removed automatic focus to prevent interference with PhoneInput component
-		
-		console.log('Form validation:', { isValid: isFormValid, errors: errors.length, errorDetails: errors });
 	}
 
 	// Run validation on mount and when blocks change
