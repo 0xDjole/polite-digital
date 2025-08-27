@@ -1,7 +1,7 @@
 ---
 import { getLocale } from "@lib/i18n";
 import { cmsApi, getBlockObjectValues } from "@lib/index";
-import { getSvgContentForAstro } from "@lib/svg-helper-utility";
+import { getSvgContentForAstro } from "@lib/core/utils/svg";
 
 const currLocale = getLocale(Astro.currentLocale);
 const { getCollection } = cmsApi();

@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { getLocale, getRelativeLocaleUrl } from "@lib/i18n";
+	import { store as reservationStore, actions as reservationActions, initReservationStore } from '@lib/core/stores/reservation';
 
 	const API_URL = import.meta.env.PUBLIC_API_URL;
 	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
@@ -11,6 +12,9 @@
 	let loading = true;
 	let error = null;
 
+	// Get currency from reservation store
+	$: businessCurrency = $reservationStore.currency;
+
 	function getGalleryThumbnail(gallery) {
 		if (!gallery?.length) return null;
 		const item = gallery.find((g) => g.settings?.isThumbnail) || gallery[0];
@@ -18,16 +22,16 @@
 		return res?.url || null;
 	}
 
-	function getPrice(priceOption) {
+	function getPrice(priceOption, currency = 'USD') {
 		if (!priceOption) return "";
 		switch (priceOption.type) {
 			case "standard":
-				return `${priceOption.basePrice}${priceOption.currency}`;
+				return `${priceOption.basePrice} ${currency}`;
 			case "custom":
 				return priceOption.customValue[locale] || priceOption.customValue.en;
 			case "complex": {
 				const val = priceOption.customValue[locale] || priceOption.customValue.en;
-				return `${priceOption.basePrice}${priceOption.currency} + ${val}`;
+				return `${priceOption.basePrice} ${currency} + ${val}`;
 			}
 			default:
 				return "";
@@ -57,6 +61,9 @@
 	}
 
 	onMount(() => {
+		// Initialize reservation store to load business config
+		initReservationStore();
+		reservationActions.loadBusinessConfig();
 		loadServices();
 	});
 </script>
@@ -142,7 +149,7 @@
 						{service.description?.[locale] || service.description?.en || ""}
 					</p>
 					<p class="text-primary-600 font-medium">
-						{getPrice(service.priceOption)}
+						{getPrice(service.priceOption, businessCurrency)}
 					</p>
 				</div>
 			</a>

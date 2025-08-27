@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import { getPrice, getGalleryThumbnail } from '../../index';
-	import { store, actions, initReservationStore, canProceed, currentStepName } from '../reservationStore.js';
+	import { getGalleryThumbnail } from '../../index';
+	import { store, actions, initReservationStore, canProceed, currentStepName } from '@lib/core/stores/reservation';
  	import { t, getLocale, getRelativeLocaleUrl } from '@lib/i18n/index';
 
 	import StepIndicator from '../StepIndicator/index.svelte';
@@ -16,9 +16,30 @@
 
 	export let service;
 
+	function getPrice(priceOption, currency = 'USD') {
+		if (!priceOption) return "";
+		const locale = getLocale();
+		switch (priceOption.type) {
+			case "standard":
+				return `${priceOption.basePrice} ${currency}`;
+			case "custom":
+				return priceOption.customValue[locale] || priceOption.customValue.en;
+			case "complex": {
+				const val = priceOption.customValue[locale] || priceOption.customValue.en;
+				return `${priceOption.basePrice} ${currency} + ${val}`;
+			}
+			default:
+				return "";
+		}
+	}
+
+	// Get currency from reservation store
+	$: businessCurrency = $store.currency;
+
 	onMount(() => {
 		initReservationStore();
 		actions.setService(service);
+		actions.loadBusinessConfig();
 	});
 
 	const locale = getLocale();
@@ -52,7 +73,7 @@
 			</div>
 
 			<div class="bg-base-100/10 rounded-xl px-6 py-3 backdrop-blur-md">
-				<p class="font-mono text-3xl font-bold">{getPrice(service.priceOption)}</p>
+				<p class="font-mono text-3xl font-bold">{getPrice(service.priceOption, businessCurrency)}</p>
 			</div>
 		</div>
 	</div>

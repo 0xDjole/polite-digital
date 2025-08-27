@@ -1,6 +1,6 @@
 <script>
 	import Icon from '@iconify/svelte';          
-	import { store, actions } from '../reservationStore.js';
+	import { store, actions } from '@lib/core/stores/reservation';
 	import { t } from '../../../lib/i18n/index';
 	
 	const changeTZ = (e) => actions.setSelectedTimeZone(e.target.value);

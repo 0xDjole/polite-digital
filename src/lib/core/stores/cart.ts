@@ -1,7 +1,7 @@
 // Unified cart store that manages both e-shop and reservation carts
 import { computed } from "nanostores";
-import { cartItems as eshopItems } from "../EShop/eshopStore.js";
-import { cartParts as reservationItems } from "../Reservation/reservationStore.js";
+import { cartItems as eshopItems } from "./eshop";
+import { cartParts as reservationItems } from "./reservation";
 
 // Combined cart count
 export const totalCartItems = computed([eshopItems, reservationItems], (eshop, reservation) => {

@@ -11,9 +11,9 @@
 		showEshopSection,
 		showReservationSection,
 		showBothSections
-	} from './cartStore.js';
-	import { initEshopStore } from '../EShop/eshopStore.js';
-	import { initReservationStore } from '../Reservation/reservationStore.js';
+	} from '@lib/core/stores/cart';
+	import { initEshopStore } from '@lib/core/stores/eshop';
+	import { initReservationStore } from '@lib/core/stores/reservation';
 
 	onMount(() => {
 		initEshopStore();

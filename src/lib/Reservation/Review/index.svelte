@@ -1,8 +1,26 @@
 <script>
 	import Icon from '@iconify/svelte';
-	import { store, actions } from '../reservationStore.js';
-	import DynamicForm from '../DynamicForm/index.svelte';
+	import { store, actions } from '@lib/core/stores/reservation';
+	import DynamicForm from '@lib/DynamicForm/index.svelte';
 	import { t, getLocale } from '../../../lib/i18n/index';
+
+	function update(idx, v) {
+		const svc = { ...$store.service };
+		const list = [...svc.reservationBlocks];
+		list[idx] = { ...list[idx], value: Array.isArray(v) ? v : [v] };
+		svc.reservationBlocks = list;
+		store.setKey('service', svc);
+	}
+
+	async function handlePhoneSendCode(blockId, phone) {
+		store.setKey('phoneNumber', phone);
+		return await actions.updateProfilePhone();
+	}
+
+	async function handlePhoneVerifyCode(blockId, code) {
+		store.setKey('verificationCode', code);
+		return await actions.verifyPhoneCode();
+	}
 </script>
 
 {#if $store.selectedSlot}
@@ -79,7 +97,12 @@
 			</div>
 		</div>
 		
-		<DynamicForm />
+		<DynamicForm 
+			blocks={$store.service?.reservationBlocks || []} 
+			onUpdate={update}
+			onPhoneSendCode={handlePhoneSendCode}
+			onPhoneVerifyCode={handlePhoneVerifyCode}
+		/>
 		
 		<button
 			class="bg-primary-600 hover:bg-primary-700 text-white w-full flex items-center justify-center gap-2 py-3 rounded-lg mt-4 transition"

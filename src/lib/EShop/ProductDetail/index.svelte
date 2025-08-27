@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte';
 	import { eshopApi, reservationApi, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
-	import { cartParts } from '@lib/Reservation/reservationStore.js';
-	import { actions } from '../eshopStore.js';
+	import { cartParts } from '@lib/core/stores/reservation';
+	import { actions, store } from '@lib/core/stores/eshop';
 	import QuantitySelector from '../QuantitySelector/index.svelte';
 	import AttributeBlocks from '../AttributeBlocks/index.svelte';
 	import Icon from '@iconify/svelte';
@@ -44,7 +44,9 @@
 
 	function formatPrice(priceOption) {
 		if (!priceOption) return '';
-		return `${priceOption.basePrice} ${priceOption.currency}`;
+		// Get currency from business store
+		const currency = $store.currency || 'USD';
+		return `${priceOption.basePrice} ${currency}`;
 	}
 
 	function getGalleryThumbnail(gallery) {

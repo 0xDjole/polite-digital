@@ -1,6 +1,6 @@
-// src/lib/env.js
-const getEnvVar = (name) => {
-	return import.meta.env[name];
+// Core configuration
+const getEnvVar = (name: string): string => {
+    return import.meta.env[name] || '';
 };
 
 export const API_URL = getEnvVar("PUBLIC_API_URL");

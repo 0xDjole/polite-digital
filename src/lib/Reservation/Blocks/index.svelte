@@ -28,6 +28,20 @@
 		
 		return getImageUrl(mediaBlock.value[0]);
 	}
+
+	// Convert style object to CSS string
+	function getStyleString(block) {
+		if (!block?.properties?.style) return '';
+		
+		// Convert camelCase to kebab-case and build CSS string
+		return Object.entries(block.properties.style)
+			.map(([key, value]) => {
+				// Convert camelCase to kebab-case (e.g., fontSize -> font-size)
+				const kebabKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+				return `${kebabKey}: ${value}`;
+			})
+			.join('; ');
+	}
 	
 </script>
 
@@ -47,40 +61,73 @@
 {:else}
 	{#each blocks as block (block.id)}
 		{#if block.type === 'text' && block.properties?.variant === 'p'}
-			<p class="my-2">
+			<p class="my-2" style={getStyleString(block)}>
 				{getLocalizedContent(block.value?.[0])}
 			</p>
 		{:else if block.type === 'text' && block.properties?.variant === 'h1'}
-			<h1 class="text-3xl font-bold my-4">
+			<h1 class="text-3xl font-bold my-4" style={getStyleString(block)}>
 				{getLocalizedContent(block.value?.[0])}
 			</h1>
 		{:else if block.type === 'text' && block.properties?.variant === 'h2'}
-			<h2 class="text-2xl font-semibold my-3">
+			<h2 class="text-2xl font-semibold my-3" style={getStyleString(block)}>
 				{getLocalizedContent(block.value?.[0])}
 			</h2>
 		{:else if block.type === 'text' && block.properties?.variant === 'h3'}
-			<h3 class="text-xl font-medium my-2">
+			<h3 class="text-xl font-medium my-2" style={getStyleString(block)}>
 				{getLocalizedContent(block.value?.[0])}
 			</h3>
+		{:else if block.type === 'text' && block.properties?.variant === 'url'}
+			{@const linkText = getLocalizedContent(block.value?.[0]) || block.properties?.url || 'Link'}
+			{@const url = block.properties?.url}
+			{#if url}
+				<div style={getStyleString(block)}>
+					<a href={url} target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 underline break-all">
+						{linkText}
+					</a>
+				</div>
+			{:else}
+				<div style={getStyleString(block)} class="text-gray-500 italic">
+					[URL: {linkText}]
+				</div>
+			{/if}
 		{:else if block.type === 'text'}
-			<p>{getLocalizedContent(block.value?.[0])}</p>
+			{@const content = getLocalizedContent(block.value?.[0])}
+			{@const url = block.properties?.url}
+			{#if url}
+				<a href={url} target="_blank" rel="noopener noreferrer" style={getStyleString(block)}>
+					{content}
+				</a>
+			{:else}
+				<p style={getStyleString(block)}>{content}</p>
+			{/if}
 		{:else if block.type === 'media'}
 			{@const imageUrl = getImageUrl(block.value?.[0])}
+			{@const url = block.properties?.url}
+			{@const altText = block.properties?.label?.en || block.properties?.label?.[Object.keys(block.properties?.label || {})[0]] || 'Image'}
 			{#if imageUrl}
-				<div>
-					<img
-						src={imageUrl}
-						alt=""
-						class="transition-transform duration-500 hover:scale-105"
-						referrerpolicy="no-referrer"
-					/>
+				<div style={getStyleString(block)}>
+					{#if url}
+						<a href={url} target="_blank" rel="noopener noreferrer">
+							<img
+								src={imageUrl}
+								alt={altText}
+								referrerpolicy="no-referrer"
+							/>
+						</a>
+					{:else}
+						<img
+							src={imageUrl}
+							alt={altText}
+							referrerpolicy="no-referrer"
+						/>
+					{/if}
 				</div>
 			{/if}
 		{:else if block.type === 'block' && block.properties?.variant === 'badge'}
 			{@const badgeText = getBadgeText(block, locale)}
 			{@const badgeImage = getBadgeImage(block)}
 			
-			<div class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-primary-900/30 border border-primary-700 text-primary-300 my-2">
+			<div class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-primary-900/30 border border-primary-700 text-primary-300 my-2" style={getStyleString(block)}>
 				<!-- Badge Image -->
 				{#if badgeImage}
 					<div class="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden bg-base-700">
@@ -105,7 +152,7 @@
 				</span>
 			</div>
 		{:else if block.type === 'block' && block.properties?.variant === 'ul'}
-			<ul class="list-disc pl-5 my-3 space-y-1">
+			<ul class="list-disc pl-5 my-3 space-y-1" style={getStyleString(block)}>
 				{#each block.value as item}
 					<li>
 						<svelte:self blocks={[item]} isNested={true} {locale} />
@@ -113,7 +160,7 @@
 				{/each}
 			</ul>
 		{:else if block.type === 'block' && block.properties?.variant === 'ol'}
-			<ol class="list-decimal pl-5 my-3 space-y-1">
+			<ol class="list-decimal pl-5 my-3 space-y-1" style={getStyleString(block)}>
 				{#each block.value as item}
 					<li>
 						<svelte:self blocks={[item]} isNested={true} {locale} />
@@ -125,7 +172,7 @@
 				<svelte:self blocks={block.value} isNested={true} {locale} />
 			{/if}
 		{:else if block.type === 'block'}
-            <div>
+            <div style={getStyleString(block)}>
 				{#each block.value as nestedBlock}
 					<svelte:self blocks={[nestedBlock]} isNested={true} {locale} />
 				{/each}

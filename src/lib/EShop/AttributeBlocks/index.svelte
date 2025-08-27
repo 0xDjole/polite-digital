@@ -1,35 +1,15 @@
 <script>
+	import { getBlockLabel, getBlockTextValue } from '@lib/index.ts';
+	
 	export let blocks = [];
 	export let variant = 'badges'; // 'badges' | 'inline' | 'list'
 	export let label = '';
 
-	// Extract text value from block, preferring 'en' language
+	// Use shared block text value extraction
 	function getBlockValue(block) {
-		if (!block.value || block.value.length === 0) return '';
-		
-		const firstValue = block.value[0];
-		
-		// Handle multilingual object
-		if (typeof firstValue === 'object' && firstValue !== null) {
-			// Try 'en' first, then fallback to first available language
-			if (firstValue.en) return firstValue.en;
-			const values = Object.values(firstValue);
-			return values[0] || '';
-		}
-		
-		// Handle simple string
-		return String(firstValue);
+		return getBlockTextValue(block, 'en');
 	}
 
-	// Get display label for block
-	function getBlockLabel(block) {
-		if (block.properties?.label?.en) return block.properties.label.en;
-		if (block.properties?.label) {
-			const labels = Object.values(block.properties.label);
-			if (labels.length > 0) return labels[0];
-		}
-		return block.key || 'Attribute';
-	}
 </script>
 
 {#if blocks && blocks.length > 0}
@@ -42,7 +22,7 @@
 			<div class="attribute-badges">
 				{#each blocks as block}
 					{@const value = getBlockValue(block)}
-					{@const blockLabel = getBlockLabel(block)}
+					{@const blockLabel = getBlockLabel(block, 'en')}
 					{#if value}
 						<span class="attribute-badge">
 							{blockLabel}: {value}
@@ -54,7 +34,7 @@
 			<div class="attribute-inline">
 				{#each blocks as block}
 					{@const value = getBlockValue(block)}
-					{@const blockLabel = getBlockLabel(block)}
+					{@const blockLabel = getBlockLabel(block, 'en')}
 					{#if value}
 						<span class="attribute-item">
 							<strong>{blockLabel}:</strong> {value}
@@ -66,7 +46,7 @@
 			<div class="attribute-list">
 				{#each blocks as block}
 					{@const value = getBlockValue(block)}
-					{@const blockLabel = getBlockLabel(block)}
+					{@const blockLabel = getBlockLabel(block, 'en')}
 					{#if value}
 						<div class="attribute-list-item">
 							<dt class="attribute-list-label">{blockLabel}</dt>

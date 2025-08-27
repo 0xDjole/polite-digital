@@ -1,8 +1,8 @@
 <script>
     import Icon from '@iconify/svelte';
-    import { store, initReservationStore } from '../reservationStore.js';
-    import { initEshopStore } from '../../EShop/eshopStore.js';
-    import { totalCartItems } from '../../Cart/cartStore.js';
+    import { initReservationStore } from '@lib/core/stores/reservation';
+    import { initEshopStore } from '@lib/core/stores/eshop';
+    import { totalCartItems } from '@lib/core/stores/cart';
     import { onMount } from 'svelte';
 	import {  getLocale, getRelativeLocaleUrl } from '@lib/i18n/index.js';
     

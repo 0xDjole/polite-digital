@@ -1,6 +1,8 @@
-import { API_URL, BUSINESS_ID } from "@lib/env";
+import { API_URL, BUSINESS_ID } from "@lib/core/config";
 import { z } from "zod";
-import httpClient from "@lib/httpClient";
+import httpClient from "@lib/core/services/http";
+
+// Block utilities are defined below in this file
 
 export { BUSINESS_ID };
 
@@ -104,55 +106,27 @@ const collectionSchema = z.object({});
 
 const getCollection = async (id) => {
 	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${id}`;
+
 	const { value } = await httpClient.get(url);
+
 	return value;
 };
 
 const getCollections = async ({ name = null, ids = null }) => {
-	let url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
+	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections`;
 
-	const queryParams = [];
-
-	if (name) {
-		queryParams.push(`name=${encodeURIComponent(name)}`);
-	}
-
-	if (ids) {
-		const idsJson = JSON.stringify(ids);
-		queryParams.push(`ids=${encodeURIComponent(idsJson)}`);
-	}
-
-	if (queryParams.length > 0) {
-		url += `?${queryParams.join("&")}`;
-	}
-
-	const response = await httpClient.get(url);
+	const response = await httpClient.get(url, {
+		params: { name, ids },
+	});
 	return response.value;
 };
 
 const getCollectionEntries = async ({ collectionId, limit, cursor, ids = null }) => {
-	let url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
+	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${collectionId}/entries`;
 
-	const queryParams = [];
-
-	if (limit) {
-		queryParams.push(`limit=${limit}`);
-	}
-
-	if (cursor) {
-		queryParams.push(`cursor=${cursor}`);
-	}
-
-	if (ids) {
-		const idsJson = JSON.stringify(ids);
-		queryParams.push(`ids=${encodeURIComponent(idsJson)}`);
-	}
-
-	if (queryParams.length > 0) {
-		url += `?${queryParams.join("&")}`;
-	}
-
-	const response = await httpClient.get(url);
+	const response = await httpClient.get(url, {
+		params: { limit, cursor, ids },
+	});
 	return response.value;
 };
 
@@ -176,14 +150,25 @@ const getCollectionEntry = async ({ collectionId, id }) => {
 	return response;
 };
 
-export function getBlockLabel(block: any): string {
+export function getBlockLabel(block: any, locale: string = "en"): string {
 	if (!block) return "";
 
 	if (block.properties?.label) {
-		return block.properties.label;
+		if (typeof block.properties.label === "object") {
+			return (
+				block.properties.label[locale] ||
+				block.properties.label.en ||
+				Object.values(block.properties.label)[0] ||
+				""
+			);
+		}
+		if (typeof block.properties.label === "string") {
+			return block.properties.label;
+		}
 	}
 
-	return block.key || "";
+	// Convert key to readable format
+	return block.key?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "";
 }
 
 export function createBlock(type: string, key: string, label?: string): any {
@@ -255,6 +240,7 @@ export function extractBlockValues(blocks: any[]): Record<string, any> {
 	return values;
 }
 
+// @deprecated Use getBlockValue from blockUtils instead
 export const getBlockValue = (entry, blockKey) => {
 	if (!entry || !entry.blocks) return null;
 
@@ -265,6 +251,7 @@ export const getBlockValue = (entry, blockKey) => {
 	return block.value[0];
 };
 
+// @deprecated Use getBlockValues from blockUtils instead
 export const getBlockValues = (entry, blockKey) => {
 	if (!entry || !entry.blocks) return null;
 
@@ -378,19 +365,64 @@ export function thumbnailUrl(service) {
 	return path ? `${storageUrl}/${path}` : null;
 }
 
-// format price
-export function getPrice(priceOption, locale) {
+// format price - handles both complex price options and simple price objects
+export function getPrice(priceOption, currency, locale = "en") {
 	if (!priceOption) return "";
+
+	// Handle simple price objects (from eshop) - now currency comes from business
+	if (priceOption.basePrice && !priceOption.type) {
+		return `${priceOption.basePrice} ${currency}`;
+	}
+
+	// Handle complex price options (from services) - now currency comes from business
 	switch (priceOption.type) {
 		case "standard":
-			return `${priceOption.basePrice}${priceOption.currency}`;
+			return `${priceOption.basePrice} ${currency}`;
 		case "custom":
 			return priceOption.customValue[locale] || priceOption.customValue.en;
 		case "complex":
 			const val = priceOption.customValue[locale] || priceOption.customValue.en;
-			return `${priceOption.basePrice}${priceOption.currency} + ${val}`;
+			return `${priceOption.basePrice} ${currency} + ${val}`;
 		default:
 			return "";
+	}
+}
+
+// Enhanced price formatter with currency symbols and rounding
+export function formatPrice(priceOption, currency, options = {}) {
+	if (!priceOption) return "";
+
+	const { showSymbols = true, decimalPlaces = 2, locale = "en" } = options;
+
+	let price;
+
+	// Handle simple price objects (from eshop)
+	if (priceOption.basePrice && !priceOption.type) {
+		price = Number(priceOption.basePrice);
+	}
+	// Handle complex price options (from services) - use getPrice for these
+	else if (priceOption.type) {
+		return getPrice(priceOption, currency, locale);
+	} else {
+		return "";
+	}
+
+	const roundedPrice = price.toFixed(decimalPlaces);
+
+	if (!showSymbols) {
+		return `${roundedPrice} ${currency}`;
+	}
+
+	// Format with currency symbols
+	switch (currency) {
+		case "USD":
+			return `$${roundedPrice}`;
+		case "EUR":
+			return `€${roundedPrice}`;
+		case "GBP":
+			return `£${roundedPrice}`;
+		default:
+			return `${roundedPrice} ${currency}`;
 	}
 }
 
@@ -436,45 +468,37 @@ export const cmsApi = () => ({
 
 export const eshopApi = {
 	// Get products
-	getProducts: async ({ businessId, categoryIds = null, status = "Published", limit = 20, cursor = null }) => {
-		let url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
-		
-		const params = [];
-		
-		if (categoryIds && categoryIds.length > 0) {
-			params.push(`categoryIds=${encodeURIComponent(JSON.stringify(categoryIds))}`);
-		}
-		
-		if (status) {
-			params.push(`status=${encodeURIComponent(status)}`);
-		}
-		
-		if (limit) {
-			params.push(`limit=${limit}`);
-		}
-		
-		if (cursor) {
-			params.push(`cursor=${encodeURIComponent(cursor)}`);
-		}
+	getProducts: async ({
+		businessId,
+		categoryIds = null,
+		status = "Published",
+		limit = 20,
+		cursor = null,
+	}) => {
+		const url = `${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/products`;
 
-		if (params.length > 0) {
-			url += `?${params.join('&')}`;
-		}
+		const response = await httpClient.get(url, {
+			params: {
+				categoryIds: categoryIds && categoryIds.length > 0 ? categoryIds : undefined,
+				status,
+				limit,
+				cursor,
+			},
+		});
 
-		try {
-			const res = await fetch(url);
-			const json = await res.json();
+		if (response.success) {
+			const json = response.value;
 			return {
 				success: true,
 				data: json.items || [],
 				cursor: json.cursor,
 				total: json.total || 0,
 			};
-		} catch (e) {
-			console.error("Error fetching products:", e);
+		} else {
+			console.error("Error fetching products:", response.error);
 			return {
 				success: false,
-				error: e.message,
+				error: response.error,
 				data: [],
 			};
 		}
@@ -502,24 +526,27 @@ export const eshopApi = {
 	},
 
 	// Checkout (direct from cart items, no backend cart)
-	checkout: async ({ token, businessId, items, paymentMethod, orderInfoBlocks, paymentIntentId = null }) => {
+	checkout: async ({ token, businessId, items, paymentMethod, blocks, paymentIntentId = null }) => {
 		try {
 			const payload = {
 				businessId,
 				items,
 				paymentMethod,
-				orderInfoBlocks,
+				blocks,
 				...(paymentIntentId && { paymentIntentId }),
 			};
 
-			const res = await fetch(`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/orders/checkout`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+			const res = await fetch(
+				`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/orders/checkout`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(payload),
 				},
-				body: JSON.stringify(payload),
-			});
+			);
 
 			if (!res.ok) {
 				const error = (await res.text()) || res.statusText;
@@ -544,22 +571,25 @@ export const eshopApi = {
 		try {
 			const tokenResponse = await reservationApi.getGuestToken();
 			if (!tokenResponse.success) {
-				throw new Error('Failed to get guest token');
+				throw new Error("Failed to get guest token");
 			}
 			const token = tokenResponse.token;
-			
-			const res = await fetch(`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/payment/create-intent`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
+
+			const res = await fetch(
+				`${API_URL}/v1/businesses/${encodeURIComponent(businessId)}/payment/create-intent`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						amount,
+						currency,
+						businessId,
+					}),
 				},
-				body: JSON.stringify({
-					amount,
-					currency,
-					businessId,
-				}),
-			});
+			);
 
 			if (!res.ok) {
 				const error = (await res.text()) || res.statusText;
@@ -572,7 +602,7 @@ export const eshopApi = {
 				data: json,
 			};
 		} catch (e) {
-			console.error('Payment intent creation failed:', e);
+			console.error("Payment intent creation failed:", e);
 			return {
 				success: false,
 				error: e.message,
@@ -730,11 +760,11 @@ export const reservationApi = {
 	},
 
 	// Complete reservation checkout
-	checkout: async ({ token, businessId, parts }) => {
+	checkout: async ({ token, businessId, parts, paymentMethod = "CASH", blocks = [] }) => {
 		try {
 			const payload = {
 				businessId,
-				info: [],
+				blocks: blocks,
 				parts: parts.map((p) => ({
 					serviceId: p.serviceId,
 					from: p.from,
@@ -744,6 +774,11 @@ export const reservationApi = {
 					providerId: p.providerId,
 				})),
 			};
+
+			// Only add payment method if it's defined (not for inquiry-only reservations)
+			if (paymentMethod !== undefined) {
+				payload.paymentMethod = paymentMethod;
+			}
 
 			const res = await fetch(`${API_URL}/v1/reservations`, {
 				method: "POST",
@@ -759,8 +794,10 @@ export const reservationApi = {
 				throw new Error(error);
 			}
 
+			const json = await res.json();
 			return {
 				success: true,
+				data: json, // Should include reservationId and clientSecret for payments
 			};
 		} catch (e) {
 			return {
@@ -770,3 +807,89 @@ export const reservationApi = {
 		}
 	},
 };
+
+// ===== ADDITIONAL BLOCK UTILITIES =====
+
+// Extract localized text value from a block, handling multilingual content
+export function getBlockTextValue(block: any, locale: string = "en"): string {
+	if (!block || !block.value || block.value.length === 0) return "";
+
+	const firstValue = block.value[0];
+
+	// Handle multilingual object
+	if (typeof firstValue === "object" && firstValue !== null) {
+		// Try specified locale first, then 'en', then first available language
+		if (firstValue[locale]) return firstValue[locale];
+		if (firstValue.en) return firstValue.en;
+		const values = Object.values(firstValue);
+		return String(values[0] || "");
+	}
+
+	// Handle simple string
+	return String(firstValue);
+}
+
+// ===== VALIDATION UTILITIES =====
+
+export interface ValidationResult {
+	isValid: boolean;
+	error?: string;
+}
+
+// Phone number validation
+export function validatePhoneNumber(phone: string): ValidationResult {
+	if (!phone) {
+		return { isValid: false, error: "Phone number is required" };
+	}
+
+	const cleaned = phone.replace(/\D/g, "");
+
+	if (cleaned.length < 8) {
+		return { isValid: false, error: "Phone number is too short" };
+	}
+
+	if (cleaned.length > 15) {
+		return { isValid: false, error: "Phone number is too long" };
+	}
+
+	return { isValid: true };
+}
+
+// Email validation
+export function validateEmail(email: string): ValidationResult {
+	if (!email) {
+		return { isValid: false, error: "Email is required" };
+	}
+
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+	if (!emailRegex.test(email)) {
+		return { isValid: false, error: "Please enter a valid email address" };
+	}
+
+	return { isValid: true };
+}
+
+// Verification code validation (4-digit codes)
+export function validateVerificationCode(code: string): ValidationResult {
+	if (!code) {
+		return { isValid: false, error: "Verification code is required" };
+	}
+
+	const cleaned = code.replace(/\D/g, "");
+
+	if (cleaned.length !== 4) {
+		return { isValid: false, error: "Please enter a 4-digit verification code" };
+	}
+
+	return { isValid: true };
+}
+
+// Generic required field validation
+export function validateRequired(value: any, fieldName: string = "This field"): ValidationResult {
+	if (value === null || value === undefined || value === "") {
+		return { isValid: false, error: `${fieldName} is required` };
+	}
+
+	return { isValid: true };
+}
