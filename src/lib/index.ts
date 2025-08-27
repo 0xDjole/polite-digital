@@ -107,7 +107,6 @@ const collectionSchema = z.object({});
 const getCollection = async (id) => {
 	const url = `${API_URL}/v1/businesses/${BUSINESS_ID}/collections/${id}`;
 
-	console.log("url", url);
 	const { value } = await httpClient.get(url);
 
 	return value;
