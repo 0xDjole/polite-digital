@@ -28,7 +28,9 @@ const { type, title, description, image, noindex = false } = Astro.props as GenP
 let optimizedImage;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 
-const imageUrl = getImageUrl(siteData.logo);
+const rawImageUrl = getImageUrl(siteData.logo);
+// Provide a fallback image URL if logo is not available
+const imageUrl = rawImageUrl || `${Astro.site}favicon-512x512.png`;
 ---
 
 <SEO
