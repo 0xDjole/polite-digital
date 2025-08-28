@@ -11,10 +11,10 @@ import svelte from "@astrojs/svelte";
 // https://astro.build/config
 export default defineConfig({
 	output: "static",
-	site: import.meta.env.PUBLIC_SITE_URL || "https://yepi.io",
+	site: import.meta.env.PUBLIC_SITE_URL,
 	image: {
 		// Allow any images coming from your CMS domain(s)
-		domains: ["storage.yepi.io"],
+		domains: ["storage.arky.io"],
 	},
 	redirects: {},
 	// i18n configuration must match src/config/translations.json.ts
