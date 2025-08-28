@@ -25,12 +25,10 @@
 	function handleValidationChange(isValid, errors) {
 		formValid = isValid;
 		formErrors = errors;
-		console.log('EShop Cart validation updated:', { isValid, errors });
 	}
 
 	function handlePaymentValidationChange(isValid) {
 		paymentFormValid = isValid;
-		console.log('Payment form validation updated:', { isValid });
 	}
 
 	// Combined validation - form must be valid, payment form only for credit card
