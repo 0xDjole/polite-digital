@@ -8,8 +8,7 @@ import icon from "astro-icon";
 import svelte from "@astrojs/svelte";
 import fs from "fs";
 
-// Load config based on ENVIRONMENT variable
-const environment = process.env.ENVIRONMENT || 'dev';
+const environment = process.env.PUBLIC_ENVIRONMENT || 'dev';
 const config = JSON.parse(fs.readFileSync(`./config/${environment}.json`, 'utf-8'));
 
 // https://astro.build/config
