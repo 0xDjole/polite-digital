@@ -9,8 +9,6 @@ env:
   TF_VAR_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   TF_VAR_CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
   TF_VAR_GITHUB_OWNER: ${{ github.repository_owner }}
-  TF_VAR_API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
-  TF_VAR_STORAGE_ENDPOINT: ${{ secrets.STORAGE_ENDPOINT }}
 
 jobs:
   deploy:

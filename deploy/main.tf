@@ -35,10 +35,12 @@ resource "cloudflare_pages_project" "polite_website" {
   deployment_configs {
     production {
       environment_variables = {
-        PUBLIC_API_URL     = var.API_ENDPOINT
-        PUBLIC_BUSINESS_ID = var.PUBLIC_BUSINESS_ID
-        PUBLIC_STORAGE_URL = var.STORAGE_ENDPOINT
-        PUBLIC_SITE_URL    = "https://${var.ROOT_DOMAIN}"
+        ENVIRONMENT = "prod"
+      }
+    }
+    preview {
+      environment_variables = {
+        ENVIRONMENT = "prod"
       }
     }
   }
