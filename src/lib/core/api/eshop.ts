@@ -8,7 +8,7 @@ export const eshopApi = {
     async getProducts({ 
         businessId, 
         categoryIds = null, 
-        status = "Published", 
+        status = "ACTIVE", 
         limit = 20, 
         cursor = null 
     }: {
