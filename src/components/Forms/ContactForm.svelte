@@ -1,9 +1,10 @@
 <script>
   import { onMount } from 'svelte';
   import { showToast } from '../../lib/toast.js';
+  import appConfig from '../../appConfig';
   
-  const API_URL = import.meta.env.PUBLIC_API_URL;
-  const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
+  const API_URL = appConfig.apiUrl;
+  const BUSINESS_ID = appConfig.businessId;
   
   let collection = null;
   let form = {};

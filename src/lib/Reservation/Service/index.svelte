@@ -4,6 +4,7 @@
 	import { getGalleryThumbnail } from '../../index';
 	import { store, actions, initReservationStore, canProceed, currentStepName } from '@lib/core/stores/reservation';
  	import { t, getLocale, getRelativeLocaleUrl } from '@lib/i18n/index';
+	import appConfig from '../../../appConfig';
 
 	import StepIndicator from '../StepIndicator/index.svelte';
 	import MethodSelector from '../MethodSelector/index.svelte';
@@ -44,7 +45,7 @@
 
 	const locale = getLocale();
 	const thumb = getGalleryThumbnail(service.gallery);
-	const thumbUrl = thumb ? `${import.meta.env.PUBLIC_STORAGE_URL}/${thumb}` : null;
+	const thumbUrl = thumb ? `${appConfig.storageUrl}/${thumb}` : null;
 </script>
 
 <div class="relative mt-16">

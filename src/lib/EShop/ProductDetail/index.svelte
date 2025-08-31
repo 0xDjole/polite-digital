@@ -7,8 +7,9 @@
 	import QuantitySelector from '../QuantitySelector/index.svelte';
 	import AttributeBlocks from '../AttributeBlocks/index.svelte';
 	import Icon from '@iconify/svelte';
+	import appConfig from '../../../appConfig';
 
-	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
+	const STORAGE_URL = appConfig.storageUrl;
 
 	export let product;
 

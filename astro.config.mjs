@@ -5,13 +5,17 @@ import mdx from "@astrojs/mdx";
 import AutoImport from "astro-auto-import";
 import compress from "@playform/compress";
 import icon from "astro-icon";
-
 import svelte from "@astrojs/svelte";
+import fs from "fs";
+
+// Load config based on ENVIRONMENT variable
+const environment = process.env.ENVIRONMENT || 'dev';
+const config = JSON.parse(fs.readFileSync(`./config/${environment}.json`, 'utf-8'));
 
 // https://astro.build/config
 export default defineConfig({
 	output: "static",
-	site: import.meta.env.PUBLIC_SITE_URL,
+	site: config.siteUrl,
 	image: {
 		// Allow any images coming from your CMS domain(s)
 		domains: ["storage.arky.io"],

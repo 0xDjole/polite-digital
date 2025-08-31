@@ -1,0 +1,7 @@
+{
+	"environment": "prod",
+	"apiUrl": "https://api.arky.io/api",
+	"storageUrl": "https://storage.arky.io/prod",
+	"siteUrl": "https://politedigital.com",
+	"businessId": "0bbf0256-2fe9-4517-81ff-ebf8ebb2f373"
+}

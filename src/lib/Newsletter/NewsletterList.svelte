@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import NewsletterCard from "./NewsletterCard.svelte";
+	import appConfig from '../../appConfig';
 	
 	interface Newsletter {
 		id: string;
@@ -49,10 +50,10 @@
 		try {
 			// Get business ID from URL or environment
 			const urlParams = new URLSearchParams(window.location.search);
-			businessId = urlParams.get('business_id') || import.meta.env.PUBLIC_BUSINESS_ID || '0bbf0256-2fe9-4517-81ff-ebf8ebb2f373';
+			businessId = urlParams.get('business_id') || appConfig.businessId || '0bbf0256-2fe9-4517-81ff-ebf8ebb2f373';
 			
 			if (!businessId) {
-				throw new Error('Business ID not found. Please configure PUBLIC_BUSINESS_ID in environment variables.');
+				throw new Error('Business ID not found. Please configure businessId in config.');
 			}
 
 			console.log('Fetching newsletters for business:', businessId);

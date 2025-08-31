@@ -1,8 +1,6 @@
 // Core configuration
-const getEnvVar = (name: string): string => {
-    return import.meta.env[name] || '';
-};
+import appConfig from '../../appConfig';
 
-export const API_URL = getEnvVar("PUBLIC_API_URL");
-export const BUSINESS_ID = getEnvVar("PUBLIC_BUSINESS_ID");
-export const STORAGE_URL = getEnvVar("PUBLIC_STORAGE_URL");
+export const API_URL = appConfig.apiUrl;
+export const BUSINESS_ID = appConfig.businessId;
+export const STORAGE_URL = appConfig.storageUrl;

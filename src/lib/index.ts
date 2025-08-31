@@ -325,10 +325,12 @@ export const getBlockFromArray = (entry: any, blockKey: string, locale = "en") =
 	});
 };
 
+import appConfig from '../appConfig';
+
 export const getImageUrl = (imageBlock, isBlock = true) => {
 	if (!imageBlock) return null;
 
-	const storageUrl = import.meta.env.PUBLIC_STORAGE_URL || "";
+	const storageUrl = appConfig.storageUrl || "";
 
 	if (isBlock) {
 		if (typeof imageBlock === "string") {
@@ -360,7 +362,7 @@ export function getGalleryThumbnail(gallery) {
 
 // full URL or null
 export function thumbnailUrl(service) {
-	const storageUrl = import.meta.env.PUBLIC_STORAGE_URL || "";
+	const storageUrl = appConfig.storageUrl || "";
 	const path = getGalleryThumbnail(service.gallery);
 	return path ? `${storageUrl}/${path}` : null;
 }
