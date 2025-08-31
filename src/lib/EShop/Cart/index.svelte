@@ -95,7 +95,6 @@
 
 		try {
 			// 1. First, create order (for both cash and credit card)
-			console.log('Creating order...');
 			const checkoutResponse = await actions.checkout(selectedPaymentMethod);
 			
 			if (!checkoutResponse.success) {
@@ -122,7 +121,6 @@
 					throw new Error('No payment client secret received');
 				}
 
-				console.log('Confirming payment...');
 				const { error, paymentIntent } = await confirmPayment(clientSecret);
 
 				if (error) {
@@ -143,7 +141,6 @@
 			actions.clearCart();
 
 		} catch (error) {
-			console.error('Checkout error:', error);
 			paymentError = error.message || 'Checkout failed. Please try again.';
 		} finally {
 			paymentProcessing = false;

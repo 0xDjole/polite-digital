@@ -56,13 +56,10 @@
 				throw new Error('Business ID not found. Please configure businessId in config.');
 			}
 
-			console.log('Fetching newsletters for business:', businessId);
 			const response = await fetchNewsletters(businessId);
-			console.log('Newsletter API response:', response);
 			
 			newsletters = response.data || [];
 		} catch (err) {
-			console.error('Failed to fetch newsletters:', err);
 			error = err instanceof Error ? err.message : 'Failed to load newsletters';
 		} finally {
 			loading = false;

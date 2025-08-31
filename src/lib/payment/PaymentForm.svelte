@@ -18,16 +18,6 @@
 	// Extract Stripe public key from payment provider
 	let stripePublicKey = $derived(paymentProvider?.type === 'stripe' ? paymentProvider.publicKey : null);
 	
-	// Debug log
-	$effect(() => {
-		console.log('PaymentForm props:', { 
-			paymentProvider, 
-			stripePublicKey,
-			selectedPaymentMethod,
-			allowedMethods,
-			variant 
-		});
-	});
 
 	let stripe = $state(null);
 	let elements = $state(null);
@@ -41,14 +31,11 @@
 
 	// Initialize Stripe
 	$effect(() => {
-		console.log('Stripe init effect:', { stripePublicKey, hasStripe: !!stripe });
 		if (stripePublicKey && !stripe) {
-			console.log(`Loading Stripe with public key: ${stripePublicKey}`);
 			loadStripe(stripePublicKey).then(s => {
 				stripe = s;
-				console.log(`Stripe loaded successfully for ${variant}`, s);
 			}).catch(err => {
-				console.error(`Failed to load Stripe for ${variant}:`, err);
+				// Silently fail, error will be shown in UI
 			});
 		}
 	});
@@ -63,7 +50,6 @@
 	});
 
 	async function setupStripeElements() {
-		console.log('setupStripeElements called:', { stripe: !!stripe, elementsReady });
 		if (!stripe || elementsReady) return;
 
 		await tick();
@@ -73,19 +59,7 @@
 		const cardExpiryContainer = document.getElementById(`${prefix}card-expiry-element`);
 		const cardCvcContainer = document.getElementById(`${prefix}card-cvc-element`);
 		
-		console.log('Container elements:', { 
-			cardNumber: !!cardNumberContainer, 
-			cardExpiry: !!cardExpiryContainer, 
-			cardCvc: !!cardCvcContainer 
-		});
-		
 		if (!cardNumberContainer || !cardExpiryContainer || !cardCvcContainer) {
-			console.error(`Card element containers not found for ${variant}`, {
-				prefix,
-				cardNumberId: `${prefix}card-number-element`,
-				cardExpiryId: `${prefix}card-expiry-element`,
-				cardCvcId: `${prefix}card-cvc-element`
-			});
 			return;
 		}
 
@@ -141,7 +115,6 @@
 			});
 			
 			elementsReady = true;
-			console.log(`Stripe card elements mounted for ${variant}`);
 
 			// Notify parent that Stripe is ready
 			if (onStripeReady) {
@@ -155,13 +128,12 @@
 				);
 			}
 		} catch (error) {
-			console.error(`Failed to mount Stripe card elements for ${variant}:`, error);
+			// Silently fail, error will be shown in UI
 		}
 	}
 
 	function updateValidationState() {
 		const isValid = cardNumberValid && cardExpiryValid && cardCvcValid;
-		console.log('Card validation state:', { cardNumberValid, cardExpiryValid, cardCvcValid, isValid });
 		if (onValidationChange) {
 			onValidationChange(isValid);
 		}

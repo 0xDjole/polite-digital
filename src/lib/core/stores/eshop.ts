@@ -226,14 +226,6 @@ export const actions = {
             const orderItems = this.prepareOrderItems();
             const blocks = this.getOrderInfoBlocks();
 
-            console.log("Checkout payload:", {
-                token,
-                businessId: BUSINESS_ID,
-                items: orderItems,
-                paymentMethod,
-                blocks,
-            });
-
             const response = await eshopApi.checkout({
                 token,
                 businessId: BUSINESS_ID,

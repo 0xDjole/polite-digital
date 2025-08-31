@@ -98,8 +98,6 @@
 	$: images = product ? getProductImages(product) : [];
 	$: selectedImage = images[selectedImageIndex];
 	$: isInStock = selectedVariant?.stock > 0;
-
-	$: console.log('iff ',images,product);
 </script>
 
 <div class="min-h-screen bg-background py-8">
