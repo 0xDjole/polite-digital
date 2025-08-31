@@ -18,7 +18,15 @@ export async function getStaticPaths() {
 	const API_URL = config.apiUrl;
 	const BUSINESS_ID = config.businessId;
 
+	console.log(`Fetching services from: ${API_URL}/v1/businesses/${BUSINESS_ID}/services?limit=100`);
 	const res = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/services?limit=100`);
+	
+	if (!res.ok) {
+		console.error(`Failed to fetch services: ${res.status} ${res.statusText}`);
+		console.error(`Response body:`, await res.text());
+		return [];
+	}
+	
 	const { items } = await res.json();
 
 	return items.flatMap((service) =>
