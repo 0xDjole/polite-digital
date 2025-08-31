@@ -7,13 +7,11 @@ terraform {
   }
 }
 
-# Website (Astro) deployment with Git integration
 resource "cloudflare_pages_project" "polite_website" {
   account_id        = var.CLOUDFLARE_ACCOUNT_ID
   name              = var.GITHUB_REPO
   production_branch = "master"
 
-  # Git integration
   source {
     type = "github"
     config {
@@ -26,7 +24,6 @@ resource "cloudflare_pages_project" "polite_website" {
     }
   }
 
-  # Build configuration
   build_config {
     build_command   = "npm run build"
     destination_dir = "dist"
@@ -35,18 +32,16 @@ resource "cloudflare_pages_project" "polite_website" {
   deployment_configs {
     production {
       environment_variables = {
-        ENVIRONMENT = "prod"
+        PUBLIC_ENVIRONMENT = "prod"
       }
     }
     preview {
       environment_variables = {
-        ENVIRONMENT = "prod"
+        PUBLIC_ENVIRONMENT = "prod"
       }
     }
   }
 }
-
-# Pages will now auto-deploy from GitHub on every push to master
 
 resource "cloudflare_pages_domain" "polite_website_domain" {
   account_id   = var.CLOUDFLARE_ACCOUNT_ID
