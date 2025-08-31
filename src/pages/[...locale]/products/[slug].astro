@@ -3,13 +3,13 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import ProductDetail from "@lib/EShop/ProductDetail/index.svelte";
 import { cmsApi, getBlockFromArray } from "@lib/index";
 import { defaultLocale, getLocale, locales } from "@lib/i18n";
-import appConfig from "../../appConfig";
+import appConfig from "../../../appConfig";
 
 const API_URL = appConfig.apiUrl;
 const BUSINESS_ID = appConfig.businessId;
 
 export async function getStaticPaths() {
-	const { default: appConfig } = await import("../../appConfig");
+	const { default: appConfig } = await import("../../../appConfig");
 	const API_URL = appConfig.apiUrl;
 	const BUSINESS_ID = appConfig.businessId;
 

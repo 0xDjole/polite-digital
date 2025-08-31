@@ -3,13 +3,13 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import { defaultLocale, getLocale, locales } from "@lib/i18n";
 import { cmsApi, getBlockFromArray } from "@lib/index";
 import Service from "@lib/Reservation/Service/index.svelte";
-import appConfig from "../../appConfig";
+import appConfig from "../../../appConfig";
 
 const API_URL = appConfig.apiUrl;
 const BUSINESS_ID = appConfig.businessId;
 
 export async function getStaticPaths() {
-	const { default: appConfig } = await import("../../appConfig");
+	const { default: appConfig } = await import("../../../appConfig");
 	const API_URL = appConfig.apiUrl;
 	const BUSINESS_ID = appConfig.businessId;
 
