@@ -21,5 +21,12 @@ const siteData = getBlockFromArray(websiteCollection, "info", currLocale);
 ---
 
 <BaseLayout title={`Products - ${siteData.title}`} description="Browse our products">
-	<ProductsPage client:load />
+	<div class="container mx-auto px-4 pt-24 pb-8">
+		<div class="text-center">
+			<div class="inline-block px-4 py-2 bg-amber-100 text-amber-800 text-xs font-medium rounded-full">
+				Preview Products
+			</div>
+		</div>
+		<ProductsPage client:load />
+	</div>
 </BaseLayout>
