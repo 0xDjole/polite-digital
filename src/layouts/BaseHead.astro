@@ -1,6 +1,5 @@
 ---
 import { type CollectionEntry } from "astro:content";
-import Seo from "@components/Seo/Seo.astro";
 
 export interface Props {
 	type?: "blog" | "general" | undefined;
@@ -71,12 +70,6 @@ import interVariable from "@fontsource-variable/inter/files/inter-latin-wght-nor
 	document.addEventListener("astro:after-swap", animations);
 </script>
 
-<Seo
-	type={type}
-	title={title}
-	description={description}
-	image={image}
-	authors={authors}
-	postFrontmatter={postFrontmatter}
-	noindex={noindex}
-/>
+<title>{title}</title>
+<meta name="description" content={description} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}

@@ -3,13 +3,15 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import { defaultLocale, getLocale, locales } from "@lib/i18n";
 import { cmsApi, getBlockFromArray } from "@lib/index";
 import Service from "@lib/Reservation/Service/index.svelte";
+import appConfig from "../../appConfig";
 
-const API_URL = import.meta.env.PUBLIC_API_URL;
-const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
+const API_URL = appConfig.apiUrl;
+const BUSINESS_ID = appConfig.businessId;
 
 export async function getStaticPaths() {
-	const API_URL = import.meta.env.PUBLIC_API_URL;
-	const BUSINESS_ID = import.meta.env.PUBLIC_BUSINESS_ID;
+	const { default: appConfig } = await import("../../appConfig");
+	const API_URL = appConfig.apiUrl;
+	const BUSINESS_ID = appConfig.businessId;
 
 	const res = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/services?limit=100`);
 	const { items } = await res.json();

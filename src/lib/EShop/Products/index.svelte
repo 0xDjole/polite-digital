@@ -3,9 +3,9 @@
 	import { eshopApi, getPrice, getImageUrl, BUSINESS_ID } from '@lib/index';
 	import { showToast } from '@lib/toast.js';
 	import { store } from '@lib/core/stores/eshop';
+	import appConfig from '../../../appConfig';
 
-
-	const STORAGE_URL = import.meta.env.PUBLIC_STORAGE_URL;
+	const STORAGE_URL = appConfig.storageUrl;
 
 	let products = [];
 	let loading = true;
