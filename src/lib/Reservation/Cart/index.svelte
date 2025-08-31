@@ -115,7 +115,6 @@
 					throw new Error('No payment client secret received');
 				}
 
-				console.log('Confirming reservation payment...');
 				const { error, paymentIntent } = await confirmPayment(clientSecret);
 
 				if (error) {
@@ -212,7 +211,6 @@
 		<!-- Payment - only show if credit card selected AND there are non-inquiry parts -->
 		{@const debugParts = ($store.parts || []).map(p => ({ id: p.id, reservationMethod: p.reservationMethod }))}
 		{@const hasNonInquiryParts = ($store.parts || []).some(part => !part.reservationMethod?.includes('INQUIRY'))}
-		{console.log('RESERVATION PAYMENT DEBUG:', { selectedPaymentMethod, parts: debugParts, hasNonInquiryParts, allowedPaymentMethods: $store.allowedPaymentMethods })}
 		{#if selectedPaymentMethod === 'CREDIT_CARD' && ($store.parts || []).some(part => !part.reservationMethod?.includes('INQUIRY'))}
 			<PaymentForm
 				allowedMethods={$store.allowedPaymentMethods || ['CASH']}

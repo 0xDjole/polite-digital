@@ -5,28 +5,13 @@ import { cmsApi, getBlockFromArray } from "@lib/index";
 import Service from "@lib/Reservation/Service/index.svelte";
 import appConfig from "../../../appConfig";
 
-const API_URL = appConfig.apiUrl;
-const BUSINESS_ID = appConfig.businessId;
-
 export async function getStaticPaths() {
-	// Use dynamic import to get fresh config at build time
-	const devConfig = (await import("../../../../config/dev.json")).default;
-	const prodConfig = (await import("../../../../config/prod.json")).default;
-	const environment = process.env.ENVIRONMENT || "dev";
-	const config = environment === "prod" ? prodConfig : devConfig;
-	
-	const API_URL = config.apiUrl;
-	const BUSINESS_ID = config.businessId;
+	const res = await fetch(`${appConfig.apiUrl}/v1/businesses/${appConfig.businessId}/services?limit=100`);
 
-	console.log(`Fetching services from: ${API_URL}/v1/businesses/${BUSINESS_ID}/services?limit=100`);
-	const res = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/services?limit=100`);
-	
 	if (!res.ok) {
-		console.error(`Failed to fetch services: ${res.status} ${res.statusText}`);
-		console.error(`Response body:`, await res.text());
 		return [];
 	}
-	
+
 	const { items } = await res.json();
 
 	return items.flatMap((service) =>
@@ -42,7 +27,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-const serviceRes = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/services/${slug}`);
+const serviceRes = await fetch(`${appConfig.apiUrl}/v1/businesses/${appConfig.businessId}/services/${slug}`);
 const service = await serviceRes.json();
 
 const { getCollection, getBlockObjectValues } = cmsApi();

@@ -5,21 +5,9 @@ import { cmsApi, getBlockFromArray } from "@lib/index";
 import { defaultLocale, getLocale, locales } from "@lib/i18n";
 import appConfig from "../../../appConfig";
 
-const API_URL = appConfig.apiUrl;
-const BUSINESS_ID = appConfig.businessId;
-
 export async function getStaticPaths() {
-	// Use dynamic import to get fresh config at build time
-	const devConfig = (await import("../../../../config/dev.json")).default;
-	const prodConfig = (await import("../../../../config/prod.json")).default;
-	const environment = process.env.ENVIRONMENT || "dev";
-	const config = environment === "prod" ? prodConfig : devConfig;
-	
-	const API_URL = config.apiUrl;
-	const BUSINESS_ID = config.businessId;
-
 	try {
-		const res = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/products?limit=100`);
+		const res = await fetch(`${appConfig.apiUrl}/v1/businesses/${appConfig.businessId}/products?limit=100`);
 		
 		if (!res.ok) {
 			console.error('Failed to fetch products:', res.status, res.statusText);
@@ -48,7 +36,7 @@ const { slug } = Astro.params;
 
 let product = null;
 try {
-	const productRes = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/products/slug/${BUSINESS_ID}/${slug}`);
+	const productRes = await fetch(`${appConfig.apiUrl}/v1/businesses/${appConfig.businessId}/products/slug/${appConfig.businessId}/${slug}`);
 	
 	if (!productRes.ok) {
 		throw new Error(`Failed to fetch product: ${productRes.status} ${productRes.statusText}`);

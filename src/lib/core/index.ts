@@ -110,8 +110,4 @@ export function initPoliteDigitalCore(config?: {
     apiUrl?: string;
     storageUrl?: string;
 }) {
-    console.log(`Polite Digital Core v${CORE_VERSION} initialized`);
-    if (config) {
-        console.log('Custom configuration provided:', config);
-    }
 }
