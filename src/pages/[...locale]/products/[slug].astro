@@ -9,9 +9,14 @@ const API_URL = appConfig.apiUrl;
 const BUSINESS_ID = appConfig.businessId;
 
 export async function getStaticPaths() {
-	const { default: appConfig } = await import("../../../appConfig");
-	const API_URL = appConfig.apiUrl;
-	const BUSINESS_ID = appConfig.businessId;
+	// Use dynamic import to get fresh config at build time
+	const devConfig = (await import("../../../../config/dev.json")).default;
+	const prodConfig = (await import("../../../../config/prod.json")).default;
+	const environment = process.env.ENVIRONMENT || "dev";
+	const config = environment === "prod" ? prodConfig : devConfig;
+	
+	const API_URL = config.apiUrl;
+	const BUSINESS_ID = config.businessId;
 
 	try {
 		const res = await fetch(`${API_URL}/v1/businesses/${BUSINESS_ID}/products?limit=100`);
