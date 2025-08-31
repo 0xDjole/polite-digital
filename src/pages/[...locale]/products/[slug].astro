@@ -7,7 +7,7 @@ import appConfig from "../../../appConfig";
 
 export async function getStaticPaths() {
 	try {
-		const res = await fetch(`${appConfig.apiUrl}/v1/businesses/${appConfig.businessId}/products?limit=100`);
+		const res = await fetch(`${appConfig.apiUrl}/v1/businesses/${appConfig.businessId}/products?status=ACTIVE&limit=100`);
 		
 		if (!res.ok) {
 			console.error('Failed to fetch products:', res.status, res.statusText);

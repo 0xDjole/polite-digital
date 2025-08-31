@@ -18,7 +18,7 @@
 			
 			const response = await eshopApi.getProducts({
 				businessId: BUSINESS_ID,
-				status: 'Published',
+				status: 'ACTIVE',
 				limit: 50
 			});
 

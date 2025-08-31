@@ -473,7 +473,7 @@ export const eshopApi = {
 	getProducts: async ({
 		businessId,
 		categoryIds = null,
-		status = "Published",
+		status = "ACTIVE",
 		limit = 20,
 		cursor = null,
 	}) => {
