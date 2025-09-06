@@ -3,15 +3,18 @@
 	import NewsletterCard from "./NewsletterCard.svelte";
 	import appConfig from '../../appConfig';
 	
+	interface StatusEvent {
+		status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'SUSPENDED';
+		created_at: number;
+	}
+
 	interface Newsletter {
 		id: string;
 		business_id: string;
 		name: string;
 		description: string;
 		newsletter_type: 'Free' | 'Paid';
-		status: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
-		stripe_product_id?: string;
-		stripe_price_id?: string;
+		statuses: StatusEvent[];
 		price?: number;
 		currency?: string;
 		created_at: number;
