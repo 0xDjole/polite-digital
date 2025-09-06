@@ -1,15 +1,18 @@
 <script lang="ts">
 	import { loadStripe } from '@stripe/stripe-js';
 	
+	interface StatusEvent {
+		status: 'ACTIVE' | 'INACTIVE' | 'DRAFT' | 'SUSPENDED';
+		created_at: number;
+	}
+
 	interface Newsletter {
 		id: string;
 		businessId: string;
 		name: string;
 		description: string;
 		newsletter_type: 'Free' | 'Paid';
-		status: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
-		stripe_product_id?: string;
-		stripe_price_id?: string;
+		statuses: StatusEvent[];
 		price?: number;
 		currency?: string;
 		created_at: number;
@@ -48,7 +51,6 @@
 				const response = await newsletterApi.subscribe({
 					newsletterId: newsletter.id,
 					email: email,
-					providerCustomerId: null,
 				});
 
 				if (response.success) {
@@ -73,42 +75,26 @@
 		}
 
 		try {
-			// Initialize Stripe - use the key from dev.json
-			const publishableKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51Q8q87RsUlxcwGxWZXE6WhzsUvgwgY9dZ2lnM2m20jPZp871aYb4RFqKuiN8CVOdBpvmd1SiBrwfIQ5H9Bkkumy800cdbg1yzP';
-			if (!publishableKey) {
-				throw new Error('Stripe publishable key not configured');
-			}
-
-			const stripe = await loadStripe(publishableKey);
-			if (!stripe) {
-				throw new Error('Failed to load Stripe');
-			}
-
-			// Create checkout session via newsletter API
+			// Subscribe to paid newsletter - backend returns checkout URL
 			const { newsletterApi } = await import('../core/api/newsletter');
-			
-			const response = await newsletterApi.createCheckoutSession({
+			const response = await newsletterApi.subscribe({
 				newsletterId: newsletter.id,
-				businessId: newsletter.businessId,
-				successUrl: `${window.location.origin}/newsletters?success=true`,
-				cancelUrl: `${window.location.origin}/newsletters?canceled=true`,
 				email: email,
 			});
 
 			if (!response.success) {
-				throw new Error(response.error || 'Failed to create checkout session');
+				throw new Error(response.error || 'Failed to start subscription');
 			}
 
-			const { sessionId } = response.data;
-
-			// Redirect to Stripe Checkout
-			const { error: stripeError } = await stripe.redirectToCheckout({
-				sessionId: sessionId,
-			});
-
-			if (stripeError) {
-				throw new Error(stripeError.message);
+			// Backend returns {subscriptionId, status, checkoutUrl}
+			const { checkoutUrl } = response.data;
+			
+			if (!checkoutUrl) {
+				throw new Error('No checkout URL received from server');
 			}
+
+			// Redirect directly to Stripe checkout URL
+			window.location.href = checkoutUrl;
 		} catch (err) {
 			console.error('Subscription error:', err);
 			error = err instanceof Error ? err.message : 'Failed to start subscription';
@@ -142,12 +128,12 @@
 			</div>
 
 			<div class="text-xs text-muted-foreground">
-				Status: <span class="capitalize">{newsletter.status.toLowerCase()}</span>
+				Status: <span class="capitalize">{newsletter.statuses[0]?.status.toLowerCase() || 'inactive'}</span>
 			</div>
 		</div>
 
 		<!-- Subscription Button -->
-		{#if newsletter.status === 'ACTIVE'}
+		{#if newsletter.statuses[0]?.status === 'ACTIVE'}
 			<div class="space-y-2">
 				<input
 					type="email"
@@ -182,7 +168,7 @@
 		{:else}
 			<div class="text-center">
 				<p class="text-muted-foreground text-sm">
-					This newsletter is currently {newsletter.status.toLowerCase()}
+					This newsletter is currently {newsletter.statuses[0]?.status.toLowerCase() || 'inactive'}
 				</p>
 			</div>
 		{/if}

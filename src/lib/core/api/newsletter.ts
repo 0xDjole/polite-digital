@@ -18,7 +18,6 @@ export interface NewsletterResponse {
 export interface NewsletterSubscribePayload {
 	newsletterId: string;
 	email: string;
-	providerCustomerId: string | null;
 }
 
 export const newsletterApi = {
@@ -64,55 +63,6 @@ export const newsletterApi = {
 		return await response.json();
 	},
 
-	async createCheckoutSession({
-		newsletterId,
-		businessId,
-		successUrl,
-		cancelUrl,
-		email
-	}: {
-		newsletterId: string;
-		businessId: string;
-		successUrl: string;
-		cancelUrl: string;
-		email: string;
-	}) {
-		try {
-			// Get the backend API URL from environment
-			const backendUrl = import.meta.env.PUBLIC_SERVER_URL || 'http://localhost:8000';
-			const url = `${backendUrl}/v1/payments/create-checkout-session`;
-
-			const response = await fetch(url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					newsletterId,
-					businessId,
-					successUrl,
-					cancelUrl,
-					email,
-				}),
-			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const data = await response.json();
-			return {
-				success: true,
-				data,
-			};
-		} catch (error) {
-			console.error('Checkout session creation error:', error);
-			return {
-				success: false,
-				error: error instanceof Error ? error.message : 'Failed to create checkout session',
-			};
-		}
-	},
 
 	async subscribe(payload: NewsletterSubscribePayload) {
 		try {
@@ -128,7 +78,6 @@ export const newsletterApi = {
 				body: JSON.stringify({
 					newsletterId: payload.newsletterId,
 					email: payload.email,
-					providerCustomerId: payload.providerCustomerId,
 				}),
 			});
 
